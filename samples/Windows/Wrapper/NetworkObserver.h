@@ -25,11 +25,11 @@
 #include "mars/comm/autobuffer.h"
 #include "Wrapper/CGITask.h"
 
+// 推送观察者，接收服务器数据;
 class PushObserver
 {
 public:
 	virtual void OnPush(uint64_t _channel_id, uint32_t _cmdid, uint32_t _taskid, const AutoBuffer& _body, const AutoBuffer& _extend) = 0;
-
 };
 
 #endif

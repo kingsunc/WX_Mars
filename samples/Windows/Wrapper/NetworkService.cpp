@@ -38,7 +38,7 @@ NetworkService& NetworkService::Instance()
 
 NetworkService::NetworkService()
 {
-	__Init();
+	Init();
 }
 NetworkService::~NetworkService()
 {
@@ -68,7 +68,7 @@ void NetworkService::start()
 	mars::stn::MakesureLonglinkConnected();
 }
 
-void NetworkService::__Init()
+void NetworkService::Init()
 {
 	mars::stn::SetCallback(mars::stn::StnCallBack::Instance());
 	mars::app::SetCallback(mars::app::AppCallBack::Instance());
@@ -91,14 +91,22 @@ int NetworkService::startTask(CGITask* task)
 bool NetworkService::Req2Buf(uint32_t _taskid, void* const _user_context, AutoBuffer& _outbuffer, AutoBuffer& _extend, int& _error_code, const int _channel_select)
 {
 	auto it = map_task_.find(_taskid);
-	if (it == map_task_.end())return false;
+	if (it == map_task_.end())
+	{
+		return false;
+	}
+	// 交给上层业务自己 打包请求数据
 	return it->second->Req2Buf(_taskid, _user_context, _outbuffer, _extend, _error_code, _channel_select);
 }
 
 int NetworkService::Buf2Resp(uint32_t _taskid, void* const _user_context, const AutoBuffer& _inbuffer, const AutoBuffer& _extend, int& _error_code, const int _channel_select)
 {
 	auto it = map_task_.find(_taskid);
-	if (it == map_task_.end())return mars::stn::kTaskFailHandleDefault;
+	if (it == map_task_.end())
+	{
+		return mars::stn::kTaskFailHandleDefault;
+	}
+	// 交给上层业务自己 解包响应数据
 	return it->second->Buf2Resp(_taskid, _user_context, _inbuffer, _extend, _error_code, _channel_select);
 }
 
@@ -117,7 +125,9 @@ void NetworkService::OnPush(uint64_t _channel_id, uint32_t _cmdid, uint32_t _tas
 {
 	auto it = map_push_observer_.find(_cmdid);
 	if (it != map_push_observer_.end() && it->second)
+	{
 		it->second->OnPush(_channel_id, _cmdid, _taskid, _body, _extend);
+	}
 }
 
 void NetworkService::setPushObserver(uint32_t _cmdid, PushObserver* _observer)

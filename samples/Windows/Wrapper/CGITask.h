@@ -19,24 +19,37 @@
 
 #ifndef _CGI_TASK_H_
 #define _CGI_TASK_H_
+
 #include <map>
 #include <string>
-
 #include "mars/comm/autobuffer.h"
 
+#ifndef IN
+#define IN
+#endif
+#ifndef OUT
+#define OUT
+#endif
+
+// 通道类型;
 enum ChannelType 
 {
-	ChannelType_ShortConn = 1,
-	ChannelType_LongConn = 2,
-	ChannelType_All = 3
-} ;
+	ChannelType_ShortConn	= 1,		// 短连接 http;
+	ChannelType_LongConn	= 2,		// 长连接 tcp;
+	ChannelType_All			= 3			// 长短连接全支持;
+};
+
+// 任务基类;
 class CGITask
 {
 public:
+	CGITask() {};
 	virtual ~CGITask() {};
-	virtual bool Req2Buf(uint32_t _taskid, void* const _user_context, AutoBuffer& _outbuffer, AutoBuffer& _extend, int& _error_code, const int _channel_select) = 0;
-	virtual int Buf2Resp(uint32_t _taskid, void* const _user_context, const AutoBuffer& _inbuffer, const AutoBuffer& _extend, int& _error_code, const int _channel_select) = 0;
-
+	
+	// 请求数据->buff;
+	virtual bool Req2Buf(IN uint32_t _taskid, IN void* const _user_context, OUT AutoBuffer& _outbuffer, OUT AutoBuffer& _extend, OUT int& _error_code, IN const int _channel_select) = 0;
+	// buff->响应数据;
+	virtual int Buf2Resp(IN uint32_t _taskid, IN void* const _user_context, IN const AutoBuffer& _inbuffer, IN const AutoBuffer& _extend, IN int& _error_code, IN const int _channel_select) = 0;
 
 	uint32_t taskid_;
 	ChannelType channel_select_;
