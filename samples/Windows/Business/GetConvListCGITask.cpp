@@ -33,11 +33,14 @@ bool GetConvListCGITask::Req2Buf(uint32_t _taskid, void* const _user_context, Au
 	_outbuffer.Write(data.c_str(), data.size());
 	return true;
 }
+
 int GetConvListCGITask::Buf2Resp(uint32_t _taskid, void* const _user_context, const AutoBuffer& _inbuffer, const AutoBuffer& _extend, int& _error_code, const int _channel_select)
 {
 	com::tencent::mars::sample::proto::ConversationListResponse response;
 	response.ParseFromArray(_inbuffer.Ptr(), _inbuffer.Length());
-	if (callback_.lock())callback_.lock()->OnResponse(this, response);
+	if (callback_.lock())
+	{
+		callback_.lock()->OnResponse(this, response);
+	}
 	return mars::stn::kTaskFailHandleNoError;
 }
-

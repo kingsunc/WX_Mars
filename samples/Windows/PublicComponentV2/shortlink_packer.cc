@@ -22,14 +22,20 @@
 
 
 using namespace http;
-namespace mars { namespace stn {
+namespace mars
+{
+namespace stn
+{
 
 shortlink_tracker* (*shortlink_tracker::Create)()
-=  []() { return new shortlink_tracker; };
+=  []()
+{
+	return new shortlink_tracker;
+};
 
 void (*shortlink_pack)(const std::string& _url, const std::map<std::string, std::string>& _headers, const AutoBuffer& _body, const AutoBuffer& _extension, AutoBuffer& _out_buff, shortlink_tracker* _tracker)
-= [](const std::string& _url, const std::map<std::string, std::string>& _headers, const AutoBuffer& _body, const AutoBuffer& _extension, AutoBuffer& _out_buff, shortlink_tracker* _tracker) {
-
+= [](const std::string& _url, const std::map<std::string, std::string>& _headers, const AutoBuffer& _body, const AutoBuffer& _extension, AutoBuffer& _out_buff, shortlink_tracker* _tracker)
+{
 	Builder req_builder(kRequest);
 	req_builder.Request().Method(RequestLine::kPost);
 	req_builder.Request().Version(kVersion_1_1);
@@ -44,7 +50,8 @@ void (*shortlink_pack)(const std::string& _url, const std::map<std::string, std:
 	snprintf(len_str, sizeof(len_str), "%u", (unsigned int)_body.Length());
 	req_builder.Fields().HeaderFiled(HeaderFields::KStringContentLength, len_str);
 
-	for (std::map<std::string, std::string>::const_iterator iter = _headers.begin(); iter != _headers.end(); ++iter) {
+	for (std::map<std::string, std::string>::const_iterator iter = _headers.begin(); iter != _headers.end(); ++iter)
+	{
 		req_builder.Fields().HeaderFiled(iter->first.c_str(), iter->second.c_str());
 	}
 
@@ -54,4 +61,3 @@ void (*shortlink_pack)(const std::string& _url, const std::map<std::string, std:
 };
 
 }}
-

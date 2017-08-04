@@ -36,20 +36,25 @@
 #endif
 
 class AutoBuffer;
+class __STNetMsgXpHeader;
 
-namespace mars {
-    namespace stn {
-    
-class longlink_tracker {
+namespace mars
+{
+namespace stn
+{
+class longlink_tracker
+{
 public:
-    static longlink_tracker* (*Create)();
+	static longlink_tracker* (*Create)();
     
 public:
-    virtual ~longlink_tracker(){};
+	virtual ~longlink_tracker()
+	{
+	};
 };
 
 /**
- * package the request data
+ * package the request data (打包请求数据)
  * _cmdid: business identifier
  * _seq: task id
  * _raw: business send buffer
@@ -58,7 +63,7 @@ public:
 extern void (*longlink_pack)(uint32_t _cmdid, uint32_t _seq, const AutoBuffer& _body, const AutoBuffer& _extension, AutoBuffer& _packed, longlink_tracker* _tracker);
 
 /**
- * unpackage the response data
+ * unpackage the response data (解包响应数据)
  * _packed: data received from server
  * _cmdid: business identifier
  * _seq: task id
@@ -68,7 +73,7 @@ extern void (*longlink_pack)(uint32_t _cmdid, uint32_t _seq, const AutoBuffer& _
  */
 extern int  (*longlink_unpack)(const AutoBuffer& _packed, uint32_t& _cmdid, uint32_t& _seq, size_t& _package_len, AutoBuffer& _body, AutoBuffer& _extension, longlink_tracker* _tracker);
 
-//heartbeat signal to keep longlink network alive
+// heartbeat signal to keep longlink network alive
 extern uint32_t (*longlink_noop_cmdid)();
 extern bool  (*longlink_noop_isresp)(uint32_t _taskid, uint32_t _cmdid, uint32_t _recv_seq, const AutoBuffer& _body, const AutoBuffer& _extend);
 extern uint32_t (*signal_keep_cmdid)();
@@ -86,5 +91,6 @@ extern bool  (*longlink_ispush)(uint32_t _cmdid, uint32_t _taskid, const AutoBuf
 extern bool  (*longlink_identify_isresp)(uint32_t _sent_seq, uint32_t _cmdid, uint32_t _recv_seq, const AutoBuffer& _body, const AutoBuffer& _extend);
 
 }
+
 }
 #endif // STN_SRC_LONGLINKPACKER_H_

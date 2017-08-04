@@ -29,13 +29,14 @@
 #include "mars/comm/autobuffer.h"
 #include "mars/stn/stn.h"
 
-namespace mars{
-
-namespace comm {
+namespace mars
+{
+namespace comm
+{
 class ProxyInfo;
 }
-    
-namespace stn{
+namespace stn
+{
     //callback interface
     class Callback
     {
@@ -63,25 +64,21 @@ namespace stn{
         virtual int  GetLonglinkIdentifyCheckBuffer(AutoBuffer& _identify_buffer, AutoBuffer& _buffer_hash, int32_t& _cmdid) = 0;
         //长连信令校验回包 
         virtual bool OnLonglinkIdentifyResponse(const AutoBuffer& _response_buffer, const AutoBuffer& _identify_buffer_hash) = 0;
-        
-        
+
         virtual void RequestSync() = 0;
-        
     };
 
     void SetCallback(Callback* const callback);
-    
 
 //    extern void SetLonglinkSvrAddr(const std::string& host, const std::vector<uint16_t> ports);
 //    extern void SetShortlinkSvrAddr(const uint16_t port);
-    
 
     // 'host' will be ignored when 'debugip' is not empty.
 	extern void (*SetLonglinkSvrAddr)(const std::string& host, const std::vector<uint16_t> ports, const std::string& debugip);
-    
+
     // 'task.host' will be ignored when 'debugip' is not empty.
 	extern void (*SetShortlinkSvrAddr)(const uint16_t port, const std::string& debugip);
-    
+
     // setting debug ip address for the corresponding host
 	extern void (*SetDebugIP)(const std::string& host, const std::string& ip);
     
@@ -89,27 +86,26 @@ namespace stn{
     // if debugip is not empty, iplist will be ignored.
     // iplist will be used when newdns/dns ip is not available.
 	extern void (*SetBackupIPs)(const std::string& host, const std::vector<std::string>& iplist);
-    
 
     // async function.
 	extern void (*StartTask)(const Task& task);
-    
+
     // sync function
 	extern void (*StopTask)(uint32_t taskid);
-    
+
     // check whether task's list has the task or not.
 	extern bool (*HasTask)(uint32_t taskid);
 
     // reconnect longlink and redo all task
     // when you change svr ip, you must call this function.
 	extern void (*RedoTasks)();
-    
+
     // stop and clear all task
 	extern void (*ClearTasks)();
-    
+
     // the same as ClearTasks(), but also reinitialize network.
 	extern void (*Reset)();
-    
+
     //setting signalling's parameters.
     //if you did not call this function, stn will use default value: period:  5s, keeptime: 20s
 	extern void (*SetSignallingStrategy)(long period, long keeptime);
@@ -117,15 +113,14 @@ namespace stn{
     // used to keep longlink active
     // keep signnaling once 'period' and last 'keeptime'
 	extern void (*KeepSignalling)();
-    
 
 	extern void (*StopSignalling)();
-    
+
     // connect quickly if longlink is not connected.
 	extern void (*MakesureLonglinkConnected)();
-    
+
 	extern bool (*LongLinkIsConnected)();
-    
+
     extern bool (*ProxyIsAvailable)(const mars::comm::ProxyInfo& _proxy_info, const std::string& _test_host, const std::vector<std::string>& _hardcode_ips);
 
     // noop is used to keep longlink conected

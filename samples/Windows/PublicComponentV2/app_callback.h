@@ -23,33 +23,33 @@
 #include <mars/app/app.h>
 #include <mars/app/app_logic.h>
 
-namespace mars {
-    namespace app {
+namespace mars
+{
+namespace app
+{
 
-
-class AppCallBack : public Callback {
-    
+class AppCallBack : public Callback
+{
 private:
-    AppCallBack() {}
-    ~AppCallBack() {}
-    AppCallBack(AppCallBack&);
-    AppCallBack& operator = (AppCallBack&);
-    
-    
+	AppCallBack() {}
+	~AppCallBack() {}
+	AppCallBack(AppCallBack&);
+	AppCallBack& operator = (AppCallBack&);
+
 public:
-    static AppCallBack* Instance();
-    static void Release();
+	static AppCallBack* Instance();
+	static void Release();
     
-    virtual std::string GetAppFilePath();
+	virtual std::string GetAppFilePath();
     
-    virtual AccountInfo GetAccountInfo();
+	virtual AccountInfo GetAccountInfo();
     
-    virtual unsigned int GetClientVersion();
+	virtual unsigned int GetClientVersion();
     
-    virtual DeviceInfo GetDeviceInfo();
+	virtual DeviceInfo GetDeviceInfo();
     
 private:
-    static AppCallBack* instance_;
+	static AppCallBack* instance_;
 };
         
 }}

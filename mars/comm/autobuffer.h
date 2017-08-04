@@ -18,15 +18,19 @@
 #include <sys/types.h>
 #include <string.h>
 
-class AutoBuffer {
-  public:
-    enum TSeek {
+#include <winsock2.h>
+
+class AutoBuffer 
+{
+public:
+    enum TSeek
+	{
         ESeekStart,
         ESeekCur,
         ESeekEnd,
     };
 
-  public:
+public:
     explicit AutoBuffer(size_t _size = 128);
     explicit AutoBuffer(void* _pbuffer, size_t _len, size_t _size = 128);
     explicit AutoBuffer(const void* _pbuffer, size_t _len, size_t _size = 128);
@@ -100,14 +104,14 @@ class AutoBuffer {
 
     void Reset();
 
-  private:
+private:
     void __FitSize(size_t _len);
 
-  private:
+private:
     AutoBuffer(const AutoBuffer& _rhs);
     AutoBuffer& operator = (const AutoBuffer& _rhs);
 
-  private:
+private:
     unsigned char* parray_;
     off_t pos_;
     size_t length_;
@@ -120,8 +124,9 @@ extern const AutoBuffer KNullAtuoBuffer;
 template <class S> class copy_wrapper_helper;
 
 template <>
-class copy_wrapper_helper<AutoBuffer> {
-  public:
+class copy_wrapper_helper<AutoBuffer>
+{
+public:
     static void copy_constructor(AutoBuffer& _lhs, AutoBuffer& _rhs)
     { _lhs.Attach(_rhs); }
 
@@ -131,5 +136,27 @@ class copy_wrapper_helper<AutoBuffer> {
     static void destructor(AutoBuffer& _delobj) {}
 };
 
-#endif	//COMM_AUTOBUFFER_H_
+#define MY_DATA
+#ifndef MY_DATA
+struct __STNetMsgXpHeader
+{
+	uint32_t    head_length;
+	uint32_t    client_version;
+	uint32_t    cmdid;
+	uint32_t    seq;
+	uint32_t	body_length;
+};
+#else
+struct __STNetMsgXpHeader
+{
+	uint32_t	body_length;
+	uint16_t	cmd_id;
+	uint8_t		version;
+	uint8_t		format;
+	uint32_t	seqid;
+};
+#define MSCP_PKG_HEADER_LEN		12
+#endif
 
+
+#endif	//COMM_AUTOBUFFER_H_

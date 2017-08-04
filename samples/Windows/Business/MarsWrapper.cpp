@@ -25,7 +25,14 @@
 #include "proto/generate/main.pb.h"
 #include "proto/generate/messagepush.pb.h"
 
-static const char* g_host = "marsopen.cn";
+//static const char* g_host = "marsopen.cn";
+
+//static const char* g_host = "127.0.0.1";
+static const char* g_host = "172.88.1.192";
+
+static const unsigned short g_shortlink_port = 1080;
+//static const unsigned short g_longlink_port = 1081;
+static const unsigned short g_longlink_port = 20001;
 
 MarsWrapper& MarsWrapper::Instance()
 {
@@ -33,10 +40,8 @@ MarsWrapper& MarsWrapper::Instance()
 	return instance_;
 }
 
-MarsWrapper::MarsWrapper()
-	: chat_msg_observer_(nullptr)
+MarsWrapper::MarsWrapper(): chat_msg_observer_(nullptr)
 {
-	
 }
 
 void MarsWrapper::OnPush(uint64_t _channel_id, uint32_t _cmdid, uint32_t _taskid, const AutoBuffer& _body, const AutoBuffer& _extend)
@@ -55,9 +60,9 @@ void MarsWrapper::OnPush(uint64_t _channel_id, uint32_t _cmdid, uint32_t _taskid
 
 void MarsWrapper::start()
 {
-	NetworkService::Instance().setClientVersion(200);
-	NetworkService::Instance().setShortLinkDebugIP(g_host, 8080);
-	NetworkService::Instance().setLongLinkAddress(g_host, 8081, "");
+	NetworkService::Instance().setClientVersion(1);
+	NetworkService::Instance().setShortLinkDebugIP(g_host, g_shortlink_port);
+	NetworkService::Instance().setLongLinkAddress(g_host, g_longlink_port, "");
 	NetworkService::Instance().start();	
 
 	NetworkService::Instance().setPushObserver(com::tencent::mars::sample::proto::CMD_ID_PUSH, this);
@@ -70,7 +75,8 @@ void MarsWrapper::pingServer(const std::string& _name, const std::string& _text,
 	task->text_ = _text;
 	task->callback_ = _callback;
 
-	task->channel_select_ = ChannelType_All;
+	//task->channel_select_ = ChannelType_All;
+	task->channel_select_ = ChannelType_LongConn;
 	task->cmdid_ = com::tencent::mars::sample::proto::CMD_ID_HELLO;
 	task->cgi_ = "/mars/hello";
 	task->host_ = g_host;

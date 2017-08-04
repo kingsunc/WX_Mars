@@ -19,6 +19,7 @@
 
 #ifndef _MARS_WRAPPER_H_
 #define _MARS_WRAPPER_H_
+
 #include "Wrapper/NetworkObserver.h"
 #include "HelloCGITask.h"
 #include "GetConvListCGITask.h"
@@ -35,21 +36,27 @@ class ChatMsgObserver
 public:
 	virtual void OnRecvChatMsg(const ChatMsg& msg) = 0;
 };
+
+// 业务包装类;
 class MarsWrapper : public PushObserver
 {
 public:
+	// 单例 非线程安全;
 	static MarsWrapper& Instance();
-
+	// 设置回调类;
+	void setChatMsgObserver(IN ChatMsgObserver* _observer);
+	void start();
 
 	virtual void OnPush(uint64_t _channel_id, uint32_t _cmdid, uint32_t _taskid, const AutoBuffer& _body, const AutoBuffer& _extend);
 
-	void setChatMsgObserver(ChatMsgObserver* _observer);
+	// 客户端请求;
 	void sendChatMsg(const ChatMsg& _chat_msg);
-	void start();
 	void pingServer(const std::string& _name, const std::string& _text, boost::weak_ptr<HelloCGICallback> _callback);
 	void getConversationList(boost::weak_ptr<GetConvListCGICallback> _callback);
+
 protected:
 	MarsWrapper();
 	ChatMsgObserver* chat_msg_observer_;
 };
+
 #endif

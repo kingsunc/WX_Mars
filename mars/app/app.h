@@ -25,17 +25,26 @@
 
 #include "mars/comm/comm_data.h"
 
-namespace mars {
-namespace app {
+namespace mars
+{
+namespace app
+{
 
-struct AccountInfo {
-	AccountInfo():uin(0), is_logoned(false){}
+// 账号信息;
+struct AccountInfo
+{
+	AccountInfo():uin(0), is_logoned(false)
+	{
+	}
+
 	int64_t uin;
 	std::string username;
 	bool is_logoned;
 };
 
-struct DeviceInfo {
+// 设备信息;
+struct DeviceInfo
+{
 	std::string devicename;
 	std::string devicetype;
 };

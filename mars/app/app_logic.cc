@@ -49,12 +49,12 @@ namespace app {
 
 static Callback* sg_callback = NULL;
 
-void SetCallback(Callback* const callback) {
+void SetCallback(Callback* const callback)
+{
 	sg_callback = callback;
 }
 
 #ifndef ANDROID
-    
     static mars::comm::ProxyInfo sg_proxyInfo;
     static bool sg_gotProxy = false;
     static Mutex sg_slproxymutex;

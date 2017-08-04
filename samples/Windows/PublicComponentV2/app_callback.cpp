@@ -21,41 +21,49 @@
 
 #include <mars/comm/autobuffer.h>
 
-namespace mars {
-    namespace app {
+namespace mars 
+{
+namespace app
+{
 
+// app »Øµ÷;
 AppCallBack* AppCallBack::instance_ = NULL;
 
-AppCallBack* AppCallBack::Instance() {
-    if(instance_ == NULL) {
+AppCallBack* AppCallBack::Instance()
+{
+    if(instance_ == NULL)
+	{
         instance_ = new AppCallBack();
     }
-    
     return instance_;
 }
 
-void AppCallBack::Release() {
+void AppCallBack::Release()
+{
     delete instance_;
     instance_ = NULL;
 }
 
 // return your app path
-std::string AppCallBack::GetAppFilePath(){
+std::string AppCallBack::GetAppFilePath()
+{
     return "";
 }
         
-AccountInfo AppCallBack::GetAccountInfo() {
+AccountInfo AppCallBack::GetAccountInfo()
+{
     AccountInfo info;
     
     return info;
 }
 
-unsigned int AppCallBack::GetClientVersion() {
-    
+unsigned int AppCallBack::GetClientVersion()
+{
     return 200;
 }
 
-DeviceInfo AppCallBack::GetDeviceInfo() {
+DeviceInfo AppCallBack::GetDeviceInfo()
+{
     DeviceInfo info;
 
     info.devicename = "";

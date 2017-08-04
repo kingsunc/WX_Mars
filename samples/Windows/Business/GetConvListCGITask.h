@@ -24,6 +24,7 @@
 
 #include "proto/generate/main.pb.h"
 #include "mars/boost/weak_ptr.hpp"
+
 class GetConvListCGITask;
 struct ConversationInfo
 {
@@ -31,11 +32,13 @@ struct ConversationInfo
 	std::string notice_;
 	std::string name_;
 };
+
 class GetConvListCGICallback
 {
 public:
 	virtual void OnResponse(GetConvListCGITask* task, const com::tencent::mars::sample::proto::ConversationListResponse& response) = 0;
 };
+
 class GetConvListCGITask : public CGITask
 {
 public:

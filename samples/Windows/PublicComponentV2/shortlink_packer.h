@@ -25,14 +25,20 @@
 
 class AutoBuffer;
 
-namespace mars { namespace stn {
+namespace mars
+{ 
+namespace stn
+{
 
-class shortlink_tracker {
+class shortlink_tracker
+{
 public:
     static shortlink_tracker* (*Create)();
     
 public:
-    virtual ~shortlink_tracker(){};
+    virtual ~shortlink_tracker()
+	{
+	};
 };
     
 extern void (*shortlink_pack)(const std::string& _url, const std::map<std::string, std::string>& _headers, const AutoBuffer& _body, const AutoBuffer& _extension, AutoBuffer& _out_buff, shortlink_tracker* _tracker);

@@ -37,10 +37,10 @@ bool ChatCGITask::Req2Buf(uint32_t _taskid, void* const _user_context, AutoBuffe
 	_outbuffer.Write(data.c_str(), data.size());
 	return true;
 }
+
 int ChatCGITask::Buf2Resp(uint32_t _taskid, void* const _user_context, const AutoBuffer& _inbuffer, const AutoBuffer& _extend, int& _error_code, const int _channel_select)
 {
 	com::tencent::mars::sample::chat::proto::SendMessageResponse response;
 	response.ParseFromArray(_inbuffer.Ptr(), _inbuffer.Length());
 	return mars::stn::kTaskFailHandleNoError;
 }
-

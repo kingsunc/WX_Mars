@@ -319,17 +319,20 @@ const char* const KStringNoCache = "no-cache";
 const char* const KStringOctetType = "application/octet-stream";
 
 
-std::pair<const std::string, std::string> HeaderFields::MakeContentLength(int _len) {
+std::pair<const std::string, std::string> HeaderFields::MakeContentLength(int _len)
+{
     char strLength[16] = {0};
     snprintf(strLength, sizeof(strLength), "%d", _len);
     return std::make_pair(KStringContentLength, strLength);
 }
 
-std::pair<const std::string, std::string> HeaderFields::MakeTransferEncodingChunked() {
+std::pair<const std::string, std::string> HeaderFields::MakeTransferEncodingChunked()
+{
     return std::make_pair(KStringTransferEncoding, KStringChunked);
 }
 
-std::pair<const std::string, std::string> HeaderFields::MakeConnectionClose() {
+std::pair<const std::string, std::string> HeaderFields::MakeConnectionClose()
+{
     return std::make_pair(KStringConnection, KStringClose);
 }
 

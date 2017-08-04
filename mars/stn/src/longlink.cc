@@ -171,7 +171,8 @@ bool LongLink::Send(const AutoBuffer& _body, const AutoBuffer& _extension, const
     return true;
 }
 
-bool LongLink::SendWhenNoData(const AutoBuffer& _body, const AutoBuffer& _extension, uint32_t _cmdid, uint32_t _taskid) {
+bool LongLink::SendWhenNoData(const AutoBuffer& _body, const AutoBuffer& _extension, uint32_t _cmdid, uint32_t _taskid)
+{
     ScopedLock lock(mutex_);
 
     if (kConnected != connectstatus_) return false;
@@ -264,23 +265,28 @@ void LongLink::Disconnect(TDisconnectInternalCode _scene) {
     }
 }
 
-bool LongLink::__NoopReq(XLogger& _log, Alarm& _alarm, bool need_active_timeout) {
+bool LongLink::__NoopReq(XLogger& _log, Alarm& _alarm, bool need_active_timeout)
+{
     AutoBuffer buffer;
     uint32_t req_cmdid = 0;
     bool suc = false;
     
-    if (identifychecker_.GetIdentifyBuffer(buffer, req_cmdid)) {
+    if (identifychecker_.GetIdentifyBuffer(buffer, req_cmdid))
+	{
         Task task(Task::kLongLinkIdentifyCheckerTaskID);
         task.cmdid = req_cmdid;
         suc = Send(buffer, KNullAtuoBuffer, task);
         identifychecker_.SetID(Task::kLongLinkIdentifyCheckerTaskID);
         xinfo2(TSF"start noop synccheck taskid:%0, cmdid:%1, ", Task::kLongLinkIdentifyCheckerTaskID, req_cmdid) >> _log;
-    } else {
+    }
+	else
+	{
         suc = __SendNoopWhenNoData();
         xinfo2(TSF"start noop taskid:%0, cmdid:%1, ", Task::kNoopTaskID, longlink_noop_cmdid()) >> _log;
     }
     
-    if (suc) {
+    if (suc)
+	{
         _alarm.Cancel();
         _alarm.Start(need_active_timeout ? (2* 1000) : (5 * 1000));
 #ifdef ANDROID
@@ -773,9 +779,12 @@ void LongLink::__RunReadWrite(SOCKET _sock, ErrCmdType& _errtype, int& _errcode,
                          || unpackret == LONGLINK_UNPACK_STREAM_PACKAGE,
                          TSF"unpackret: %_", unpackret);
                 
-                if (LONGLINK_UNPACK_STREAM_PACKAGE == unpackret) {
+                if (LONGLINK_UNPACK_STREAM_PACKAGE == unpackret)
+				{
                     OnRecv(taskid, packlen, packlen);
-                } else if (!__NoopResp(cmdid, taskid, stream_resp.stream, stream_resp.extension, alarmnooptimeout, nooping, _profile)) {
+                }
+				else if (!__NoopResp(cmdid, taskid, stream_resp.stream, stream_resp.extension, alarmnooptimeout, nooping, _profile))
+				{
                     OnResponse(kEctOK, 0, cmdid, taskid, stream_resp.stream, stream_resp.extension, _profile);
 					sent_taskids.erase(taskid);
                 }

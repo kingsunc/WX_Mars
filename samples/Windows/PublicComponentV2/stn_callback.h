@@ -22,13 +22,13 @@
 #include "mars/comm/windows/projdef.h"
 #include <mars/stn/stn_logic.h>
 
-//#include "NetworkService.h"
-
-namespace mars {
-    namespace stn {
+namespace mars
+{
+namespace stn
+{
         
-class StnCallBack : public Callback {
-    
+class StnCallBack : public Callback
+{
 private:
     StnCallBack() {}
     ~StnCallBack() {}
@@ -38,7 +38,7 @@ private:
 public:
     static StnCallBack* Instance();
     static void Release();
-    
+ 
     virtual bool MakesureAuthed();
     
     //流量统计
@@ -69,7 +69,7 @@ private:
     static StnCallBack* instance_;
     
 };
-    }
-}
+
+}}
 
 #endif /* STNCALLBACK_h */

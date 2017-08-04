@@ -24,12 +24,17 @@
 
 #include "proto/generate/main.pb.h"
 #include "mars/boost/weak_ptr.hpp"
+
 class HelloCGITask;
+
+// Hello任务回调;
 class HelloCGICallback
 {
 public:
 	virtual void OnResponse(HelloCGITask* task, const com::tencent::mars::sample::proto::HelloResponse& response) = 0;
 };
+
+// Hello任务;
 class HelloCGITask : public CGITask 
 {
 public:
