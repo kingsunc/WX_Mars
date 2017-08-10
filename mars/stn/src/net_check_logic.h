@@ -28,32 +28,35 @@
 
 class CommFrequencyLimit;
 
-namespace mars {
-    namespace stn {
+namespace mars
+{
+namespace stn
+{
     
 class NetSource;
 
-class NetCheckLogic {
-  public:
+class NetCheckLogic
+{
+public:
     NetCheckLogic();
     ~NetCheckLogic();
 
     void UpdateLongLinkInfo(unsigned int _continues_fail_count, bool _task_succ);
     void UpdateShortLinkInfo(unsigned int _continue_fail_count, bool _task_succ);
 
-  private:
-    struct NetTaskStatusItem{
+private:
+    struct NetTaskStatusItem
+	{
 		uint32_t records;
 		uint64_t last_failedtime;
 		NetTaskStatusItem(): records(0xFFFFFFFF), last_failedtime(0) {}
 	};
 
-  private:
+private:
     bool __ShouldNetCheck();
     void __StartNetCheck();
 
-  private:
-
+private:
     CommFrequencyLimit* frequency_limit_;
     NetSource::DnsUtil dns_util_;
 
@@ -63,7 +66,6 @@ class NetCheckLogic {
     NetTaskStatusItem shortlink_taskstatus_item_;
 };
 
-    }
-}
+}}
 
 #endif // STN_SRC_NET_CHECK_LOGIC_H_

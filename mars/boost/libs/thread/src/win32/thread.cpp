@@ -48,37 +48,39 @@
 #pragma comment(lib, "runtimeobject.lib")
 #endif
 
-namespace mars_boost {} namespace boost = mars_boost; namespace mars_boost
-{
-  namespace detail
-  {
-    thread_data_base::~thread_data_base()
-    {
-        for (notify_list_t::iterator i = notify.begin(), e = notify.end();
-                i != e; ++i)
-        {
-            i->second->unlock();
-            i->first->notify_all();
-        }
-        for (async_states_t::iterator i = async_states_.begin(), e = async_states_.end();
-                i != e; ++i)
-        {
-#ifndef BOOST_NO_EXCEPTIONS
-            (*i)->make_ready();
-#endif
-        }
-    }
-  }
+namespace mars_boost{}
+namespace boost = mars_boost;
 
-    namespace
-    {
+namespace mars_boost
+{
+	namespace detail
+	{
+		thread_data_base::~thread_data_base()
+		{
+			for (notify_list_t::iterator i = notify.begin(), e = notify.end(); i != e; ++i)
+			{
+				i->second->unlock();
+				i->first->notify_all();
+			}
+
+			for (async_states_t::iterator i = async_states_.begin(), e = async_states_.end(); i != e; ++i)
+			{
+#ifndef BOOST_NO_EXCEPTIONS
+				(*i)->make_ready();
+#endif
+			}
+		}
+	}
+
+	namespace
+	{
 #ifdef BOOST_THREAD_PROVIDES_ONCE_CXX11
-        mars_boost::once_flag current_thread_tls_init_flag;
+		mars_boost::once_flag current_thread_tls_init_flag;
 #else
-        mars_boost::once_flag current_thread_tls_init_flag=BOOST_ONCE_INIT;
+		mars_boost::once_flag current_thread_tls_init_flag=BOOST_ONCE_INIT;
 #endif
 #if defined(UNDER_CE)
-        // Windows CE does not define the TLS_OUT_OF_INDEXES constant.
+		// Windows CE does not define the TLS_OUT_OF_INDEXES constant.
 #define TLS_OUT_OF_INDEXES 0xFFFFFFFF
 #endif
 #if !BOOST_PLAT_WINDOWS_RUNTIME
@@ -87,9 +89,9 @@ namespace mars_boost {} namespace boost = mars_boost; namespace mars_boost
         __declspec(thread) mars_boost::detail::thread_data_base* current_thread_data_base;
 #endif
 
-        void create_current_thread_tls_key()
-        {
-            tss_cleanup_implemented(); // if anyone uses TSS, we need the cleanup linked in
+		void create_current_thread_tls_key()
+		{
+			tss_cleanup_implemented(); // if anyone uses TSS, we need the cleanup linked in
 #if !BOOST_PLAT_WINDOWS_RUNTIME
             current_thread_tls_key=TlsAlloc();
             BOOST_ASSERT(current_thread_tls_key!=TLS_OUT_OF_INDEXES);
@@ -99,11 +101,11 @@ namespace mars_boost {} namespace boost = mars_boost; namespace mars_boost
         void cleanup_tls_key()
         {
 #if !BOOST_PLAT_WINDOWS_RUNTIME
-            if(current_thread_tls_key!=TLS_OUT_OF_INDEXES)
-            {
-                TlsFree(current_thread_tls_key);
-                current_thread_tls_key=TLS_OUT_OF_INDEXES;
-            }
+			if(current_thread_tls_key!=TLS_OUT_OF_INDEXES)
+			{
+				TlsFree(current_thread_tls_key);
+				current_thread_tls_key=TLS_OUT_OF_INDEXES;
+			}
 #endif
         }
 
@@ -126,44 +128,43 @@ namespace mars_boost {} namespace boost = mars_boost; namespace mars_boost
         }
     }
 
-    namespace detail
-    {
-      thread_data_base* get_current_thread_data()
-      {
+	namespace detail
+	{
+		thread_data_base* get_current_thread_data()
+		{
 #if BOOST_PLAT_WINDOWS_RUNTIME
-          return current_thread_data_base;
+			return current_thread_data_base;
 #else
-          if (current_thread_tls_key == TLS_OUT_OF_INDEXES)
-          {
-              return 0;
-          }
-          return (detail::thread_data_base*)TlsGetValue(current_thread_tls_key);
+			if (current_thread_tls_key == TLS_OUT_OF_INDEXES)
+			{
+				return 0;
+			}
+			return (detail::thread_data_base*)TlsGetValue(current_thread_tls_key);
 #endif
-      }
-    }
+		}
+	}
 
-    namespace
-    {
+	namespace
+	{
 #ifndef BOOST_HAS_THREADEX
 // Windows CE doesn't define _beginthreadex
 
-        struct ThreadProxyData
-        {
-            typedef unsigned (__stdcall* func)(void*);
-            func start_address_;
-            void* arglist_;
-            ThreadProxyData(func start_address,void* arglist) : start_address_(start_address), arglist_(arglist) {}
-        };
+		struct ThreadProxyData
+		{
+			typedef unsigned (__stdcall* func)(void*);
+			func start_address_;
+			void* arglist_;
+			ThreadProxyData(func start_address,void* arglist) : start_address_(start_address), arglist_(arglist) {}
+		};
 
         DWORD WINAPI ThreadProxy(LPVOID args)
         {
-            mars_boost::csbl::unique_ptr<ThreadProxyData> data(reinterpret_cast<ThreadProxyData*>(args));
-            DWORD ret=data->start_address_(data->arglist_);
-            return ret;
+			mars_boost::csbl::unique_ptr<ThreadProxyData> data(reinterpret_cast<ThreadProxyData*>(args));
+			DWORD ret=data->start_address_(data->arglist_);
+			return ret;
         }
 
         //typedef void* uintptr_t;
-
         inline uintptr_t _beginthreadex(void* security, unsigned stack_size, unsigned (__stdcall* start_address)(void*),
                                               void* arglist, unsigned initflag, unsigned* thrdaddr)
         {
@@ -171,7 +172,8 @@ namespace mars_boost {} namespace boost = mars_boost; namespace mars_boost
             ThreadProxyData* data = new ThreadProxyData(start_address,arglist);
             HANDLE hthread=CreateThread(static_cast<LPSECURITY_ATTRIBUTES>(security),stack_size,ThreadProxy,
                                         data,initflag,&threadID);
-            if (hthread==0) {
+            if (hthread==0)
+			{
               delete data;
               return 0;
             }
@@ -193,7 +195,8 @@ namespace mars_boost {} namespace boost = mars_boost; namespace mars_boost
             thread_exit_callback_node(mars_boost::detail::thread_exit_function_base* func_,
                                       thread_exit_callback_node* next_):
                 func(func_),next(next_)
-            {}
+            {
+			}
         };
 
     }
@@ -371,12 +374,12 @@ namespace mars_boost {} namespace boost = mars_boost; namespace mars_boost
 
     thread::thread(detail::thread_data_ptr data):
         thread_info(data)
-    {}
+    {
+	}
 
     namespace
     {
-        struct externally_launched_thread:
-            detail::thread_data_base
+        struct externally_launched_thread: detail::thread_data_base
         {
             externally_launched_thread()
             {
@@ -385,7 +388,8 @@ namespace mars_boost {} namespace boost = mars_boost; namespace mars_boost
                 interruption_enabled=false;
 #endif
             }
-            ~externally_launched_thread() {
+            ~externally_launched_thread()
+			{
               BOOST_ASSERT(notify.empty());
               notify.clear();
               BOOST_ASSERT(async_states_.empty());
@@ -393,9 +397,12 @@ namespace mars_boost {} namespace boost = mars_boost; namespace mars_boost
             }
 
             void run()
-            {}
+            {
+			}
+
             void notify_all_at_thread_exit(condition_variable*, mutex*)
-            {}
+            {
+			}
 
         private:
             externally_launched_thread(externally_launched_thread&);
@@ -468,50 +475,50 @@ namespace mars_boost {} namespace boost = mars_boost; namespace mars_boost
     }
 
 #if defined BOOST_THREAD_USES_DATETIME
-    bool thread::timed_join(mars_boost::system_time const& wait_until)
-    {
-      return do_try_join_until(mars_boost::detail::get_milliseconds_until(wait_until));
-    }
+	bool thread::timed_join(mars_boost::system_time const& wait_until)
+	{
+		return do_try_join_until(mars_boost::detail::get_milliseconds_until(wait_until));
+	}
 #endif
-    bool thread::do_try_join_until_noexcept(uintmax_t milli, bool& res)
-    {
-      detail::thread_data_ptr local_thread_info=(get_thread_info)();
-      if(local_thread_info)
-      {
-          if(!this_thread::interruptible_wait(this->native_handle(),milli))
-          {
-            res=false;
-            return true;
-          }
-          release_handle();
-          res=true;
-          return true;
-      }
-      else
-      {
-        return false;
-      }
-    }
+	bool thread::do_try_join_until_noexcept(uintmax_t milli, bool& res)
+	{
+		detail::thread_data_ptr local_thread_info=(get_thread_info)();
+		if(local_thread_info)
+		{
+			if(!this_thread::interruptible_wait(this->native_handle(),milli))
+			{
+				res=false;
+				return true;
+			}
+			release_handle();
+			res=true;
+			return true;
+		}
+		else
+		{
+			return false;
+		}
+	}
 
-    void thread::detach()
-    {
-        release_handle();
-    }
+	void thread::detach()
+	{
+		release_handle();
+	}
 
-    void thread::release_handle()
-    {
-        thread_info=0;
-    }
+	void thread::release_handle()
+	{
+		thread_info=0;
+	}
 
 #if defined BOOST_THREAD_PROVIDES_INTERRUPTIONS
-    void thread::interrupt()
-    {
-        detail::thread_data_ptr local_thread_info=(get_thread_info)();
-        if(local_thread_info)
-        {
-            local_thread_info->interrupt();
-        }
-    }
+	void thread::interrupt()
+	{
+		detail::thread_data_ptr local_thread_info=(get_thread_info)();
+		if(local_thread_info)
+		{
+			local_thread_info->interrupt();
+		}
+	}
 
     bool thread::interruption_requested() const BOOST_NOEXCEPT
     {

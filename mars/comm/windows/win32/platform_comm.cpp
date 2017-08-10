@@ -62,7 +62,8 @@ bool getAPNInfo(APNInfo& info) {
 void ConsoleLog(const XLoggerInfo* _info, const char* _log)
 {
 	if (NULL == _info || NULL == _log) return;
-	static const char* levelStrings[] = {
+	static const char* levelStrings[] =
+	{
 		"V",
 		"D",  // debug
 		"I",  // info
@@ -76,4 +77,5 @@ void ConsoleLog(const XLoggerInfo* _info, const char* _log)
 	char log[16 * 1024] = { 0 };
 	snprintf(log, sizeof(log), "[%s][%s][%s, %s, %d][%s\n", levelStrings[_info->level], NULL == _info->tag ? "" : _info->tag, file_name, strFuncName, _info->line, _log);
 	::OutputDebugStringA(log);
+	printf(log);
 }

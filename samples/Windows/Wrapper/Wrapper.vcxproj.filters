@@ -31,8 +31,11 @@
     <Filter Include="protocol\json">
       <UniqueIdentifier>{ec4ca79c-5217-4433-b687-6c28281b8778}</UniqueIdentifier>
     </Filter>
-    <Filter Include="request">
+    <Filter Include="idl">
       <UniqueIdentifier>{c1ef97be-9759-476e-b990-6592fc8cd5c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="idl\tars">
+      <UniqueIdentifier>{5de17444-2a96-4bd3-b69f-f97cd6817209}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -63,26 +66,26 @@
     <ClInclude Include="MarsWrapper.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="request\Tars.h">
-      <Filter>request</Filter>
-    </ClInclude>
-    <ClInclude Include="request\TarsDisplayer.h">
-      <Filter>request</Filter>
-    </ClInclude>
-    <ClInclude Include="request\TarsType.h">
-      <Filter>request</Filter>
-    </ClInclude>
-    <ClInclude Include="request\tup.h">
-      <Filter>request</Filter>
-    </ClInclude>
     <ClInclude Include="task\Login_Task.h">
       <Filter>task</Filter>
     </ClInclude>
     <ClInclude Include="task\CGITask.h">
       <Filter>task</Filter>
     </ClInclude>
-    <ClInclude Include="request\request.h">
-      <Filter>request</Filter>
+    <ClInclude Include="idl\tars\request.h">
+      <Filter>idl\tars</Filter>
+    </ClInclude>
+    <ClInclude Include="protocol\tars\Tars.h">
+      <Filter>protocol\tars</Filter>
+    </ClInclude>
+    <ClInclude Include="protocol\tars\TarsDisplayer.h">
+      <Filter>protocol\tars</Filter>
+    </ClInclude>
+    <ClInclude Include="protocol\tars\TarsType.h">
+      <Filter>protocol\tars</Filter>
+    </ClInclude>
+    <ClInclude Include="protocol\tars\tup.h">
+      <Filter>protocol\tars</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

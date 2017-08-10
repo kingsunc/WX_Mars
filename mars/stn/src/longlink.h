@@ -47,36 +47,45 @@ class WakeUpLock;
 
 class SmartHeartbeat;
 
+namespace mars
+{
 
-namespace mars {
-    namespace comm {
-        class ProxyInfo;
-    }
-    namespace stn {
+namespace comm
+{
+    class ProxyInfo;
+}
+namespace stn
+{
 
 class NetSource;
 class longlink_tracker;
 
-struct LongLinkNWriteData {
-    LongLinkNWriteData(ssize_t _writelen, const Task& _task)
-    : writelen(_writelen), task(_task) {}
-    
+struct LongLinkNWriteData
+{
+    LongLinkNWriteData(ssize_t _writelen, const Task& _task): writelen(_writelen), task(_task)
+	{
+	}
+
     ssize_t writelen;
     Task task;
 };
         
-struct StreamResp {
-    StreamResp(const Task& _task = Task(Task::kInvalidTaskID))
-    : task(_task), stream(KNullAtuoBuffer), extension(KNullAtuoBuffer) {}
+struct StreamResp
+{
+    StreamResp(const Task& _task = Task(Task::kInvalidTaskID)): task(_task), stream(KNullAtuoBuffer), extension(KNullAtuoBuffer)
+	{
+	}
     
     Task task;
     move_wrapper<AutoBuffer> stream;
     move_wrapper<AutoBuffer> extension;
 };
 
-class LongLink {
-  public:
-    enum TLongLinkStatus {
+class LongLink
+{
+public:
+    enum TLongLinkStatus
+	{
         kConnectIdle = 0,
         kConnecting = 1,
         kConnected,
@@ -85,7 +94,8 @@ class LongLink {
     };
 
     // Note: Never Delete Item!!!Just Add!!!
-    enum TDisconnectInternalCode {
+    enum TDisconnectInternalCode 
+	{
         kNone = 0,
         kReset = 10000,        // no use
         kRemoteClosed = 10001,
@@ -109,7 +119,7 @@ class LongLink {
         kTimeCheckSucc = 10019,
     };
 
-  public:
+public:
     boost::signals2::signal<void (TLongLinkStatus _connectStatus)> SignalConnection;
     boost::signals2::signal<void (const ConnectProfile& _connprofile)> broadcast_linkstatus_signal_;
     
@@ -118,7 +128,7 @@ class LongLink {
     boost::function< void (ErrCmdType _error_type, int _error_code, uint32_t _cmdid, uint32_t _taskid, AutoBuffer& _body, AutoBuffer& _extension, const ConnectProfile& _info)> OnResponse;
     boost::function<void (int _line, ErrCmdType _errtype, int _errcode, const std::string& _ip, uint16_t _port)> fun_network_report_;
 
-  public:
+public:
     LongLink(const mq::MessageQueue_t& _messagequeueid, NetSource& _netsource);
     virtual ~LongLink();
 
@@ -133,11 +143,11 @@ class LongLink {
     ConnectProfile  Profile() const   { return conn_profile_; }
     tickcount_t&    GetLastRecvTime() { return lastrecvtime_; }
     
-  private:
+private:
     LongLink(const LongLink&);
     LongLink& operator=(const LongLink&);
 
-  protected:
+protected:
     void    __ConnectStatus(TLongLinkStatus _status);
     void    __UpdateProfile(const ConnectProfile& _conn_profile);
     void    __RunResponseError(ErrCmdType _type, int _errcode, ConnectProfile& _profile, bool _networkreport = true);
@@ -151,36 +161,35 @@ class LongLink {
     virtual SOCKET   __RunConnect(ConnectProfile& _conn_profile);
     virtual void     __RunReadWrite(SOCKET _sock, ErrCmdType& _errtype, int& _errcode, ConnectProfile& _profile);
     
-  protected:
-    
+protected:
     uint32_t   __GetNextHeartbeatInterval();
     void       __NotifySmartHeartbeatConnectStatus(TLongLinkStatus _status);
     void       __NotifySmartHeartbeatHeartReq(ConnectProfile& _profile, uint64_t _internal, uint64_t _actual_internal);
     void       __NotifySmartHeartbeatHeartResult(bool _succes, bool _fail_of_timeout, ConnectProfile& _profile);
     void       __NotifySmartHeartbeatJudgeMIUIStyle();
 
-  protected:
-    MessageQueue::ScopeRegister     asyncreg_;
-    NetSource&                      netsource_;
+protected:
+    MessageQueue::ScopeRegister							asyncreg_;
+    NetSource&											netsource_;
     
-    Mutex                           mutex_;
-    Thread                          thread_;
+    Mutex												mutex_;
+    Thread												thread_;
 
-    boost::scoped_ptr<longlink_tracker>         tracker_;
-    NetSource::DnsUtil                          dns_util_;
-    SocketBreaker                               connectbreak_;
-	SocketBreaker             testproxybreak_;
-    TLongLinkStatus                             connectstatus_;
-    ConnectProfile                              conn_profile_;
-    TDisconnectInternalCode                     disconnectinternalcode_;
+    boost::scoped_ptr<longlink_tracker>					tracker_;
+    NetSource::DnsUtil									dns_util_;
+    SocketBreaker										connectbreak_;
+	SocketBreaker										testproxybreak_;
+    TLongLinkStatus										connectstatus_;
+    ConnectProfile										conn_profile_;
+    TDisconnectInternalCode								disconnectinternalcode_;
     
     SocketBreaker                                        readwritebreak_;
     LongLinkIdentifyChecker                              identifychecker_;
     std::list<std::pair<Task, move_wrapper<AutoBuffer>>> lstsenddata_;
     tickcount_t                                          lastrecvtime_;
     
-    SmartHeartbeat*                              smartheartbeat_;
-    WakeUpLock*                                  wakelock_;
+    SmartHeartbeat*										smartheartbeat_;
+    WakeUpLock*											wakelock_;
 };
         
 }}

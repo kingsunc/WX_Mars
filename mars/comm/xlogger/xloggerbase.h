@@ -28,7 +28,8 @@
 extern "C" {
 #endif
 
-typedef enum {
+typedef enum
+{
     kLevelAll = 0,
     kLevelVerbose = 0,
     kLevelDebug,    // Detailed information on the flow through the system.
@@ -37,9 +38,10 @@ typedef enum {
     kLevelError,    // Other runtime errors or unexpected conditions.
     kLevelFatal,    // Severe errors that cause premature termination.
     kLevelNone,     // Special level used to disable all log messages.
-} TLogLevel;
+}TLogLevel;
 
-typedef struct XLoggerInfo_t {
+typedef struct XLoggerInfo_t
+{
     TLogLevel level;
     const char* tag;
     const char* filename;
@@ -58,7 +60,7 @@ extern intmax_t xlogger_maintid();
 typedef void (*xlogger_appender_t)(const XLoggerInfo* _info, const char* _log);
 extern const char* xlogger_dump(const void* _dumpbuffer, size_t _len);
 
-TLogLevel   xlogger_Level();
+TLogLevel xlogger_Level();
 void xlogger_SetLevel(TLogLevel _level);
 int  xlogger_IsEnabledFor(TLogLevel _level);
 xlogger_appender_t xlogger_SetAppender(xlogger_appender_t _appender);

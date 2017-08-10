@@ -102,41 +102,50 @@ static const uint32_t kCheckifAboveCount = 5;
 
 NetCheckLogic::NetCheckLogic()
     : frequency_limit_(new CommFrequencyLimit(kLimitCount, kLimitTimeSpan))
-	, last_netcheck_time_(0) {
+	, last_netcheck_time_(0)
+{
     xinfo_function();
 }
 
-NetCheckLogic::~NetCheckLogic() {
+NetCheckLogic::~NetCheckLogic()
+{
     xinfo_function();
-
     delete frequency_limit_;
 }
 
-void NetCheckLogic::UpdateLongLinkInfo(unsigned int _continues_fail_count, bool _task_succ) {
-	if (!_task_succ ) longlink_taskstatus_item_.last_failedtime = ::gettickcount();
+void NetCheckLogic::UpdateLongLinkInfo(unsigned int _continues_fail_count, bool _task_succ)
+{
+	if (!_task_succ)
+	{
+		longlink_taskstatus_item_.last_failedtime = ::gettickcount();
+	}
 	SET_BIT(_task_succ, longlink_taskstatus_item_.records, kValidBitsFilter);
 	xdebug2("shortlink:_continueFailCount=%d, _isTaskSucc=%d, records=0x%x", _continues_fail_count, _task_succ, longlink_taskstatus_item_.records);
 
-    if (__ShouldNetCheck()) {
+    if (__ShouldNetCheck())
+	{
         __StartNetCheck();
     }
 }
 
-void NetCheckLogic::UpdateShortLinkInfo(unsigned int _continues_fail_count, bool _task_succ) {
-
-	if (!_task_succ ) shortlink_taskstatus_item_.last_failedtime = ::gettickcount();
+void NetCheckLogic::UpdateShortLinkInfo(unsigned int _continues_fail_count, bool _task_succ)
+{
+	if (!_task_succ)
+	{
+		shortlink_taskstatus_item_.last_failedtime = ::gettickcount();
+	}
 	SET_BIT(_task_succ, shortlink_taskstatus_item_.records, kValidBitsFilter);
 	xdebug2("shortlink:_continues_fail_count: %d, _task_succ: %d, records=0x%x", _continues_fail_count, _task_succ, shortlink_taskstatus_item_.records);
 
-    if (__ShouldNetCheck()) {
+    if (__ShouldNetCheck())
+	{
         __StartNetCheck();
     }
 }
 
-bool NetCheckLogic::__ShouldNetCheck() {
-
+bool NetCheckLogic::__ShouldNetCheck()
+{
     bool ret = false;
-
 	bool shortlink_shouldcheck = false;
 	uint32_t succ_count = 0;
 	uint32_t most_recent_shorttasks_status = 0;
@@ -146,7 +155,9 @@ bool NetCheckLogic::__ShouldNetCheck() {
 
 	bool is_shortlink_bad = succ_count < kCheckifBelowCount;
 	bool is_shortlink_good = succ_count > kCheckifAboveCount;
-	if (is_shortlink_bad) { // 最近八次坏，前八次好，就进入netcheck
+	if (is_shortlink_bad)
+	{
+		// 最近八次坏，前八次好，就进入netcheck
 		unsigned int valid_record_taskcount = 0;
 		CAL_BIT_COUNT(kValidBitsFilter, valid_record_taskcount);
 		xinfo2(TSF"netcheck: shortlink succ_count: %_, is most recent %_ times. valid_record_taskcount: %_.", succ_count, kMostRecentTaskStartN[1], valid_record_taskcount);
@@ -169,7 +180,9 @@ bool NetCheckLogic::__ShouldNetCheck() {
 
 	bool is_longlink_bad = succ_count < kCheckifBelowCount;
 	bool is_longlink_good = succ_count > kCheckifAboveCount;
-	if (is_longlink_bad) { // 最近八次坏，前八次好，就进入netcheck
+	if (is_longlink_bad)
+	{
+		// 最近八次坏，前八次好，就进入netcheck
 		unsigned int valid_record_taskcount = 0;
 		CAL_BIT_COUNT(kValidBitsFilter, valid_record_taskcount);
 		xinfo2(TSF"netcheck: longlink succ_count: %_, in most recent %_ times. valid_record_taskcount: %_.", succ_count, kMostRecentTaskStartN[1], valid_record_taskcount);
@@ -185,19 +198,27 @@ bool NetCheckLogic::__ShouldNetCheck() {
 
 	ret = longlink_shouldcheck || shortlink_shouldcheck;
 	static int increment_steps = 0;
-	if (ret) {
-		 if (::gettickspan(last_netcheck_time_) < (kMinCheckTimeSpan + increment_steps * kCheckTimeSpanIncrementStep)) {
+	if (ret)
+	{
+		 if (::gettickspan(last_netcheck_time_) < (kMinCheckTimeSpan + increment_steps * kCheckTimeSpanIncrementStep))
+		 {
 			 ret = false;
 			 xinfo2(TSF"continous hit netcheck strategy, skip this. last_netcheck_time_=%_", last_netcheck_time_);
-		 } else {
+		 }
+		 else
+		 {
 			 increment_steps ++;
 		 }
 	}
-	if (is_shortlink_good && is_longlink_good) {// network is stable now.
+
+	if (is_shortlink_good && is_longlink_good)
+	{
+		// network is stable now.
 		increment_steps = 0;
 	}
 
-    if (ret && !frequency_limit_->Check()) {
+    if (ret && !frequency_limit_->Check())
+	{
         xinfo2(TSF"limit, wait!");
         return false;
     }
@@ -205,41 +226,53 @@ bool NetCheckLogic::__ShouldNetCheck() {
     return ret;
 }
 
-void NetCheckLogic::__StartNetCheck() {
-
+void NetCheckLogic::__StartNetCheck() 
+{
 	//get longlink check map
 	CheckIPPorts longlink_check_items;
 	std::vector<std::string> longlink_hosts = NetSource::GetLongLinkHosts();
-	if (longlink_hosts.empty()) {
+	if (longlink_hosts.empty())
+	{
 		xerror2(TSF"longlink host is empty.");
 		return;
 	}
 
 	std::vector<uint16_t> longlink_portlist;
 	NetSource::GetLonglinkPorts(longlink_portlist);
-	if (longlink_portlist.empty()) {
+	if (longlink_portlist.empty())
+	{
 		xerror2(TSF"longlink no port");
 		return;
 	}
 
-	for (std::vector<std::string>::iterator host_iter = longlink_hosts.begin(); host_iter != longlink_hosts.end(); ++host_iter) {
+	for (std::vector<std::string>::iterator host_iter = longlink_hosts.begin(); host_iter != longlink_hosts.end(); ++host_iter)
+	{
 		std::vector<std::string> longlink_iplist;
 		dns_util_.GetNewDNS().GetHostByName(*host_iter, longlink_iplist);
-		if (longlink_iplist.empty()) dns_util_.GetDNS().GetHostByName(*host_iter, longlink_iplist);
-		if (longlink_iplist.empty()) {
+		if (longlink_iplist.empty())
+		{
+			dns_util_.GetDNS().GetHostByName(*host_iter, longlink_iplist);
+		}
+		if (longlink_iplist.empty())
+		{
 			xerror2(TSF"no dns ip for longlink host: %_", *host_iter);
 			continue;
 		}
 
 		std::vector<CheckIPPort> check_ipport_list;
-		for (std::vector<uint16_t>::iterator port_iter = longlink_portlist.begin(); port_iter != longlink_portlist.end(); ++port_iter) {
-			for (std::vector<std::string>::iterator ip_iter = longlink_iplist.begin(); ip_iter != longlink_iplist.end(); ++ip_iter) {
+		for (std::vector<uint16_t>::iterator port_iter = longlink_portlist.begin(); port_iter != longlink_portlist.end(); ++port_iter)
+		{
+			for (std::vector<std::string>::iterator ip_iter = longlink_iplist.begin(); ip_iter != longlink_iplist.end(); ++ip_iter)
+			{
 				CheckIPPort ipport_item(*ip_iter, *port_iter);
 				check_ipport_list.push_back(ipport_item);
 			}
 		}
 
-		if (!check_ipport_list.empty()) longlink_check_items.insert(std::pair< std::string, std::vector<CheckIPPort> >(*host_iter, check_ipport_list));
+		if (!check_ipport_list.empty())
+		{
+			longlink_check_items.insert(std::pair< std::string, std::vector<CheckIPPort> >(*host_iter, check_ipport_list));
+		}
 	}
 
 	//shortlink check map
@@ -248,31 +281,42 @@ void NetCheckLogic::__StartNetCheck() {
 	RequestNetCheckShortLinkHosts(shortlink_hostlist);
 	uint16_t shortlink_port = NetSource::GetShortLinkPort();
 
-
-	for (std::vector<std::string>::iterator iter = shortlink_hostlist.begin(); iter != shortlink_hostlist.end(); ++iter) {
-		if (longlink_portlist.empty()) {
+	for (std::vector<std::string>::iterator iter = shortlink_hostlist.begin(); iter != shortlink_hostlist.end(); ++iter)
+	{
+		if (longlink_portlist.empty())
+		{
 			xerror2(TSF"longlink no port");
 			break;
 		}
 
 		std::vector<std::string> shortlink_iplist;
 		dns_util_.GetNewDNS().GetHostByName(*iter, shortlink_iplist);
-		if (shortlink_iplist.empty()) dns_util_.GetDNS().GetHostByName(*iter, shortlink_iplist);
-		if (shortlink_iplist.empty()) {
+		if (shortlink_iplist.empty())
+		{
+			dns_util_.GetDNS().GetHostByName(*iter, shortlink_iplist);
+		}
+		if (shortlink_iplist.empty())
+		{
 			xerror2(TSF"no dns ip for longlink host: %_", *iter);
 			continue;
 		}
 
 		std::vector<CheckIPPort> check_ipport_list;
-		for (std::vector<std::string>::iterator ip_iter = shortlink_iplist.begin(); ip_iter != shortlink_iplist.end(); ++ip_iter) {
+		for (std::vector<std::string>::iterator ip_iter = shortlink_iplist.begin(); ip_iter != shortlink_iplist.end(); ++ip_iter)
+		{
 			CheckIPPort ipport_item(*ip_iter, shortlink_port);
 			check_ipport_list.push_back(ipport_item);
 		}
 
-		if (!check_ipport_list.empty()) shortlink_check_items.insert(std::pair< std::string, std::vector<CheckIPPort> >(*iter, check_ipport_list));
+		if (!check_ipport_list.empty())
+		{
+			shortlink_check_items.insert(std::pair< std::string, std::vector<CheckIPPort> >(*iter, check_ipport_list));
+		}
 	}
 
-
     int mode = (NET_CHECK_BASIC | NET_CHECK_LONG | NET_CHECK_SHORT);
-    if (!longlink_check_items.empty() || !shortlink_check_items.empty()) StartActiveCheck(longlink_check_items, shortlink_check_items, mode, UNUSE_TIMEOUT);
+	if (!longlink_check_items.empty() || !shortlink_check_items.empty())
+	{
+		StartActiveCheck(longlink_check_items, shortlink_check_items, mode, UNUSE_TIMEOUT);
+	}
 }

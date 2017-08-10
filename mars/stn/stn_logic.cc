@@ -40,8 +40,10 @@
 #include "stn/src/signalling_keeper.h"
 #include "stn/src/proxy_test.h"
 
-namespace mars {
-namespace stn {
+namespace mars
+{
+namespace stn
+{
 
 static Callback* sg_callback = NULL;
 static const std::string kLibName = "stn";
@@ -61,7 +63,8 @@ static const std::string kLibName = "stn";
     	ret = stn_ptr->func;\
     }
 
-static void onCreate() {
+static void onCreate()
+{
 #if !UWP && !defined(WIN32)
     signal(SIGPIPE, SIG_IGN);
 #endif
@@ -69,10 +72,10 @@ static void onCreate() {
     xinfo2(TSF"stn oncreate");
     ActiveLogic::Singleton::Instance();
     NetCore::Singleton::Instance();
-
 }
 
-static void onDestroy() {
+static void onDestroy()
+{
     xinfo2(TSF"stn onDestroy");
 
     NetCore::Singleton::Release();
@@ -82,33 +85,38 @@ static void onDestroy() {
     // ActiveLogic::Singleton::Release();
 }
 
-static void onSingalCrash(int _sig) {
+static void onSingalCrash(int _sig)
+{
     appender_close();
 }
 
-static void onExceptionCrash() {
+static void onExceptionCrash()
+{
     appender_close();
 }
 
-static void onNetworkChange() {
-
+static void onNetworkChange()
+{
     STN_WEAK_CALL(OnNetworkChange());
 }
     
-static void OnNetworkDataChange(const char* _tag, ssize_t _send, ssize_t _recv) {
-    
-    if (NULL == _tag || strnlen(_tag, 1024) == 0) {
+static void OnNetworkDataChange(const char* _tag, ssize_t _send, ssize_t _recv)
+{
+    if (NULL == _tag || strnlen(_tag, 1024) == 0)
+	{
         xassert2(false);
         return;
     }
-    
-    if (NULL != XLOGGER_TAG && 0 == strcmp(_tag, XLOGGER_TAG)) {
+
+    if (NULL != XLOGGER_TAG && 0 == strcmp(_tag, XLOGGER_TAG))
+	{
         TrafficData(_send, _recv);
     }
 }
 
 
-static void __initbind_baseprjevent() {
+static void __initbind_baseprjevent()
+{
 
 #ifdef ANDROID
 	mars::baseevent::addLoadModule(kLibName);
@@ -119,92 +127,91 @@ static void __initbind_baseprjevent() {
     GetSignalOnExceptionCrash().connect(&onExceptionCrash);
     GetSignalOnNetworkChange().connect(5, &onNetworkChange);    //define group 5
 
-    
 #ifndef XLOGGER_TAG
 #error "not define XLOGGER_TAG"
 #endif
-    
+
     GetSignalOnNetworkDataChange().connect(&OnNetworkDataChange);
 }
 
 BOOT_RUN_STARTUP(__initbind_baseprjevent);
     
-void SetCallback(Callback* const callback) {
+void SetCallback(Callback* const callback)
+{
 	sg_callback = callback;
 }
 
 void (*StartTask)(const Task& _task)
-= [](const Task& _task) {
+= [](const Task& _task)
+{
     STN_WEAK_CALL(StartTask(_task));
 };
 
 void (*StopTask)(uint32_t _taskid)
-= [](uint32_t _taskid) {
+= [](uint32_t _taskid)
+{
     STN_WEAK_CALL(StopTask(_taskid));
 };
 
 bool (*HasTask)(uint32_t _taskid)
-= [](uint32_t _taskid) {
+= [](uint32_t _taskid)
+{
 	bool has_task = false;
 	STN_WEAK_CALL_RETURN(HasTask(_taskid), has_task);
 	return has_task;
 };
 
 void (*RedoTasks)()
-= []() {
+= []()
+{
    STN_WEAK_CALL(RedoTasks());
 };
 
 void (*ClearTasks)()
-= []() {
+= []()
+{
    STN_WEAK_CALL(ClearTasks());
 };
 
 void (*Reset)()
-= []() {
+= []()
+{
 	xinfo2(TSF "stn reset");
 	NetCore::Singleton::Release();
 	NetCore::Singleton::Instance();
 };
 
 void (*MakesureLonglinkConnected)()
-= []() {
+= []()
+{
     xinfo2(TSF "make sure longlink connect");
    STN_WEAK_CALL(MakeSureLongLinkConnect());
 };
 
 bool (*LongLinkIsConnected)()
-= []() {
+= []()
+{
     bool connected = false;
     STN_WEAK_CALL_RETURN(LongLinkIsConnected(), connected);
     return connected;
 };
     
 bool (*ProxyIsAvailable)(const mars::comm::ProxyInfo& _proxy_info, const std::string& _test_host, const std::vector<std::string>& _hardcode_ips)
-= [](const mars::comm::ProxyInfo& _proxy_info, const std::string& _test_host, const std::vector<std::string>& _hardcode_ips){
-    
+= [](const mars::comm::ProxyInfo& _proxy_info, const std::string& _test_host, const std::vector<std::string>& _hardcode_ips)
+{
     return ProxyTest::Singleton::Instance()->ProxyIsAvailable(_proxy_info, _test_host, _hardcode_ips);
 };
 
-//void SetLonglinkSvrAddr(const std::string& host, const std::vector<uint16_t> ports)
-// {
-//	SetLonglinkSvrAddr(host, ports, "");
-//};
-
-
 void (*SetLonglinkSvrAddr)(const std::string& host, const std::vector<uint16_t> ports, const std::string& debugip)
-= [](const std::string& host, const std::vector<uint16_t> ports, const std::string& debugip) {
+= [](const std::string& host, const std::vector<uint16_t> ports, const std::string& debugip)
+{
 	std::vector<std::string> hosts;
-	if (!host.empty()) {
+	if (!host.empty())
+	{
 		hosts.push_back(host);
 	}
 	NetSource::SetLongLink(hosts, ports, debugip);
 };
-
-//void SetShortlinkSvrAddr(const uint16_t port)
-//{
-//	NetSource::SetShortlink(port, "");
-//};
     
 void (*SetShortlinkSvrAddr)(const uint16_t port, const std::string& debugip)
 = [](const uint16_t port, const std::string& debugip)
@@ -324,13 +331,13 @@ void (*ReportConnectStatus)(int status, int longlink_status)
 void (*OnLongLinkNetworkError)(ErrCmdType _err_type, int _err_code, const std::string& _ip, uint16_t _port)
 = [](ErrCmdType _err_type, int _err_code, const std::string& _ip, uint16_t _port)
 {
-
+	xassert2(sg_callback != NULL);
 };
     
 void (*OnShortLinkNetworkError)(ErrCmdType _err_type, int _err_code, const std::string& _ip, const std::string& _host, uint16_t _port)
 = [](ErrCmdType _err_type, int _err_code, const std::string& _ip, const std::string& _host, uint16_t _port)
 {
-
+	xassert2(sg_callback != NULL);
 };
 
 //长连信令校验 ECHECK_NOW = 0, ECHECK_NEVER = 1, ECHECK_NEXT = 2

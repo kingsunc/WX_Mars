@@ -26,9 +26,9 @@ intmax_t xlogger_tid()
 }
 
 static intmax_t sg_maintid = GetCurrentThreadId();
+
 intmax_t xlogger_maintid()
 {
     return sg_maintid;
 }
 }
-

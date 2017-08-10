@@ -31,7 +31,7 @@
 #include "mars/comm/autobuffer.h"
 #include "mars/stn/stn.h"
 
-// 客户端版本号;
+// 通信协议版本号;
 static uint32_t sg_client_version = 0;
 
 #pragma pack(push, 1)

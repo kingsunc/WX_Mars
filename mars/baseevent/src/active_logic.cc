@@ -42,7 +42,7 @@ BOOT_RUN_STARTUP(__initbind_baseprjevent);
 
 ActiveLogic::ActiveLogic()
 : isforeground_(false), isactive_(true)
-, alarm_(boost::bind(&ActiveLogic::__OnInActive, this), false)
+, alarm_(boost::bind(&ActiveLogic::OnInActive, this), false)
 , lastforegroundchangetime_(::gettickcount())
 {
     xinfo_function();
@@ -115,7 +115,7 @@ uint64_t ActiveLogic::LastForegroundChangeTime() const
 	return lastforegroundchangetime_;
 }
 
-void ActiveLogic::__OnInActive()
+void ActiveLogic::OnInActive()
 {
     xdebug_function();
     if (!isforeground_) isactive_ = false;

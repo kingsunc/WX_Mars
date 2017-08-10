@@ -1,5 +1,7 @@
 #include "PSIMCallConcrete.h"
 #include "PSIMTaskCallback.h"
+#include "xlogger/xlogger.h"
+#include "log/appender.h"
 
 enum DeviceType
 {
@@ -30,6 +32,18 @@ CPSIMCallBack* CPSIMCallConcrete::GetIMPSCallBack()
 // ≥ı ºªØ;
 bool CPSIMCallConcrete::Init()
 {
+	// init xlog
+	std::string logPath = "D://Log";	//use your log path
+	std::string pubKey = "aaa";			//use you pubkey for log encrypt						 
+#if _DEBUG
+	xlogger_SetLevel(kLevelAll);
+	appender_set_console_log(true);
+#else
+	xlogger_SetLevel(kLevelInfo);
+	appender_set_console_log(false);
+#endif
+	appender_open(kAppednerAsync, logPath.c_str(), "Test", pubKey.c_str());
+
 	MarsWrapper::GetInstance().Start();
 
 	return true;
@@ -39,6 +53,9 @@ bool CPSIMCallConcrete::Init()
 bool CPSIMCallConcrete::UnInit()
 {
 	CPSIMTaskCallback::ReleaseInstance();
+
+	// uninit xlog
+	appender_close();
 
 	return true;
 }

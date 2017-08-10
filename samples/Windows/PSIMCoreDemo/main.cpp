@@ -13,7 +13,7 @@ int main()
 
 	AfxGetPSIMCall()->MsgLogin("xes", "token", "100001", "testname", "1111");
 
-	Sleep(30 * 1000);
+	getchar();
 
 	return 1;
 }

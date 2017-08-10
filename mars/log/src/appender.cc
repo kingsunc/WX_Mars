@@ -663,7 +663,10 @@ void xlogger_appender(const XLoggerInfo* _info, const char* _log) {
     DEFINE_SCOPERECURSIONLIMIT(recursion);
     static Tss s_recursion_str(free);
 
-    if (sg_consolelog_open) ConsoleLog(_info,  _log);
+	if (sg_consolelog_open)
+	{
+		ConsoleLog(_info, _log);
+	}
 
     if (2 <= (int)recursion.Get() && NULL == s_recursion_str.get()) {
         if ((int)recursion.Get() > 10) return;
@@ -784,7 +787,6 @@ const char* xlogger_dump(const void* _dumpbuffer, size_t _len) {
 
     return (const char*)sg_tss_dumpfile.get();
 }
-
 
 static void get_mark_info(char* _info, size_t _infoLen) {
 	struct timeval tv;

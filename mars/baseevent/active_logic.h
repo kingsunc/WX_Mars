@@ -44,7 +44,7 @@ public:
     uint64_t LastForegroundChangeTime() const;
 
 private:
-    void __OnInActive();
+    void OnInActive();
 
 private:
     bool   isforeground_;

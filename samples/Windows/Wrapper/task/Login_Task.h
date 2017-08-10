@@ -22,7 +22,7 @@
 
 #include "task/CGITask.h"
 #include "mars/boost/weak_ptr.hpp"
-#include "../request/request.h"
+#include "../idl/tars/request.h"
 
 class Login_Task;
 

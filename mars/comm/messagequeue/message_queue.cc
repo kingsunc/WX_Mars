@@ -833,69 +833,86 @@ boost::shared_ptr<RunloopCond> RunloopCond::CurrentCond() {
 }
 
 MessageQueueCreater::MessageQueueCreater(bool _iscreate, const char* _msg_queue_name)
-    : MessageQueueCreater(boost::shared_ptr<RunloopCond>(), _iscreate, _msg_queue_name)
-{}
+	: MessageQueueCreater(boost::shared_ptr<RunloopCond>(), _iscreate, _msg_queue_name)
+{
+}
     
 MessageQueueCreater::MessageQueueCreater(boost::shared_ptr<RunloopCond> _breaker, bool _iscreate, const char* _msg_queue_name)
-    : thread_(boost::bind(&MessageQueueCreater::__ThreadRunloop, this), _msg_queue_name)
-	, messagequeue_id_(KInvalidQueueID), breaker_(_breaker) {
+    : thread_(boost::bind(&MessageQueueCreater::__ThreadRunloop, this), _msg_queue_name), messagequeue_id_(KInvalidQueueID), breaker_(_breaker)
+{
 	if (_iscreate)
+	{
 		CreateMessageQueue();
+	}
 }
 
-MessageQueueCreater::~MessageQueueCreater() {
+MessageQueueCreater::~MessageQueueCreater()
+{
     CancelAndWait();
 }
 
-void MessageQueueCreater::__ThreadRunloop() {
+void MessageQueueCreater::__ThreadRunloop()
+{
     ScopedLock lock(messagequeue_mutex_);
     lock.unlock();
     
     RunLoop().Run();
-    
 }
 
-MessageQueue_t MessageQueueCreater::GetMessageQueue() {
+MessageQueue_t MessageQueueCreater::GetMessageQueue()
+{
     return messagequeue_id_;
 }
 
-MessageQueue_t MessageQueueCreater::CreateMessageQueue() {
+MessageQueue_t MessageQueueCreater::CreateMessageQueue()
+{
     ScopedLock lock(messagequeue_mutex_);
+	if (thread_.isruning())
+	{
+		return messagequeue_id_;
+	}
 
-    if (thread_.isruning()) return messagequeue_id_;
+    if (0 != thread_.start())
+	{
+		return KInvalidQueueID;
+	}
 
-    if (0 != thread_.start()) { return KInvalidQueueID;}
     messagequeue_id_ = __CreateMessageQueueInfo(breaker_, thread_.tid());
     xinfo2(TSF"create messageqeue id:%_", messagequeue_id_);
     
     return messagequeue_id_;
 }
 
-void MessageQueueCreater::CancelAndWait() {
+void MessageQueueCreater::CancelAndWait()
+{
     ScopedLock lock(messagequeue_mutex_);
-
-    if (KInvalidQueueID == messagequeue_id_) return;
+	if (KInvalidQueueID == messagequeue_id_)
+	{
+		return;
+	}
     
     BreakMessageQueueRunloop(messagequeue_id_);
     messagequeue_id_ = KInvalidQueueID;
     lock.unlock();
-    if(ThreadUtil::currentthreadid() != thread_.tid()) {
+    if(ThreadUtil::currentthreadid() != thread_.tid())
+	{
         thread_.join();
     }
 }
 
-MessageQueue_t MessageQueueCreater::CreateNewMessageQueue(boost::shared_ptr<RunloopCond> _breaker, thread_tid _tid) {
+MessageQueue_t MessageQueueCreater::CreateNewMessageQueue(boost::shared_ptr<RunloopCond> _breaker, thread_tid _tid)
+{
     return(__CreateMessageQueueInfo(_breaker, _tid));
 }
 
-MessageQueue_t MessageQueueCreater::CreateNewMessageQueue(boost::shared_ptr<RunloopCond> _breaker, const char* _messagequeue_name) {
-    
+MessageQueue_t MessageQueueCreater::CreateNewMessageQueue(boost::shared_ptr<RunloopCond> _breaker, const char* _messagequeue_name)
+{
     SpinLock* sp = new SpinLock;
     Thread thread(boost::bind(&__ThreadNewRunloop, sp), _messagequeue_name, true);
 //    thread.outside_join();
     ScopedSpinLock lock(*sp);
-
-    if (0 != thread.start()) {
+    if (0 != thread.start())
+	{
         delete sp;
         return KInvalidQueueID;
     }
@@ -904,20 +921,25 @@ MessageQueue_t MessageQueueCreater::CreateNewMessageQueue(boost::shared_ptr<Runl
     return id;
 }
     
-MessageQueue_t MessageQueueCreater::CreateNewMessageQueue(const char* _messagequeue_name) {
+MessageQueue_t MessageQueueCreater::CreateNewMessageQueue(const char* _messagequeue_name)
+{
     return CreateNewMessageQueue(boost::shared_ptr<RunloopCond>(), _messagequeue_name);
 }
 
-void MessageQueueCreater::ReleaseNewMessageQueue(MessageQueue_t _messagequeue_id) {
-
-	if (KInvalidQueueID == _messagequeue_id) return;
+void MessageQueueCreater::ReleaseNewMessageQueue(MessageQueue_t _messagequeue_id)
+{
+	if (KInvalidQueueID == _messagequeue_id)
+	{
+		return;
+	}
 
 	BreakMessageQueueRunloop(_messagequeue_id);
 	WaitForRunningLockEnd(_messagequeue_id);
 	ThreadUtil::join((thread_tid)_messagequeue_id);
 }
 
-void MessageQueueCreater::__ThreadNewRunloop(SpinLock* _sp) {
+void MessageQueueCreater::__ThreadNewRunloop(SpinLock* _sp)
+{
     ScopedSpinLock lock(*_sp);
     lock.unlock();
     delete _sp;
@@ -925,44 +947,59 @@ void MessageQueueCreater::__ThreadNewRunloop(SpinLock* _sp) {
     RunLoop().Run();
 }
 
-MessageQueue_t GetDefMessageQueue() {
+MessageQueue_t GetDefMessageQueue()
+{
     static MessageQueueCreater* s_defmessagequeue = new MessageQueueCreater;
     return s_defmessagequeue->CreateMessageQueue();
 }
 
-MessageQueue_t GetDefTaskQueue() {
+MessageQueue_t GetDefTaskQueue()
+{
     static MessageQueueCreater* s_deftaskqueue = new MessageQueueCreater;
     return s_deftaskqueue->CreateMessageQueue();
 }
 
-MessageHandler_t DefAsyncInvokeHandler(const MessageQueue_t& _messagequeue) {
+MessageHandler_t DefAsyncInvokeHandler(const MessageQueue_t& _messagequeue)
+{
     ScopedLock lock(sg_messagequeue_map_mutex);
     const MessageQueue_t& id = _messagequeue;
 
     std::map<MessageQueue_t, MessageQueueContent>::iterator pos = sg_messagequeue_map.find(id);
-    if (sg_messagequeue_map.end() == pos) return KNullHandler;
+	if (sg_messagequeue_map.end() == pos)
+	{
+		return KNullHandler;
+	}
 
     MessageQueueContent& content = pos->second;
     return content.invoke_reg;
 }
 
 ScopeRegister::ScopeRegister(const MessageHandler_t& _reg)
-: m_reg(new MessageHandler_t(_reg)) {}
+	: m_reg(new MessageHandler_t(_reg))
+{
+}
 
-ScopeRegister::~ScopeRegister() {
+ScopeRegister::~ScopeRegister()
+{
     Cancel();
     delete m_reg;
 }
 
 const MessageHandler_t& ScopeRegister::Get() const
-{return *m_reg;}
+{
+	return *m_reg;
+}
 
-void ScopeRegister::Cancel() const {
+void ScopeRegister::Cancel() const
+{
     UnInstallMessageHandler(*m_reg);
     CancelMessage(*m_reg);
 }
-void ScopeRegister::CancelAndWait() const {
+
+void ScopeRegister::CancelAndWait() const
+{
     Cancel();
     WaitForRunningLockEnd(*m_reg);
 }
+
 }  // namespace MessageQueue

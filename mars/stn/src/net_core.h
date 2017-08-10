@@ -30,45 +30,54 @@
 #include "mars/stn/src/longlink.h"
 #endif
 
-namespace mars {
-    
-    namespace stn {
+namespace mars
+{
+namespace stn
+{
 
 class NetSource;
 
-    
 class ShortLinkTaskManager;
-        
+
 #ifdef USE_LONG_LINK
 class LongLinkTaskManager;
 class TimingSync;
 class ZombieTaskManager;
 class NetSourceTimerCheck;
 #endif
-        
+
 class SignallingKeeper;
 class NetCheckLogic;
 class DynamicTimeout;
 class AntiAvalanche;
 
-enum {
+enum
+{
     kCallFromLong,
     kCallFromShort,
     kCallFromZombie,
 };
 
-class NetCore {
-  public:
+class NetCore
+{
+public:
     SINGLETON_INTRUSIVE(NetCore, new NetCore, __Release);
 
-  public:
+public:
     boost::function<void (Task& _task)> task_process_hook_;
     boost::function<int (int _from, ErrCmdType _err_type, int _err_code, int _fail_handle, const Task& _task)> task_callback_hook_;
     boost::signals2::signal<void (uint32_t _cmdid, const AutoBuffer& _buffer)> push_preprocess_signal_;
 
-  public:
-    MessageQueue::MessageQueue_t GetMessageQueueId() { return messagequeue_creater_.GetMessageQueue(); }
-    void    CancelAndWait() { messagequeue_creater_.CancelAndWait(); }
+public:
+    MessageQueue::MessageQueue_t GetMessageQueueId()
+	{
+		return messagequeue_creater_.GetMessageQueue();
+	}
+
+    void    CancelAndWait()
+	{
+		messagequeue_creater_.CancelAndWait();
+	}
     
     void    StartTask(const Task& _task);
     void    StopTask(uint32_t _taskid);
@@ -88,12 +97,12 @@ class NetCore {
     LongLink& Longlink();
 #endif
 
-  private:
+private:
     NetCore();
     virtual ~NetCore();
     static void __Release(NetCore* _instance);
     
-  private:
+private:
     int     __CallBack(int _from, ErrCmdType _err_type, int _err_code, int _fail_handle, const Task& _task, unsigned int _taskcosttime);
     void    __OnShortLinkNetworkError(int _line, ErrCmdType _err_type, int _err_code, const std::string& _ip, const std::string& _host, uint16_t _port);
 
@@ -110,11 +119,11 @@ class NetCore {
     
     void    __OnSignalActive(bool _isactive);
 
-  private:
+private:
     NetCore(const NetCore&);
     NetCore& operator=(const NetCore&);
 
-  private:
+private:
     MessageQueue::MessageQueueCreater   messagequeue_creater_;
     MessageQueue::ScopeRegister         asyncreg_;
     NetSource*                          net_source_;
@@ -134,7 +143,6 @@ class NetCore {
 #endif
 
     bool                                shortlink_try_flag_;
-
 };
         
 }}

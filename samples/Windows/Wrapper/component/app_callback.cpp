@@ -57,6 +57,7 @@ AccountInfo AppCallBack::GetAccountInfo()
     return info;
 }
 
+// ¿Í»§¶Ë°æ±¾ºÅ;
 unsigned int AppCallBack::GetClientVersion()
 {
     return 200;

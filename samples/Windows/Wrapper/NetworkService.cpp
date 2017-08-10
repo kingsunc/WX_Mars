@@ -44,20 +44,24 @@ void NetworkService::setClientVersion(uint32_t _client_version)
 {
 	mars::stn::SetClientVersion(_client_version);
 }
+
 void NetworkService::setShortLinkDebugIP(const std::string& _ip, unsigned short _port)
 {
 	mars::stn::SetShortlinkSvrAddr(_port, _ip);
 }
+
 void NetworkService::setShortLinkPort(unsigned short _port)
 {
 	mars::stn::SetShortlinkSvrAddr(_port, "");
 }
+
 void NetworkService::setLongLinkAddress(const std::string& _ip, unsigned short _port, const std::string& _debug_ip)
 {
 	std::vector<uint16_t> ports;
 	ports.push_back(_port);
 	mars::stn::SetLonglinkSvrAddr(_ip, ports, _debug_ip);
 }
+
 void NetworkService::Start()
 {
 	mars::baseevent::OnForeground(true);

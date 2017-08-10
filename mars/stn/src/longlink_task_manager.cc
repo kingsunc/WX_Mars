@@ -64,7 +64,8 @@ LongLinkTaskManager::LongLinkTaskManager(NetSource& _netsource, ActiveLogic& _ac
     longlink_->SignalConnection.connect(boost::bind(&LongLinkTaskManager::__SignalConnection, this, _1));
 }
 
-LongLinkTaskManager::~LongLinkTaskManager() {
+LongLinkTaskManager::~LongLinkTaskManager()
+{
     xinfo_function();
     longlink_->SignalConnection.disconnect(boost::bind(&LongLinkTaskManager::__SignalConnection, this, _1));
     asyncreg_.CancelAndWait();
@@ -78,7 +79,8 @@ LongLinkTaskManager::~LongLinkTaskManager() {
 #endif
 }
 
-bool LongLinkTaskManager::StartTask(const Task& _task) {
+bool LongLinkTaskManager::StartTask(const Task& _task)
+{
     xverbose_function();
     xdebug2(TSF"taskid=%0", _task.taskid);
 
@@ -92,14 +94,17 @@ bool LongLinkTaskManager::StartTask(const Task& _task) {
     return true;
 }
 
-bool LongLinkTaskManager::StopTask(uint32_t _taskid) {
+bool LongLinkTaskManager::StopTask(uint32_t _taskid)
+{
     xverbose_function();
 
     std::list<TaskProfile>::iterator first = lst_cmd_.begin();
     std::list<TaskProfile>::iterator last = lst_cmd_.end();
 
-    while (first != last) {
-        if (_taskid == first->task.taskid) {
+    while (first != last)
+	{
+        if (_taskid == first->task.taskid)
+		{
             xinfo2(TSF"find the task taskid:%0", _taskid);
 
             longlink_->Stop(first->task.taskid);
@@ -113,14 +118,17 @@ bool LongLinkTaskManager::StopTask(uint32_t _taskid) {
     return false;
 }
 
-bool LongLinkTaskManager::HasTask(uint32_t _taskid) const {
+bool LongLinkTaskManager::HasTask(uint32_t _taskid) const
+{
     xverbose_function();
 
     std::list<TaskProfile>::const_iterator first = lst_cmd_.begin();
     std::list<TaskProfile>::const_iterator last = lst_cmd_.end();
 
-    while (first != last) {
-    	if (_taskid == first->task.taskid) {
+    while (first != last)
+	{
+    	if (_taskid == first->task.taskid)
+		{
     		return true;
     	}
     	++first;
@@ -129,28 +137,33 @@ bool LongLinkTaskManager::HasTask(uint32_t _taskid) const {
     return false;
 }
 
-void LongLinkTaskManager::ClearTasks() {
+void LongLinkTaskManager::ClearTasks()
+{
     xverbose_function();
     longlink_->Disconnect(LongLink::kReset);
     MessageQueue::CancelMessage(asyncreg_.Get(), 0);
     lst_cmd_.clear();
 }
 
-unsigned int LongLinkTaskManager::GetTaskCount() {
+unsigned int LongLinkTaskManager::GetTaskCount()
+{
     return (unsigned int)lst_cmd_.size();
 }
 
-unsigned int LongLinkTaskManager::GetTasksContinuousFailCount() {
+unsigned int LongLinkTaskManager::GetTasksContinuousFailCount()
+{
     return tasks_continuous_fail_count_;
 }
 
-void LongLinkTaskManager::RedoTasks() {
+void LongLinkTaskManager::RedoTasks()
+{
     xinfo_function();
 
     std::list<TaskProfile>::iterator first = lst_cmd_.begin();
     std::list<TaskProfile>::iterator last = lst_cmd_.end();
 
-    while (first != last) {
+    while (first != last)
+	{
         std::list<TaskProfile>::iterator next = first;
         ++next;
 
@@ -501,19 +514,22 @@ std::list<TaskProfile>::iterator LongLinkTaskManager::__Locate(uint32_t _taskid)
     return it;
 }
 
-void LongLinkTaskManager::__OnResponse(ErrCmdType _error_type, int _error_code, uint32_t _cmdid, uint32_t _taskid, AutoBuffer& _body, AutoBuffer& _extension, const ConnectProfile& _connect_profile) {
+void LongLinkTaskManager::__OnResponse(ErrCmdType _error_type, int _error_code, uint32_t _cmdid, uint32_t _taskid, AutoBuffer& _body, AutoBuffer& _extension, const ConnectProfile& _connect_profile)
+{
     move_wrapper<AutoBuffer> body(_body);
     move_wrapper<AutoBuffer> extension(_extension);
     RETURN_LONKLINK_SYNC2ASYNC_FUNC(boost::bind(&LongLinkTaskManager::__OnResponse, this, _error_type, _error_code, _cmdid, _taskid, body, extension, _connect_profile));
     // svr push notify
     
-    if (kEctOK == _error_type && ::longlink_ispush(_cmdid, _taskid, body, extension))  {
+    if (kEctOK == _error_type && ::longlink_ispush(_cmdid, _taskid, body, extension))
+	{
         xinfo2(TSF"task push seq:%_, cmdid:%_, len:(%_, %_)", _taskid, _cmdid, body->Length(), extension->Length());
         OnPush(_connect_profile.start_time, _cmdid, _taskid, body, extension);
         return;
     }
     
-    if (kEctOK != _error_type) {
+    if (kEctOK != _error_type)
+	{
         xwarn2(TSF"task error, taskid:%_, cmdid:%_, error_type:%_, error_code:%_", _taskid, _cmdid, _error_type, _error_code);
         __BatchErrorRespHandle(_error_type, _error_code, kTaskFailHandleDefault, 0, _connect_profile);
         return;
@@ -521,7 +537,8 @@ void LongLinkTaskManager::__OnResponse(ErrCmdType _error_type, int _error_code, 
     
     std::list<TaskProfile>::iterator it = __Locate(_taskid);
     
-    if (lst_cmd_.end() == it) {
+    if (lst_cmd_.end() == it)
+	{
         xwarn2_if(Task::kInvalidTaskID != _taskid, TSF"task no found task:%0, cmdid:%1, ect:%2, errcode:%3",
                   _taskid, _cmdid, _error_type, _error_code);
         return;
@@ -534,7 +551,8 @@ void LongLinkTaskManager::__OnResponse(ErrCmdType _error_type, int _error_code, 
     int err_code = 0;
     int handle_type = Buf2Resp(it->task.taskid, it->task.user_context, body, extension, err_code, Task::kChannelLong);
     
-    switch(handle_type){
+    switch(handle_type)
+	{
         case kTaskFailHandleNoError:
         {
             dynamic_timeout_.CgiTaskStatistic(it->task.cgi, (unsigned int)it->transfer_profile.send_data_size + (unsigned int)body->Length(), ::gettickcount() - it->transfer_profile.start_send_time);

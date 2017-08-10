@@ -22,8 +22,10 @@
 
 #include <stdint.h>
 
-namespace mars{
-namespace baseevent{
+namespace mars
+{
+namespace baseevent
+{
     void OnCreate();
     void OnDestroy();
     void OnSingalCrash(int _sig);

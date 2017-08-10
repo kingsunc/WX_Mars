@@ -26,13 +26,13 @@
 #ifdef ANDROID
 #include <jni.h>
 
-namespace mars {
-namespace baseevent {
-
+namespace mars
+{
+namespace baseevent
+{
 	extern void addLoadModule(std::string _module_name);
 
 	extern jobject getLoadLibraries(JNIEnv *_env);
-
 }
 }
 

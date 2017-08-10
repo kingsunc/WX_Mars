@@ -36,21 +36,34 @@
 
 class ActiveLogic;
 
-namespace mars {
-    namespace stn {
+namespace mars
+{
+namespace stn
+{
 
 struct IPPortItem;
 
-class NetSource {
-  public:
-    class DnsUtil {
+class NetSource
+{
+public:
+
+	// DNS∏®÷˙¿‡;
+	class DnsUtil
+	{
+
     public:
     	DnsUtil();
         ~DnsUtil();
-        
+
     public:
-        DNS& GetNewDNS() {	return new_dns_;}
-        DNS& GetDNS() {	return dns_;}
+        DNS& GetNewDNS()
+		{
+			return new_dns_;
+		}
+        DNS& GetDNS()
+		{
+			return dns_;
+		}
 
         void Cancel(const std::string& host = "");
         
@@ -63,7 +76,7 @@ class NetSource {
         DNS dns_;
     };
 
-  public:
+public:
     //set longlink host and ports
     static void SetLongLink(const std::vector<std::string>& _hosts, const std::vector<uint16_t>& _ports, const std::string& _debugip);
     //set shortlink port
@@ -85,11 +98,11 @@ class NetSource {
 
     static std::string DumpTable(const std::vector<IPPortItem>& _ipport_items);
     
-  public:
+public:
     NetSource(ActiveLogic& _active_logic);
     ~NetSource();
 
-  public:
+public:
     // for long link
     bool GetLongLinkItems(std::vector<IPPortItem>& _ipport_items, DnsUtil& _dns_util);
 
@@ -106,8 +119,8 @@ class NetSource {
     bool GetLongLinkSpeedTestIPs(std::vector<IPPortItem>& _ip_vec);
     void ReportLongLinkSpeedTestResult(std::vector<IPPortItem>& _ip_vec);
 
-  private:
-    
+private:
+
     bool __HasShortLinkDebugIP(const std::vector<std::string>& _hostlist);
     
     bool __GetLonglinkDebugIPPort(std::vector<IPPortItem>& _ipport_items);
@@ -116,13 +129,11 @@ class NetSource {
     void __GetIPPortItems(std::vector<IPPortItem>& _ipport_items, const std::vector<std::string>& _hostlist, DnsUtil& _dns_util, bool _islonglink);
     size_t __MakeIPPorts(std::vector<IPPortItem>& _ip_items, const std::string& _host, size_t _count, DnsUtil& _dns_util, bool _isbackup, bool _islonglink);
 
-  private:
+private:
     ActiveLogic&        active_logic_;
     SimpleIPPortSort    ipportstrategy_;
 };
         
-    }
-}
-
+}}
 
 #endif // STN_SRC_NETSOURCE_H_

@@ -139,14 +139,14 @@
     <ClInclude Include="component\shortlink_packer.h" />
     <ClInclude Include="component\stnproto_logic.h" />
     <ClInclude Include="component\stn_callback.h" />
+    <ClInclude Include="idl\tars\request.h" />
     <ClInclude Include="MarsWrapper.h" />
     <ClInclude Include="NetworkObserver.h" />
     <ClInclude Include="NetworkService.h" />
-    <ClInclude Include="request\request.h" />
-    <ClInclude Include="request\Tars.h" />
-    <ClInclude Include="request\TarsDisplayer.h" />
-    <ClInclude Include="request\TarsType.h" />
-    <ClInclude Include="request\tup.h" />
+    <ClInclude Include="protocol\tars\Tars.h" />
+    <ClInclude Include="protocol\tars\TarsDisplayer.h" />
+    <ClInclude Include="protocol\tars\TarsType.h" />
+    <ClInclude Include="protocol\tars\tup.h" />
     <ClInclude Include="task\CGITask.h" />
     <ClInclude Include="task\Login_Task.h" />
   </ItemGroup>

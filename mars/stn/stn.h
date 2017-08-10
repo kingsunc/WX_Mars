@@ -45,10 +45,10 @@ public:
     static const int kChannelLong	= 0x2;		// 长连接，tcp
     static const int kChannelBoth	= 0x3;		// 全连接
 
-	// 通道策略
-    static const int kChannelNormalStrategy				= 0;	// 通道普通策略
-    static const int kChannelFastStrategy				= 1;	// 通道快速策略
-    static const int kChannelDisasterRecoveryStategy	= 2;	// 通道容灾策略
+	// 通道策略(普通、快速、容灾)
+	static const int kChannelNormalStrategy				= 0;
+	static const int kChannelFastStrategy				= 1;
+	static const int kChannelDisasterRecoveryStategy	= 2;
 
 	// 任务优先级划分
     static const int kTaskPriorityHighest = 0;
@@ -70,17 +70,17 @@ public:
     Task(uint32_t _taskid);
 
     // 请求
-    uint32_t		taskid;				// 任务ID
-    uint32_t		cmdid;				// 命令ID;
-    uint64_t		channel_id;			// 通道ID;
-    int32_t			channel_select;		// 通道类型;
-    std::string		cgi;				// user
+    uint32_t		taskid;						// 任务ID
+    uint32_t		cmdid;						// 命令ID;
+    uint64_t		channel_id;					// 通道ID;
+    int32_t			channel_select;				// 通道类型;
+    std::string		cgi;						// user
 
     //optional
-    bool			send_only;			// user - 只发送，不需要响应;
-    bool			need_authed;		// user - 需要认证;
-    bool			limit_flow;			// user - 限制流畅;
-    bool			limit_frequency;	// user - 限制频率;
+    bool			send_only;					// user - 只发送，不需要响应;
+    bool			need_authed;				// user - 需要认证;
+    bool			limit_flow;					// user - 限制流畅;
+    bool			limit_frequency;			// user - 限制频率;
     
     bool			network_status_sensitive;	// user - 网络状态敏感;
     int32_t			channel_strategy;			// 通道策略;

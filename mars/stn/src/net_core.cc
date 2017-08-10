@@ -298,13 +298,16 @@ void NetCore::StartTask(const Task& _task) {
 
     xgroup2() << group;
 
-    switch (task.channel_select) {
-    case Task::kChannelBoth: {
+    switch (task.channel_select)
+	{
+    case Task::kChannelBoth:
+	{
 
 #ifdef USE_LONG_LINK
         bool bUseLongLink = LongLink::kConnected == longlink_task_manager_->LongLinkChannel().ConnectStatus();
 
-        if (bUseLongLink && task.channel_strategy == Task::kChannelFastStrategy) {
+        if (bUseLongLink && (task.channel_strategy == Task::kChannelFastStrategy) )
+		{
             xinfo2(TSF"long link task count:%0, ", longlink_task_manager_->GetTaskCount());
             bUseLongLink = bUseLongLink && (longlink_task_manager_->GetTaskCount() <= kFastSendUseLonglinkTaskCntLimit);
         }
