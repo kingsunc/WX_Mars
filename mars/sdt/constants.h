@@ -20,48 +20,48 @@
 #ifndef SDT_INTERFACE_CONSTANTS_H_
 #define SDT_INTERFACE_CONSTANTS_H_
 
-#define NET_CHECK_BASIC 1
-#define NET_CHECK_LONG (1 << 1)
-#define NET_CHECK_SHORT (1 << 2)
+#define NET_CHECK_BASIC		1
+#define NET_CHECK_LONG		(1 << 1)
+#define NET_CHECK_SHORT		(1 << 2)
 
 // Error sequence.
-#define ERR_SEQ (-1)
+#define ERR_SEQ				(-1)
 
-#define MODE_BASIC(mode) ((mode) & NET_CHECK_BASIC)
-#define MODE_LONG(mode) ((mode) & NET_CHECK_LONG)
-#define MODE_SHORT(mode) ((mode) & NET_CHECK_SHORT)
+#define MODE_BASIC(mode)	((mode) & NET_CHECK_BASIC)
+#define MODE_LONG(mode)		((mode) & NET_CHECK_LONG)
+#define MODE_SHORT(mode)	((mode) & NET_CHECK_SHORT)
 
 // For default host.
-#define DEFAULT_HTTP_HOST "www.qq.com"
-#define DEFAULT_PING_HOST "www.qq.com"
-#define DUMMY_HOST "DUMMY HOST"
+#define DEFAULT_HTTP_HOST	"www.qq.com"
+#define DEFAULT_PING_HOST	"www.qq.com"
+#define DUMMY_HOST			"DUMMY HOST"
 
 // For report builder.
-#define NET_CHECK_TAG "NET_CHECK"
+#define NET_CHECK_TAG		"NET_CHECK"
 
-#define CHECK_SUC "check success"
-#define CHECK_FAIL "check failed"
+#define CHECK_SUC			"check success"
+#define CHECK_FAIL			"check failed"
 
 // For net type report.
-#define NoNetType "NoNet"
-#define WifiType "Wifi Net"
-#define MobileType "Mobile Net"
-#define OtherNetType "Other Net"
+#define NoNetType			"NoNet"
+#define WifiType			"Wifi Net"
+#define MobileType			"Mobile Net"
+#define OtherNetType		"Other Net"
 
 // For HTTP
-#define HTTP_DEFAULT_TIMEOUT        (5*1000)   // 5000ms
+#define HTTP_DEFAULT_TIMEOUT        (5*1000)	// 5000ms
 #define HTTP_DUMMY_RECV_DATA_SIZE   (1)
 // For PING
-#define DEFAULT_PING_TIMEOUT        (4)        // 4s
-#define DEFAULT_PING_COUNT          (2)        // times
-#define DEFAULT_PING_INTERVAL       (1)        // 1s
+#define DEFAULT_PING_TIMEOUT        (4)			// 4s
+#define DEFAULT_PING_COUNT          (2)			// times
+#define DEFAULT_PING_INTERVAL       (1)			// 1s
 // For TCP
-#define DEFAULT_TCP_CONN_TIMEOUT 5000  // ms
-#define DEFAULT_TCP_RECV_TIMEOUT    (5*1000)   // 5000ms
+#define DEFAULT_TCP_CONN_TIMEOUT	5000		// ms
+#define DEFAULT_TCP_RECV_TIMEOUT    (5*1000)	// 5000ms
 // For DNS
-#define DEFAULT_DNS_TIMEOUT         (3*1000)   // 3000ms
+#define DEFAULT_DNS_TIMEOUT         (3*1000)	// 3000ms
 // For net check timeout
-#define UNUSE_TIMEOUT               (INT_MAX)        // ms
+#define UNUSE_TIMEOUT               (INT_MAX)	// ms
 
 // For HTTP User agent.
 #ifdef ANDROID

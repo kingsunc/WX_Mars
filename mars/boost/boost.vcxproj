@@ -48,7 +48,7 @@
     <OutDir>$(SolutionDir)\lib_d\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)$(Configuration)\lib\</OutDir>
+    <OutDir>$(SolutionDir)\lib_d\</OutDir>
     <IncludePath>$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">

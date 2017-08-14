@@ -17,7 +17,6 @@
 
 #include "mars/comm/socket/unix_socket.h"
 
-
 #ifdef __cplusplus
 extern "C"{
 #endif
@@ -36,17 +35,15 @@ extern "C"{
 struct socket_ipinfo_t
 {
     int  size;
-//    int  cost;
-//    struct  in_addr dns;
+	// int  cost;
+	// struct  in_addr dns;
     struct  in_addr ip[SOCKET_MAX_IP_COUNT];
 };
 
 int socket_gethostbyname(const char* _host, struct socket_ipinfo_t* _ipinfo, int _timeout /*ms*/, const char* _dnsserver);
 
-
 #ifdef __cplusplus
 }
-
 
 ////////
 class NetCheckTrafficMonitor;
@@ -54,5 +51,3 @@ int socket_gethostbyname(const char* _host, struct socket_ipinfo_t* _ipinfo, int
 #endif
 
 #endif //SDT_SRC_CHECKIMPL_DNSQUERY_H_
-
-

@@ -31,19 +31,22 @@
 
 #include "netchecker_profile.h"
 
-namespace mars {
-namespace sdt {
+namespace mars
+{
+namespace sdt
+{
 
-class BaseChecker {
-  public:
+class BaseChecker
+{
+public:
     BaseChecker();
     virtual ~BaseChecker();
 
-  public:
+public:
     virtual int StartDoCheck(CheckRequestProfile& _check_request) = 0;
     virtual int CancelDoCheck() = 0;
 
-  protected:
+protected:
     virtual void __DoCheck(CheckRequestProfile& _check_request) = 0;
 };
 

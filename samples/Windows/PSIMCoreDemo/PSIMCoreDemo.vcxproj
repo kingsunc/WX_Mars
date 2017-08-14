@@ -94,7 +94,7 @@
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>ws2_32.lib;libeay32.lib;ssleay32.lib;app.lib;baseevent.lib;boost.lib;comm.lib;log.lib;openssl.lib;sdt.lib;stn.lib;PSIMCore.lib;Wrapper.lib</AdditionalDependencies>
+      <AdditionalDependencies>ws2_32.lib;libeay32.lib;ssleay32.lib;app.lib;baseevent.lib;boost.lib;comm.lib;log.lib;openssl.lib;sdt.lib;stn.lib;Wrapper.lib;PSIMCore.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>..\lib_d</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>

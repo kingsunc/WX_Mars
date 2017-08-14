@@ -32,40 +32,47 @@ using namespace mars::sdt;
 
 static std::string sg_netcheck_cgi;
 
-namespace mars {
-namespace sdt {
-
-	void SetHttpNetcheckCGI(std::string cgi) {
+namespace mars
+{
+namespace sdt
+{
+	void SetHttpNetcheckCGI(std::string cgi)
+	{
 		sg_netcheck_cgi = cgi;
 	}
+}}
 
-}
-}
-
-HttpChecker::HttpChecker() {
+HttpChecker::HttpChecker()
+{
     xverbose_function();
 }
 
-HttpChecker::~HttpChecker() {
+HttpChecker::~HttpChecker()
+{
     xverbose_function();
 }
 
-int HttpChecker::StartDoCheck(CheckRequestProfile& _check_request) {
+int HttpChecker::StartDoCheck(CheckRequestProfile& _check_request)
+{
     xinfo_function();
     return BaseChecker::StartDoCheck(_check_request);
 }
 
-int HttpChecker::CancelDoCheck() {
+int HttpChecker::CancelDoCheck()
+{
     xinfo_function();
     return BaseChecker::CancelDoCheck();
 }
 
-void HttpChecker::__DoCheck(CheckRequestProfile& _check_request) {
+void HttpChecker::__DoCheck(CheckRequestProfile& _check_request)
+{
     xinfo_function();
 
-    for (CheckIPPorts_Iterator iter = _check_request.shortlink_items.begin(); iter != _check_request.shortlink_items.end(); ++iter) {
+    for (CheckIPPorts_Iterator iter = _check_request.shortlink_items.begin(); iter != _check_request.shortlink_items.end(); ++iter)
+	{
     	std::string host = iter->first;
-    	for (std::vector<CheckIPPort>::iterator ipport = iter->second.begin(); ipport != iter->second.end(); ++ipport) {
+    	for (std::vector<CheckIPPort>::iterator ipport = iter->second.begin(); ipport != iter->second.end(); ++ipport)
+		{
     		CheckResultProfile profile;
     		profile.netcheck_type = kHttpCheck;
     		profile.network_type = ::getNetInfo();
@@ -77,7 +84,8 @@ void HttpChecker::__DoCheck(CheckRequestProfile& _check_request) {
     		uint64_t start_time = gettickcount();
     		std::string errmsg;
             
-            if (!strutil::StartsWith(profile.url, "http://")) {
+            if (!strutil::StartsWith(profile.url, "http://"))
+			{
                 profile.url = std::string("http://") + profile.url;
             }
             
@@ -85,19 +93,23 @@ void HttpChecker::__DoCheck(CheckRequestProfile& _check_request) {
     		uint64_t cost_time = gettickcount() - start_time;
     		profile.rtt = cost_time;
 
-            if (ret >= 0) {
+            if (ret >= 0)
+			{
                 xinfo2(TSF"http check, host: %_, ret: %_", profile.url, profile.status_code);
             }
-            else {
+            else
+			{
                 xinfo2(TSF"http check, host: %_, ret: %_", profile.url, profile.status_code);
             }
 
             _check_request.checkresult_profiles.push_back(profile);
             _check_request.check_status = (ret >= 0 ? kCheckContinue : kCheckFinish);
 
-			if (_check_request.total_timeout != UNUSE_TIMEOUT) {
+			if (_check_request.total_timeout != UNUSE_TIMEOUT)
+			{
 				_check_request.total_timeout -= cost_time;
-				if (_check_request.total_timeout <= 0) {
+				if (_check_request.total_timeout <= 0)
+				{
 					xinfo2(TSF"http check, host: %_, timeout.", host);
 					break;
 				}

@@ -15,5 +15,8 @@ int main()
 
 	getchar();
 
+	AfxGetPSIMCall()->UnInit();
+	CPSIMCallFactory::ReleaseInstance();
+
 	return 1;
 }

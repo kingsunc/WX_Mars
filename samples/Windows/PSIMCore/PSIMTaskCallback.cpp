@@ -15,7 +15,7 @@ CPSIMTaskCallback* CPSIMTaskCallback::GetInstance()
 {
 	if (!m_pInstance)
 	{
-		m_pInstance = new CPSIMTaskCallback;
+		m_pInstance = new CPSIMTaskCallback();
 	}
 	return m_pInstance;
 }

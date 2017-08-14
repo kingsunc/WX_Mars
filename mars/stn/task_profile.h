@@ -30,24 +30,28 @@
 #include "mars/stn/stn.h"
 #include "mars/stn/config.h"
 
-namespace mars {
-namespace stn  {
+namespace mars
+{
+namespace stn
+{
 
-struct ProfileExtension {
-
+struct ProfileExtension
+{
 	ProfileExtension() {}
 	virtual ~ProfileExtension() {}
 
 	virtual void Reset() {}
 };
 
-struct NoopProfile {
-
-    NoopProfile() {
-    	Reset();
+struct NoopProfile
+{
+    NoopProfile()
+	{
+		Reset();
     }
 
-    void Reset() {
+    void Reset()
+	{
         success = false;
         noop_internal = 0;
         noop_actual_internal = 0;
@@ -63,22 +67,24 @@ struct NoopProfile {
 };
 
 
-struct ConnectProfile {
-    
-    ConnectProfile() {
+struct ConnectProfile
+{
+    ConnectProfile()
+	{
         Reset();
     }
-    
-    void Reset(){
+
+    void Reset()
+	{
         net_type.clear();
         tid = 0;
-        
+
         start_time = 0;
         dns_time = 0;
         dns_endtime = 0;
         //todo
         ip_items.clear();
-        
+
         conn_reason = 0;
         conn_time = 0;
         conn_errcode = 0;
@@ -102,8 +108,10 @@ struct ConnectProfile {
         nat64 = false;
 
         noop_profiles.clear();
-        if (extension_ptr)
-        		extension_ptr->Reset();
+		if (extension_ptr)
+		{
+			extension_ptr->Reset();
+		}
     }
     
     std::string net_type;
@@ -143,12 +151,15 @@ struct ConnectProfile {
 };
 
         
-struct TransferProfile {
-    TransferProfile(const Task& _task):task(_task){
+struct TransferProfile
+{
+    TransferProfile(const Task& _task):task(_task)
+	{
         Reset();
     }
     
-    void Reset() {
+    void Reset()
+	{
         connect_profile.Reset();
         loop_start_task_time = 0;
         first_start_send_time = 0;
@@ -171,12 +182,12 @@ struct TransferProfile {
     const Task& task;
     ConnectProfile connect_profile;
     
-    uint64_t loop_start_task_time;  // ms
-    uint64_t first_start_send_time; //ms
-    uint64_t start_send_time;    // ms
-    uint64_t last_receive_pkg_time;  // ms
-    uint64_t read_write_timeout;    // ms
-    uint64_t first_pkg_timeout;  // ms
+    uint64_t loop_start_task_time;			// ms
+    uint64_t first_start_send_time;			// ms
+    uint64_t start_send_time;				// ms
+    uint64_t last_receive_pkg_time;			// ms
+    uint64_t read_write_timeout;			// ms
+    uint64_t first_pkg_timeout;				// ms
     
     size_t sent_size;
     size_t send_data_size;
@@ -189,33 +200,35 @@ struct TransferProfile {
     int error_code;
 };
         
-struct TaskProfile {
-    
-    static uint64_t ComputeTaskTimeout(const Task& _task) {
+struct TaskProfile
+{
+    static uint64_t ComputeTaskTimeout(const Task& _task)
+	{
         uint64_t readwritetimeout = 15 * 1000;
-        
-        if (0 < _task.server_process_cost)
-            readwritetimeout = _task.server_process_cost + 15 * 1000;
+		if (0 < _task.server_process_cost)
+		{
+			readwritetimeout = _task.server_process_cost + 15 * 1000;
+		}
         
         int trycount = 0;// DEF_TASK_RETRY_COUNT;
-        
-        if (0 <= _task.retry_count)
-            trycount = _task.retry_count;
+		if (0 <= _task.retry_count)
+		{
+			trycount = _task.retry_count;
+		}
         
         trycount++;
-        
         uint64_t task_timeout = (readwritetimeout + 5 * 1000) * trycount;
-        
-        if (0 < _task.total_timetout &&  (uint64_t)_task.total_timetout < task_timeout)
+		if (0 < _task.total_timetout && (uint64_t)_task.total_timetout < task_timeout)
+		{
             task_timeout = _task.total_timetout;
-        
+		}
+
         return  task_timeout;
     }
     
-    TaskProfile(const Task& _task):task(_task), transfer_profile(task), task_timeout(ComputeTaskTimeout(_task)), start_task_time(::gettickcount()){
-        
+    TaskProfile(const Task& _task):task(_task), transfer_profile(task), task_timeout(ComputeTaskTimeout(_task)), start_task_time(::gettickcount())
+	{
         remain_retry_count = task.retry_count;
-        
         running_id = 0;
         
         end_task_time = 0;
@@ -232,13 +245,15 @@ struct TaskProfile {
         err_type = kEctOK;
         err_code = 0;
     }
-    
-    void InitSendParam() {
+
+    void InitSendParam()
+	{
         transfer_profile.Reset();
         running_id = 0;
     }
-    
-    void PushHistory() {
+
+    void PushHistory()
+	{
         history_transfer_profiles.push_back(transfer_profile);
     }
 
@@ -247,8 +262,8 @@ struct TaskProfile {
     intptr_t running_id;
     
     const uint64_t task_timeout;
-    const uint64_t start_task_time;  // ms
-    uint64_t end_task_time;	//ms
+    const uint64_t start_task_time;		// ms
+    uint64_t end_task_time;				// ms
     uint64_t retry_start_time;
 
     int remain_retry_count;
@@ -259,7 +274,7 @@ struct TaskProfile {
     bool antiavalanche_checked;
     
     bool use_proxy;
-    uint64_t retry_time_interval;    // ms
+    uint64_t retry_time_interval;		// ms
 
     ErrCmdType err_type;
     int err_code;
@@ -267,13 +282,12 @@ struct TaskProfile {
 
     std::vector<TransferProfile> history_transfer_profiles;
 };
-        
 
 void __SetLastFailedStatus(std::list<TaskProfile>::iterator _it);
 uint64_t __ReadWriteTimeout(uint64_t  _first_pkg_timeout);
 uint64_t  __FirstPkgTimeout(int64_t  _init_first_pkg_timeout, size_t _sendlen, int _send_count, int _dynamictimeout_status);
 bool __CompareTask(const TaskProfile& _first, const TaskProfile& _second);
+
 }}
 
 #endif
-

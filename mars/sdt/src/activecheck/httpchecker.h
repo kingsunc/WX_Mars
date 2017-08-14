@@ -27,18 +27,21 @@
 
 #include "basechecker.h"
 
-namespace mars {
-namespace sdt {
+namespace mars
+{
+namespace sdt
+{
 
-class HttpChecker : public BaseChecker {
-  public:
+class HttpChecker : public BaseChecker
+{
+public:
     HttpChecker();
     virtual ~HttpChecker();
 
     virtual int StartDoCheck(CheckRequestProfile& _check_request);
     virtual int CancelDoCheck();
 
-  protected:
+protected:
     virtual void __DoCheck(CheckRequestProfile& _check_request);
 };
 

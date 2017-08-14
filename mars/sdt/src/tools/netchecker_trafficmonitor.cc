@@ -29,7 +29,8 @@ NetCheckTrafficMonitor::NetCheckTrafficMonitor(unsigned long mobileDataThreshold
     , mobile_send_data_size_(0)
     , wifi_data_threshold_(wifiDataThreshold)
     , mobile_data_threshold_(mobileDataThreshold)
-    , is_ignore_recv_data_(isIgnoreRecvData) {
+    , is_ignore_recv_data_(isIgnoreRecvData)
+{
     xinfo_function();
 }
 
@@ -94,7 +95,8 @@ int NetCheckTrafficMonitor::__data(unsigned long sendDataSize, unsigned long rec
     return 0;
 }
 
-void NetCheckTrafficMonitor::__dumpDataSize() {
+void NetCheckTrafficMonitor::__dumpDataSize()
+{
     xinfo_function();
     xinfo2(TSF"m_wifiRecvDataSize=%_,wifi_send_data_size_=%_,mobile_recv_data_size_=%_,mobile_send_data_size_=%_,wifi_data_threshold_=%_,mobile_data_threshold_=%_,is_ignore_recv_data_=%_"
            , wifi_recv_data_size_, wifi_send_data_size_, mobile_recv_data_size_, mobile_send_data_size_, wifi_data_threshold_, mobile_data_threshold_, is_ignore_recv_data_);

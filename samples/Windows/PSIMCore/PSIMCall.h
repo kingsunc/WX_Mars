@@ -17,6 +17,29 @@ public:
 	virtual void MsgLogin(const char* strAppID, const char* strAppToken, const char* strUserID, const char* strUserName, const char* strDeviceToken) = 0;
 	// 注销
 	virtual void MsgLogout() = 0;
+
+	//// 获取群信息;
+	//virtual void GetGroupInfo(const char* strGroupID) = 0;
+	//
+	//// 获取群成员;
+	//virtual void GetGroupUsers(const char* strGroupID, const int iPageNum, const int iPageSize) = 0;
+	//// 添加群成员;
+	//virtual void AddGroupUsers(const char* strGroupID) = 0;
+	//// 添加群成员;
+	//virtual void DeleteGroupUsers(const char* strGroupID) = 0;
+
+	//// 设置群成员角色
+	//virtual void SetGroupUserRole(const char* strGroupID) = 0;
+
+	//// 禁言
+	//virtual void Shutup(const char* strGroupID) = 0;
+	//// 解禁
+	//virtual void UnShutup(const char* strGroupID) = 0;
+	//// 获取禁言列表
+	//virtual void GetShutupList(const char* strGroupID) = 0;
+
+	//// 邀请群成员
+	//virtual void InviteGroupUsers(const char* strGroupID) = 0;
 };
 
 class CPSIMCallFactory

@@ -32,6 +32,14 @@ CPSIMCallBack* CPSIMCallConcrete::GetIMPSCallBack()
 // ≥ı ºªØ;
 bool CPSIMCallConcrete::Init()
 {
+	char strIn[100] = "abcdefghijklmnopqrstuvwxyz";
+	char strOut[100] = {0};
+	AutoBuffer strBuff;
+	strBuff.AllocWrite(strlen(strIn) + 1, true);
+	strBuff.Write(strIn);
+	strBuff.Seek(0, AutoBuffer::ESeekStart);
+	strBuff.Read(10, strOut, 6);
+
 	// init xlog
 	std::string logPath = "D://Log";	//use your log path
 	std::string pubKey = "aaa";			//use you pubkey for log encrypt						 
