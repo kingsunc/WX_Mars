@@ -58,40 +58,48 @@
 using namespace mars::stn;
 using namespace mars::app;
 
-inline  static bool __ValidAndInitDefault(Task& _task, XLogger& _group) {
-    if (2*60*1000 < _task.server_process_cost) {
+inline  static bool __ValidAndInitDefault(Task& _task, XLogger& _group)
+{
+    if (2*60*1000 < _task.server_process_cost)
+	{
         xerror2(TSF"server_process_cost invalid:%_ ", _task.server_process_cost) >> _group;
         return false;
     }
     
-    if (30 < _task.retry_count) {
+    if (30 < _task.retry_count)
+	{
         xerror2(TSF"retrycount invalid:%_ ", _task.retry_count) >> _group;
         return false;
     }
     
-    if (10 * 60 * 1000 < _task.total_timetout) {
+    if (10 * 60 * 1000 < _task.total_timetout)
+	{
         xerror2(TSF"total_timetout invalid:%_ ", _task.total_timetout) >> _group;
         return false;
     }
     
-    if (_task.channel_select & Task::kChannelLong) {
+    if (_task.channel_select & Task::kChannelLong)
+	{
         xassert2(_task.cmdid > 0);
-        
-        if (0 == _task.cmdid) {
+        if (0 == _task.cmdid)
+		{
             xerror2("use longlink, but 0 == _task.cmdid ") >> _group;
             _task.channel_select &= ~Task::kChannelLong;
         }
     }
     
-    if (_task.channel_select & Task::kChannelShort) {
+    if (_task.channel_select & Task::kChannelShort)
+	{
         xassert2(!_task.cgi.empty());
-        if (_task.cgi.empty()) {
+        if (_task.cgi.empty())
+		{
             xerror2("use shortlink, but cgi is empty ") >> _group;
             _task.channel_select &= ~Task::kChannelShort;
         }
     }
     
-    if (0 >  _task.retry_count) {
+    if (0 >  _task.retry_count)
+	{
         _task.retry_count = DEF_TASK_RETRY_COUNT;
     }
     
@@ -99,9 +107,7 @@ inline  static bool __ValidAndInitDefault(Task& _task, XLogger& _group) {
 }
 
 #define AYNC_HANDLER asyncreg_.Get()
-
 static const int kShortlinkErrTime = 3;
-
 
 NetCore::NetCore()
     : messagequeue_creater_(true, XLOGGER_TAG)
@@ -119,7 +125,8 @@ NetCore::NetCore()
     , netsource_timercheck_(new NetSourceTimerCheck(net_source_, *ActiveLogic::Singleton::Instance(), longlink_task_manager_->LongLinkChannel(), messagequeue_creater_.GetMessageQueue()))
     , timing_sync_(new TimingSync(*ActiveLogic::Singleton::Instance()))
 #endif
-    , shortlink_try_flag_(false) {
+    , shortlink_try_flag_(false)
+{
     xwarn2(TSF"publiccomponent version: %0 %1", __DATE__, __TIME__);
     xassert2(messagequeue_creater_.GetMessageQueue() != MessageQueue::KInvalidQueueID, "CreateNewMessageQueue Error!!!");
     xinfo2(TSF"netcore messagequeue_id=%_, handler:(%_,%_)", messagequeue_creater_.GetMessageQueue(), asyncreg_.Get().queue, asyncreg_.Get().seq);
@@ -132,84 +139,72 @@ NetCore::NetCore()
     printinfo = printinfo + "ISP_CODE : " + info.isp_code + "\n";
 
     AccountInfo account = ::GetAccountInfo();
-
-    if (0 != account.uin) {
+    if (0 != account.uin)
+	{
         char uinBuffer[64] = {0};
         snprintf(uinBuffer, sizeof(uinBuffer), "%u", (unsigned int)account.uin);
         printinfo = printinfo + "Uin :" + uinBuffer  + "\n";
     }
-
-    if (!account.username.empty()) {
+    if (!account.username.empty())
+	{
         printinfo = printinfo + "UserName :" + account.username + "\n";
     }
 
     char version[256] = {0};
     snprintf(version, sizeof(version), "0x%X", mars::app::GetClientVersion());
     printinfo = printinfo + "ClientVersion :" + version + "\n";
-
     xwarn2(TSF"\n%0", printinfo.c_str());
 
     {
         //note: iOS getwifiinfo may block for 10+ seconds sometimes
         ASYNC_BLOCK_START
-
         xinfo2(TSF"net info:%_", GetDetailNetInfo());
-        
         ASYNC_BLOCK_END
     }
-                   
+
     xinfo_function();
-
     ActiveLogic::Singleton::Instance()->SignalActive.connect(boost::bind(&NetCore::__OnSignalActive, this, _1));
-
 
 #ifdef USE_LONG_LINK
     zombie_task_manager_->fun_start_task_ = boost::bind(&NetCore::StartTask, this, _1);
     zombie_task_manager_->fun_callback_ = boost::bind(&NetCore::__CallBack, this, (int)kCallFromZombie, _1, _2, _3, _4, _5);
-        
+
     // async
     longlink_task_manager_->fun_callback_ = boost::bind(&NetCore::__CallBack, this, (int)kCallFromLong, _1, _2, _3, _4, _5);
-
     // sync
     longlink_task_manager_->fun_notify_retry_all_tasks = boost::bind(&NetCore::RetryTasks, this, _1, _2, _3, _4);
     longlink_task_manager_->fun_notify_network_err_ = boost::bind(&NetCore::__OnLongLinkNetworkError, this, _1, _2, _3, _4, _5);
     longlink_task_manager_->fun_anti_avalanche_check_ = boost::bind(&AntiAvalanche::Check, anti_avalanche_, _1, _2, _3);
     longlink_task_manager_->LongLinkChannel().fun_network_report_ = boost::bind(&NetCore::__OnLongLinkNetworkError, this, _1, _2, _3, _4, _5);
-
     longlink_task_manager_->LongLinkChannel().SignalConnection.connect(boost::bind(&TimingSync::OnLongLinkStatuChanged, timing_sync_, _1));
     longlink_task_manager_->LongLinkChannel().SignalConnection.connect(boost::bind(&NetCore::__OnLongLinkConnStatusChange, this, _1));
 
 #ifdef __APPLE__
     longlink_task_manager_->getLongLinkConnectMonitor().fun_longlink_reset_ = boost::bind(&NetCore::__ResetLongLink, this);
 #endif
-        
     netsource_timercheck_->fun_time_check_suc_ = boost::bind(&NetCore::__OnTimerCheckSuc, this);
-
 #endif
 
     // async
     shortlink_task_manager_->fun_callback_ = boost::bind(&NetCore::__CallBack, this, (int)kCallFromShort, _1, _2, _3, _4, _5);
-
     // sync
     shortlink_task_manager_->fun_notify_retry_all_tasks = boost::bind(&NetCore::RetryTasks, this, _1, _2, _3, _4);
     shortlink_task_manager_->fun_notify_network_err_ = boost::bind(&NetCore::__OnShortLinkNetworkError, this, _1, _2, _3, _4, _5, _6);
     shortlink_task_manager_->fun_anti_avalanche_check_ = boost::bind(&AntiAvalanche::Check, anti_avalanche_, _1, _2, _3);
     shortlink_task_manager_->fun_shortlink_response_ = boost::bind(&NetCore::__OnShortLinkResponse, this, _1);
 
-        
 #ifdef USE_LONG_LINK
     GetSignalOnNetworkDataChange().connect(boost::bind(&SignallingKeeper::OnNetWorkDataChanged, signalling_keeper_, _1, _2, _3));
 	signalling_keeper_->fun_send_signalling_buffer_ = boost::bind(&LongLink::SendWhenNoData, &longlink_task_manager_->LongLinkChannel(), _1, _2, _3, Task::kSignallingKeeperTaskID);
 #endif
-
 }
 
-NetCore::~NetCore() {
+NetCore::~NetCore()
+{
     xinfo_function();
 
     ActiveLogic::Singleton::Instance()->SignalActive.disconnect(boost::bind(&NetCore::__OnSignalActive, this, _1));
     asyncreg_.Cancel();
-
 
 #ifdef USE_LONG_LINK
     GetSignalOnNetworkDataChange().disconnect(boost::bind(&SignallingKeeper::OnNetWorkDataChanged, signalling_keeper_, _1, _2, _3));
@@ -236,8 +231,10 @@ NetCore::~NetCore() {
     MessageQueue::MessageQueueCreater::ReleaseNewMessageQueue(MessageQueue::Handler2Queue(asyncreg_.Get()));
 }
 
-void NetCore::__Release(NetCore* _instance) {
-    if (MessageQueue::CurrentThreadMessageQueue() != MessageQueue::Handler2Queue(_instance->asyncreg_.Get())) {
+void NetCore::__Release(NetCore* _instance)
+{
+    if (MessageQueue::CurrentThreadMessageQueue() != MessageQueue::Handler2Queue(_instance->asyncreg_.Get()))
+	{
         WaitMessage(AsyncInvoke((MessageQueue::AsyncInvokeFunction)boost::bind(&NetCore::__Release, _instance), _instance->asyncreg_.Get()));
         return;
     }
@@ -245,9 +242,8 @@ void NetCore::__Release(NetCore* _instance) {
     delete _instance;
 }
 
-
-void NetCore::StartTask(const Task& _task) {
-    
+void NetCore::StartTask(const Task& _task)
+{
     ASYNC_BLOCK_START
 
     xgroup2_define(group);
@@ -258,18 +254,20 @@ void NetCore::StartTask(const Task& _task) {
     xinfo2(TSF" total_timetout:%_, network_status_sensitive:%_, priority:%_, report_arg:%_",  _task.total_timetout,  _task.network_status_sensitive, _task.priority, _task.report_arg) >> group;
 
     Task task = _task;
-    if (!__ValidAndInitDefault(task, group)) {
+    if (!__ValidAndInitDefault(task, group))
+	{
         OnTaskEnd(task.taskid, task.user_context, kEctLocal, kEctLocalTaskParam);
         return;
     }
     
-    if (task_process_hook_) {
+    if (task_process_hook_)
+	{
     	task_process_hook_(task);
     }
 
-    if (0 == task.channel_select) {
+    if (0 == task.channel_select)
+	{
         xerror2(TSF"error channelType (%_, %_), ", kEctLocal, kEctLocalChannelSelect) >> group;
-        
         OnTaskEnd(task.taskid, task.user_context, kEctLocal, kEctLocalChannelSelect);
         return;
     }
@@ -278,7 +276,8 @@ void NetCore::StartTask(const Task& _task) {
 #ifdef USE_LONG_LINK
         && LongLink::kConnected != longlink_task_manager_->LongLinkChannel().ConnectStatus()
 #endif
-        ) {
+        )
+	{
         xerror2(TSF"error no net (%_, %_), ", kEctLocal, kEctLocalNoNet) >> group;
         OnTaskEnd(task.taskid, task.user_context, kEctLocal, kEctLocalNoNet);
         return;
@@ -287,13 +286,12 @@ void NetCore::StartTask(const Task& _task) {
     bool start_ok = false;
 
 #ifdef USE_LONG_LINK
-
-    if (LongLink::kConnected != longlink_task_manager_->LongLinkChannel().ConnectStatus()
-            && (Task::kChannelLong & task.channel_select) && ActiveLogic::Singleton::Instance()->IsForeground()
-
-            && (15 * 60 * 1000 >= gettickcount() - ActiveLogic::Singleton::Instance()->LastForegroundChangeTime()))
-        longlink_task_manager_->getLongLinkConnectMonitor().MakeSureConnected();
-
+	if (LongLink::kConnected != longlink_task_manager_->LongLinkChannel().ConnectStatus()
+		&& (Task::kChannelLong & task.channel_select) && ActiveLogic::Singleton::Instance()->IsForeground()
+		&& (15 * 60 * 1000 >= gettickcount() - ActiveLogic::Singleton::Instance()->LastForegroundChangeTime()))
+	{
+		longlink_task_manager_->getLongLinkConnectMonitor().MakeSureConnected();
+	}
 #endif
 
     xgroup2() << group;
@@ -301,80 +299,108 @@ void NetCore::StartTask(const Task& _task) {
     switch (task.channel_select)
 	{
     case Task::kChannelBoth:
-	{
-
-#ifdef USE_LONG_LINK
-        bool bUseLongLink = LongLink::kConnected == longlink_task_manager_->LongLinkChannel().ConnectStatus();
-
-        if (bUseLongLink && (task.channel_strategy == Task::kChannelFastStrategy) )
 		{
-            xinfo2(TSF"long link task count:%0, ", longlink_task_manager_->GetTaskCount());
-            bUseLongLink = bUseLongLink && (longlink_task_manager_->GetTaskCount() <= kFastSendUseLonglinkTaskCntLimit);
-        }
-
-        if (bUseLongLink)
-            start_ok = longlink_task_manager_->StartTask(task);
-        else
-#endif
-            start_ok = shortlink_task_manager_->StartTask(task);
-    }
-    break;
 #ifdef USE_LONG_LINK
+			bool bUseLongLink = LongLink::kConnected == longlink_task_manager_->LongLinkChannel().ConnectStatus();
+			if (bUseLongLink && (task.channel_strategy == Task::kChannelFastStrategy) )
+			{
+				xinfo2(TSF"long link task count:%0, ", longlink_task_manager_->GetTaskCount());
+				bUseLongLink = bUseLongLink && (longlink_task_manager_->GetTaskCount() <= kFastSendUseLonglinkTaskCntLimit);
+			}
 
+			if (bUseLongLink)
+			{
+				start_ok = longlink_task_manager_->StartTask(task);
+			}
+			else
+#endif
+			{
+				start_ok = shortlink_task_manager_->StartTask(task);
+			}
+		}
+		break;
+#ifdef USE_LONG_LINK
     case Task::kChannelLong:
-        start_ok = longlink_task_manager_->StartTask(task);
+		{
+			start_ok = longlink_task_manager_->StartTask(task);
+		}
         break;
 #endif
-
     case Task::kChannelShort:
-        start_ok = shortlink_task_manager_->StartTask(task);
+		{
+			start_ok = shortlink_task_manager_->StartTask(task);
+		}
         break;
-
     default:
-        xassert2(false);
+		{
+			xassert2(false);
+		}
         break;
     }
 
-    if (!start_ok) {
+    if (!start_ok)
+	{
         xerror2(TSF"taskid:%_, error starttask (%_, %_)", task.taskid, kEctLocal, kEctLocalStartTaskFail);
         OnTaskEnd(task.taskid, task.user_context, kEctLocal, kEctLocalStartTaskFail);
-    } else {
+    }
+	else
+	{
 #ifdef USE_LONG_LINK
         zombie_task_manager_->OnNetCoreStartTask();
 #endif
     }
-        
+
     ASYNC_BLOCK_END
 }
 
-void NetCore::StopTask(uint32_t _taskid) {
-   ASYNC_BLOCK_START
-    
+void NetCore::StopTask(uint32_t _taskid)
+{
+	ASYNC_BLOCK_START
+
 #ifdef USE_LONG_LINK
-    if (longlink_task_manager_->StopTask(_taskid)) return;
-    if (zombie_task_manager_->StopTask(_taskid)) return;
+	if (longlink_task_manager_->StopTask(_taskid))
+	{
+		return;
+	}
+   if (zombie_task_manager_->StopTask(_taskid))
+   {
+	   return;
+   }
 #endif
 
-    if (shortlink_task_manager_->StopTask(_taskid)) return;
-
+   if (shortlink_task_manager_->StopTask(_taskid))
+   {
+	   return;
+   }
     xerror2(TSF"task no found taskid:%0", _taskid);
     
    ASYNC_BLOCK_END
 }
 
-bool NetCore::HasTask(uint32_t _taskid) const {
+bool NetCore::HasTask(uint32_t _taskid) const
+{
 	WAIT_SYNC2ASYNC_FUNC(boost::bind(&NetCore::HasTask, this, _taskid));
 
 #ifdef USE_LONG_LINK
-    if (longlink_task_manager_->HasTask(_taskid)) return true;
-    if (zombie_task_manager_->HasTask(_taskid)) return true;
+	if (longlink_task_manager_->HasTask(_taskid))
+	{
+		return true;
+	}
+	if (zombie_task_manager_->HasTask(_taskid))
+	{
+		return true;
+	}
 #endif
-    if (shortlink_task_manager_->HasTask(_taskid)) return true;
+	if (shortlink_task_manager_->HasTask(_taskid))
+	{
+		return true;
+	}
     
 	return false;
 }
 
-void NetCore::ClearTasks() {
+void NetCore::ClearTasks()
+{
     ASYNC_BLOCK_START
     
 #ifdef USE_LONG_LINK
@@ -386,97 +412,107 @@ void NetCore::ClearTasks() {
     ASYNC_BLOCK_END
 }
 
-void NetCore::OnNetworkChange() {
-    
+void NetCore::OnNetworkChange()
+{
     SYNC2ASYNC_FUNC(boost::bind(&NetCore::OnNetworkChange, this));  //if already messagequeue, no need to async
-
     xinfo_function();
 
     std::string ip_stack_log;
     TLocalIPStack ip_stack = local_ipstack_detect_log(ip_stack_log);
 
-    switch (::getNetInfo()) {
+    switch (::getNetInfo())
+	{
     case kNoNet:
-        xinfo2(TSF"task network change current network:no network");
+		{
+			xinfo2(TSF"task network change current network:no network");
+		}
         break;
-
-    case kWifi: {
-        WifiInfo info;
-        getCurWifiInfo(info);
-        xinfo2(TSF"task network change current network:wifi, ssid:%_, ip_stack:%_, log:%_", info.ssid, TLocalIPStackStr[ip_stack], ip_stack_log);
-    }
-    break;
-
-    case kMobile: {
-        SIMInfo info;
-        getCurSIMInfo(info);
-        RadioAccessNetworkInfo raninfo;
-        getCurRadioAccessNetworkInfo(raninfo);
-        xinfo2(TSF"task network change current network:mobile, ispname:%_, ispcode:%_, ran:%_, ip_stack:%_, log:%_", info.isp_name, info.isp_code, raninfo.radio_access_network, TLocalIPStackStr[ip_stack], ip_stack_log);
-    }
-    break;
-
+    case kWifi:
+		{
+			WifiInfo info;
+			getCurWifiInfo(info);
+			xinfo2(TSF"task network change current network:wifi, ssid:%_, ip_stack:%_, log:%_", info.ssid, TLocalIPStackStr[ip_stack], ip_stack_log);
+		}
+		break;
+    case kMobile:
+		{
+			SIMInfo info;
+			getCurSIMInfo(info);
+			RadioAccessNetworkInfo raninfo;
+			getCurRadioAccessNetworkInfo(raninfo);
+			xinfo2(TSF"task network change current network:mobile, ispname:%_, ispcode:%_, ran:%_, ip_stack:%_, log:%_", info.isp_name, info.isp_code, raninfo.radio_access_network, TLocalIPStackStr[ip_stack], ip_stack_log);
+		}
+		break;
     case kOtherNet:
-        xinfo2(TSF"task network change current network:other, ip_stack:%_, log:%_", TLocalIPStackStr[ip_stack], ip_stack_log);
+		{
+			xinfo2(TSF"task network change current network:other, ip_stack:%_, log:%_", TLocalIPStackStr[ip_stack], ip_stack_log);
+		}
         break;
-
     default:
         xassert2(false);
         break;
     }
-    
+
 #ifdef USE_LONG_LINK
     netsource_timercheck_->CancelConnect();
 #endif
 
     net_source_->ClearCache();
-    
+
     dynamic_timeout_->ResetStatus();
 #ifdef USE_LONG_LINK
     timing_sync_->OnNetworkChange();
-    if (longlink_task_manager_->getLongLinkConnectMonitor().NetworkChange())
+	if (longlink_task_manager_->getLongLinkConnectMonitor().NetworkChange())
+	{
         longlink_task_manager_->RedoTasks();
+	}
+
     zombie_task_manager_->RedoTasks();
 #endif
-    
+
     shortlink_task_manager_->RedoTasks();
-    
+
     shortlink_try_flag_ = false;
     shortlink_error_count_ = 0;
-    
 }
 
-void NetCore::KeepSignal() {
+void NetCore::KeepSignal()
+{
     ASYNC_BLOCK_START
 	signalling_keeper_->Keep();
     ASYNC_BLOCK_END
 }
 
-void NetCore::StopSignal() {
+void NetCore::StopSignal()
+{
     ASYNC_BLOCK_START
 	signalling_keeper_->Stop();
     ASYNC_BLOCK_END
 }
 
 #ifdef USE_LONG_LINK
-LongLink& NetCore::Longlink() { return longlink_task_manager_->LongLinkChannel();}
+LongLink& NetCore::Longlink()
+{
+	return longlink_task_manager_->LongLinkChannel();
+}
 
 #ifdef __APPLE__
-void NetCore::__ResetLongLink() {
+void NetCore::__ResetLongLink()
+{
     SYNC2ASYNC_FUNC(boost::bind(&NetCore::__ResetLongLink, this));
 
     longlink_task_manager_->LongLinkChannel().Disconnect(LongLink::kNetworkChange);
     longlink_task_manager_->RedoTasks();
-    
 }
 #endif
 #endif  // apple
 
-void NetCore::RedoTasks() {
-   ASYNC_BLOCK_START
-    
+void NetCore::RedoTasks()
+{
+	ASYNC_BLOCK_START
+
     xinfo_function();
-    
+
 #ifdef USE_LONG_LINK
     netsource_timercheck_->CancelConnect();
 #endif
@@ -491,18 +527,20 @@ void NetCore::RedoTasks() {
 #endif
     shortlink_task_manager_->RedoTasks();
     
-   ASYNC_BLOCK_END
+	ASYNC_BLOCK_END
 }
 
-void NetCore::RetryTasks(ErrCmdType _err_type, int _err_code, int _fail_handle, uint32_t _src_taskid) {
-
+void NetCore::RetryTasks(ErrCmdType _err_type, int _err_code, int _fail_handle, uint32_t _src_taskid)
+{
 	shortlink_task_manager_->RetryTasks(_err_type, _err_code, _fail_handle, _src_taskid);
+
 #ifdef USE_LONG_LINK
 	longlink_task_manager_->RetryTasks(_err_type, _err_code, _fail_handle, _src_taskid);
 #endif
 }
 
-void NetCore::MakeSureLongLinkConnect() {
+void NetCore::MakeSureLongLinkConnect()
+{
 #ifdef USE_LONG_LINK
     ASYNC_BLOCK_START
     longlink_task_manager_->LongLinkChannel().MakeSureConnected();
@@ -510,42 +548,53 @@ void NetCore::MakeSureLongLinkConnect() {
 #endif
 }
 
-bool NetCore::LongLinkIsConnected() {
+bool NetCore::LongLinkIsConnected()
+{
 #ifdef USE_LONG_LINK
     return LongLink::kConnected == longlink_task_manager_->LongLinkChannel().ConnectStatus();
 #endif
     return false;
 }
 
-int NetCore::__CallBack(int _from, ErrCmdType _err_type, int _err_code, int _fail_handle, const Task& _task, unsigned int _taskcosttime) {
-
-	if (task_callback_hook_ && 0 == task_callback_hook_(_from, _err_type, _err_code, _fail_handle, _task)) {
+int NetCore::__CallBack(int _from, ErrCmdType _err_type, int _err_code, int _fail_handle, const Task& _task, unsigned int _taskcosttime)
+{
+	if (task_callback_hook_ && 0 == task_callback_hook_(_from, _err_type, _err_code, _fail_handle, _task))
+	{
 		xwarn2(TSF"task_callback_hook let task return. taskid:%_, cgi%_.", _task.taskid, _task.cgi);
 		return 0;
 	}
 
-    if (kEctOK == _err_type || kTaskFailHandleTaskEnd == _fail_handle)
-    	return OnTaskEnd(_task.taskid, _task.user_context, _err_type, _err_code);
+	if (kEctOK == _err_type || kTaskFailHandleTaskEnd == _fail_handle)
+	{
+		return OnTaskEnd(_task.taskid, _task.user_context, _err_type, _err_code);
+	}
 
-    if (kCallFromZombie == _from) return OnTaskEnd(_task.taskid, _task.user_context, _err_type, _err_code);
+	if (kCallFromZombie == _from)
+	{
+		return OnTaskEnd(_task.taskid, _task.user_context, _err_type, _err_code);
+	}
 
 #ifdef USE_LONG_LINK
-    if (!zombie_task_manager_->SaveTask(_task, _taskcosttime))
+	if (!zombie_task_manager_->SaveTask(_task, _taskcosttime))
 #endif
-        return OnTaskEnd(_task.taskid, _task.user_context, _err_type, _err_code);
+	{
+		return OnTaskEnd(_task.taskid, _task.user_context, _err_type, _err_code);
+	}
 
     return 0;
 }
 
-void NetCore::__OnShortLinkResponse(int _status_code) {
-    if (_status_code == 301 || _status_code == 302 || _status_code == 307) {
-        
+void NetCore::__OnShortLinkResponse(int _status_code)
+{
+    if (_status_code == 301 || _status_code == 302 || _status_code == 307)
+	{
 #ifdef USE_LONG_LINK
         LongLink::TLongLinkStatus longlink_status = longlink_task_manager_->LongLinkChannel().ConnectStatus();
         unsigned int continues_fail_count = longlink_task_manager_->GetTasksContinuousFailCount();
         xinfo2(TSF"status code:%0, long link status:%1, longlink task continue fail count:%2", _status_code, longlink_status, continues_fail_count);
 
-        if (LongLink::kConnected == longlink_status && continues_fail_count == 0) {
+        if (LongLink::kConnected == longlink_status && continues_fail_count == 0)
+		{
             return;
         }
 #endif
@@ -555,38 +604,55 @@ void NetCore::__OnShortLinkResponse(int _status_code) {
 
 #ifdef USE_LONG_LINK
 
-//void NetCore::__OnPush(uint32_t _cmdid, uint32_t _taskid, const AutoBuffer& _buf) {
-//
-//    if (is_push_data(_cmdid, _taskid)) {
-//        xinfo2(TSF"task push seq:%_, cmdid:%_, len:%_", _taskid, _cmdid, _buf.Length());
-//        push_preprocess_signal_(_cmdid, _buf);
-//        OnPush(_cmdid, _buf);
-//    }
-//}
-
-void NetCore::__OnLongLinkNetworkError(int _line, ErrCmdType _err_type, int _err_code, const std::string& _ip, uint16_t _port) {
+void NetCore::__OnLongLinkNetworkError(int _line, ErrCmdType _err_type, int _err_code, const std::string& _ip, uint16_t _port)
+{
     SYNC2ASYNC_FUNC(boost::bind(&NetCore::__OnLongLinkNetworkError, this, _line, _err_type,  _err_code, _ip, _port));
     xassert2(MessageQueue::CurrentThreadMessageQueue() == messagequeue_creater_.GetMessageQueue());
 
     netcheck_logic_->UpdateLongLinkInfo(longlink_task_manager_->GetTasksContinuousFailCount(), _err_type == kEctOK);
     OnLongLinkNetworkError(_err_type, _err_code, _ip, _port);
 
-    if (kEctOK == _err_type) zombie_task_manager_->RedoTasks();
+#if 0
+	// 原来的mars代码;
+	if (kEctOK == _err_type)
+	{
+		zombie_task_manager_->RedoTasks();
+	}
 
-    if (kEctDial == _err_type) return;
+	if (kEctDial == _err_type) return;
 
-    if (kEctHttp == _err_type) return;
+	if (kEctHttp == _err_type) return;
 
-    if (kEctServer == _err_type) return;
+	if (kEctServer == _err_type) return;
 
-    if (kEctLocal == _err_type) return;
+	if (kEctLocal == _err_type) return;
+#else
+	switch (_err_type)
+	{
+	case kEctOK:
+		{
+			zombie_task_manager_->RedoTasks();
+		}
+		break;
+	case kEctDial:
+	case kEctHttp:
+	case kEctServer:
+	case kEctLocal:
+		{
+			return;
+		}
+		break;
+	default:
+		break;
+	}
+#endif
 
     net_source_->ReportLongIP(_err_type == kEctOK, _ip, _port);
-
 }
 #endif
 
-void NetCore::__OnShortLinkNetworkError(int _line, ErrCmdType _err_type, int _err_code, const std::string& _ip, const std::string& _host, uint16_t _port) {
+void NetCore::__OnShortLinkNetworkError(int _line, ErrCmdType _err_type, int _err_code, const std::string& _ip, const std::string& _host, uint16_t _port)
+{
     SYNC2ASYNC_FUNC(boost::bind(&NetCore::__OnShortLinkNetworkError, this, _line, _err_type,  _err_code, _ip, _host, _port));
     xassert2(MessageQueue::CurrentThreadMessageQueue() == messagequeue_creater_.GetMessageQueue());
 
@@ -595,116 +661,178 @@ void NetCore::__OnShortLinkNetworkError(int _line, ErrCmdType _err_type, int _er
 
     shortlink_try_flag_ = true;
 
-    if (_err_type == kEctOK) {
+    if (_err_type == kEctOK)
+	{
         shortlink_error_count_ = 0;
-    } else {
+    }
+	else
+	{
         ++shortlink_error_count_;
     }
 
     __ConnStatusCallBack();
 
+#if 0
+	// 原来的mars代码;
 #ifdef USE_LONG_LINK
-    if (kEctOK == _err_type) zombie_task_manager_->RedoTasks();
+	if (kEctOK == _err_type)
+	{
+		zombie_task_manager_->RedoTasks();
+	}
+#endif
+	if (kEctDial == _err_type) return;
+
+	if (kEctNetMsgXP == _err_type) return;
+
+	if (kEctServer == _err_type) return;
+
+	if (kEctLocal == _err_type) return;
+#else
+	switch (_err_type)
+	{
+	case kEctOK:
+		{
+#ifdef USE_LONG_LINK
+			zombie_task_manager_->RedoTasks();
+#endif
+		}
+		break;
+	case kEctDial:
+	case kEctNetMsgXP:
+	case kEctServer:
+	case kEctLocal:
+		{
+			return;
+		}
+		break;
+	default:
+		break;
+	}
 #endif
 
-    if (kEctDial == _err_type) return;
-
-    if (kEctNetMsgXP == _err_type) return;
-
-    if (kEctServer == _err_type) return;
-
-    if (kEctLocal == _err_type) return;
-
     net_source_->ReportShortIP(_err_type == kEctOK, _ip, _host, _port);
-
 }
 
-
 #ifdef USE_LONG_LINK
-void NetCore::__OnLongLinkConnStatusChange(LongLink::TLongLinkStatus _status) {
-    if (LongLink::kConnected == _status) zombie_task_manager_->RedoTasks();
+void NetCore::__OnLongLinkConnStatusChange(LongLink::TLongLinkStatus _status)
+{
+	if (LongLink::kConnected == _status)
+	{
+		zombie_task_manager_->RedoTasks();
+	}
 
     __ConnStatusCallBack();
 }
 #endif
 
-void NetCore::__ConnStatusCallBack() {
-
+void NetCore::__ConnStatusCallBack()
+{
     int all_connstatus = kNetworkUnavailable;
 
-    if (shortlink_try_flag_) {
-		if (shortlink_error_count_ >= kShortlinkErrTime) {
+    if (shortlink_try_flag_)
+	{
+		if (shortlink_error_count_ >= kShortlinkErrTime)
+		{
 			all_connstatus = kServerFailed;
-		} else if (0 == shortlink_error_count_) {
+		}
+		else if (0 == shortlink_error_count_)
+		{
 			all_connstatus = kConnected;
-		} else {
+		}
+		else
+		{
 			all_connstatus = kNetworkUnkown;
 		}
-	} else {
+	}
+	else
+	{
 		all_connstatus = kNetworkUnkown;
 	}
 
     int longlink_connstatus = kNetworkUnkown;
 #ifdef USE_LONG_LINK
     longlink_connstatus = longlink_task_manager_->LongLinkChannel().ConnectStatus();
-    switch (longlink_connstatus) {
-		case LongLink::kDisConnected:
+    switch (longlink_connstatus)
+	{
+	case LongLink::kDisConnected:
+		{
 			return;
-		case LongLink::kConnectFailed:
-			if (shortlink_try_flag_) {
-				if (0 == shortlink_error_count_) {
+		}
+		break;
+	case LongLink::kConnectFailed:
+		{
+			if (shortlink_try_flag_)
+			{
+				if (0 == shortlink_error_count_)
+				{
 					all_connstatus = kConnected;
 				}
-				else if (shortlink_error_count_ >= kShortlinkErrTime) {
+				else if (shortlink_error_count_ >= kShortlinkErrTime)
+				{
 					all_connstatus = kServerFailed;
 				}
-				else {
+				else
+				{
 					all_connstatus = kNetworkUnkown;
 				}
 			}
-			else {
+			else
+			{
 				all_connstatus = kNetworkUnkown;
 			}
-            longlink_connstatus = kServerFailed;
-			break;
-
-		case LongLink::kConnectIdle:
-		case LongLink::kConnecting:
-			if (shortlink_try_flag_) {
-				if (0 == shortlink_error_count_) {
+			longlink_connstatus = kServerFailed;
+		}
+		break;
+	case LongLink::kConnectIdle:
+	case LongLink::kConnecting:
+		{
+			if (shortlink_try_flag_)
+			{
+				if (0 == shortlink_error_count_)
+				{
 					all_connstatus = kConnected;
 				}
-				else if (shortlink_error_count_ >= kShortlinkErrTime) {
+				else if (shortlink_error_count_ >= kShortlinkErrTime)
+				{
 					all_connstatus = kServerFailed;
 				}
-				else {
+				else
+				{
 					all_connstatus = kConnecting;
 				}
 			}
-			else {
+			else
+			{
 				all_connstatus = kConnecting;
 			}
-            
-            longlink_connstatus = kConnecting;
-			break;
-
-		case LongLink::kConnected:
+			longlink_connstatus = kConnecting;
+		}
+		break;
+	case LongLink::kConnected:
+		{
 			all_connstatus = kConnected;
 			shortlink_error_count_ = 0;
 			shortlink_try_flag_ = false;
-            longlink_connstatus = kConnected;
-			break;
-
-		default:
+			longlink_connstatus = kConnected;
+		}
+		break;
+	default:
+		{
 			xassert2(false);
-			break;
+		}
+		break;
 	}
 #else
-    if (shortlink_error_count_ >= kShortlinkErrTime) {
+    if (shortlink_error_count_ >= kShortlinkErrTime)
+	{
     	all_connstatus = kServerFailed;
-    } else if (0 == shortlink_error_count_) {
+    }
+	else if (0 == shortlink_error_count_)
+	{
     	all_connstatus = kConnected;
-    } else {
+    }
+	else
+	{
     	all_connstatus = kConnected;
     }
 #endif
@@ -713,22 +841,19 @@ void NetCore::__ConnStatusCallBack() {
     ReportConnectStatus(all_connstatus, longlink_connstatus);
 }
 
-void NetCore::__OnTimerCheckSuc() {
+void NetCore::__OnTimerCheckSuc()
+{
     SYNC2ASYNC_FUNC(boost::bind(&NetCore::__OnTimerCheckSuc, this));
-    
+
 #ifdef USE_LONG_LINK
     xinfo2("netsource timercheck disconnect longlink");
     longlink_task_manager_->LongLinkChannel().Disconnect(LongLink::kTimeCheckSucc);
-    
 #endif
-
 }
 
-void NetCore::__OnSignalActive(bool _isactive) {
+void NetCore::__OnSignalActive(bool _isactive)
+{
     ASYNC_BLOCK_START
-    
     anti_avalanche_->OnSignalActive(_isactive);
-    
     ASYNC_BLOCK_END
 }
-

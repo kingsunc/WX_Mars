@@ -25,9 +25,7 @@
 #include <inttypes.h>
 #endif
 
-
 #include <algorithm>
-
 #include "comm/xlogger/xlogger.h"
 #include "comm/socket/socketselect.h"
 #include "comm/socket/tcpclient_fsm.h"
@@ -45,31 +43,38 @@ namespace COMPLEX_CONNECT_NAMESPACE {
 ComplexConnect::ComplexConnect(unsigned int _timeout, unsigned int _interval)
     : timeout_(_timeout), interval_(_interval), error_interval_(_interval), max_connect_(3), trycount_(0), index_(-1), errcode_(0)
     , index_conn_rtt_(0), index_conn_totalcost_(0), totalcost_(0)
-{}
+{
+}
 
 ComplexConnect::ComplexConnect(unsigned int _timeout /*ms*/, unsigned int _interval /*ms*/, unsigned int _error_interval /*ms*/, unsigned int _max_connect)
     : timeout_(_timeout), interval_(_interval), error_interval_(_error_interval), max_connect_(_max_connect),  trycount_(0), index_(-1), errcode_(0)
     , index_conn_rtt_(0), index_conn_totalcost_(0), totalcost_(0)
-{}
+{
+}
 
 ComplexConnect::~ComplexConnect()
-{}
+{
+}
 
-int ComplexConnect::__ConnectTime(unsigned int _index) const {
+int ComplexConnect::__ConnectTime(unsigned int _index) const
+{
     return _index * interval_;
 }
 
-int ComplexConnect::__ConnectTimeout(unsigned int _index) const {
+int ComplexConnect::__ConnectTimeout(unsigned int _index) const
+{
     return __ConnectTime(_index) + timeout_;
 }
 
-namespace {
+namespace
+{
 
-class ConnectCheckFSM : public TcpClientFSM {
-  public:
-    enum TCheckStatus {
+class ConnectCheckFSM : public TcpClientFSM
+{
+public:
+    enum TCheckStatus
+	{
         ECheckInit,
-        
         EConnProxySucc,
         
         EProxyHttpTunelConnSvrReq,
@@ -86,36 +91,69 @@ class ConnectCheckFSM : public TcpClientFSM {
     };
 
     ConnectCheckFSM(const socket_address& _addr, unsigned int _connect_timeout, unsigned int _index, MComplexConnect* _observer)
-        : TcpClientFSM(_addr.address()), connect_timeout_(_connect_timeout), index_(_index), observer_(_observer), checkfintime_(0) {
+        : TcpClientFSM(_addr.address()), connect_timeout_(_connect_timeout), index_(_index), observer_(_observer), checkfintime_(0)
+	{
         check_status_ = (_observer && _observer->OnShouldVerify(_index, addr_)) ? ECheckInit : ECheckOK;
     }
 
-    TCheckStatus CheckStatus() const { return check_status_;}
-    int TotalRtt() const { return int(checkfintime_ - start_connecttime_);}
+    TCheckStatus CheckStatus() const
+	{
+		return check_status_;
+	}
 
-  protected:
-    virtual void _OnCreate() { if (observer_) observer_->OnCreated(index_, addr_, sock_);}
-    virtual void _OnConnect() { if (observer_) observer_->OnConnect(index_, addr_, sock_);}
-    virtual void _OnConnected(int _rtt) {
+    int TotalRtt() const
+	{
+		return int(checkfintime_ - start_connecttime_);
+	}
+
+protected:
+	virtual void _OnCreate()
+	{
+		if (observer_)
+		{
+			observer_->OnCreated(index_, addr_, sock_);
+		}
+	}
+
+	virtual void _OnConnect()
+	{
+		if (observer_)
+		{
+			observer_->OnConnect(index_, addr_, sock_);
+		}
+	}
+
+    virtual void _OnConnected(int _rtt)
+	{
         checkfintime_ = ::gettickcount();
-
-        if (!observer_) return;
+		if (!observer_)
+		{
+			return;
+		}
 
         observer_->OnConnected(index_, addr_, sock_, 0, _rtt);
-
-        if (ECheckOK == CheckStatus()) {
+        if (ECheckOK == CheckStatus())
+		{
             return;
         }
 
-        if (!observer_->OnVerifySend(index_, addr_, sock_, send_buf_)) {
+        if (!observer_->OnVerifySend(index_, addr_, sock_, send_buf_))
+		{
             check_status_ = ECheckFail;
         }
     }
 
-    virtual void _OnRecv(AutoBuffer& _recv_buff, ssize_t _recv_len) {
-        if (!observer_) return;
+    virtual void _OnRecv(AutoBuffer& _recv_buff, ssize_t _recv_len)
+	{
+		if (!observer_)
+		{
+			return;
+		}
 
-        if (ECheckOK == CheckStatus()) return;
+		if (ECheckOK == CheckStatus())
+		{
+			return;
+		}
 
         check_status_ = observer_->OnVerifyRecv(index_, addr_, sock_, recv_buf_) ? ECheckOK : ECheckFail;
         checkfintime_ = gettickcount();
@@ -123,26 +161,45 @@ class ConnectCheckFSM : public TcpClientFSM {
 
     virtual void _OnSend(AutoBuffer& _send_buff, ssize_t _send_len) {}
 
-    virtual void _OnClose(TSocketStatus _status, int _error, bool _userclose) {
+    virtual void _OnClose(TSocketStatus _status, int _error, bool _userclose)
+	{
         checkfintime_ = gettickcount();
 
-        if (observer_ && !_userclose) {
-            if (EConnecting == _status) {
+        if (observer_ && !_userclose)
+		{
+            if (EConnecting == _status)
+			{
                 observer_->OnConnected(index_, addr_, sock_, _error, TotalRtt());
-            } else if (EReadWrite == _status && SOCKET_ERRNO(ETIMEDOUT) == _error) {
+            }
+			else if (EReadWrite == _status && SOCKET_ERRNO(ETIMEDOUT) == _error)
+			{
                 checkfintime_ = gettickcount();
                 observer_->OnVerifyTimeout((int)(checkfintime_ - end_connecttime_));
             }
         }
     }
 
-    virtual int ConnectTimeout() const {return (int)(start_connecttime_ + ConnectAbsTimeout() - gettickcount());}
-    virtual int ReadWriteTimeout() const {return (int)(end_connecttime_ + ReadWriteAbsTimeout() - gettickcount());}
+    virtual int ConnectTimeout() const
+	{
+		return (int)(start_connecttime_ + ConnectAbsTimeout() - gettickcount());
+	}
 
-    virtual int ConnectAbsTimeout() const { return connect_timeout_; }
-    virtual int ReadWriteAbsTimeout() const { return std::max(1000, std::min(6 * Rtt(), ConnectAbsTimeout() - Rtt()));}
+    virtual int ReadWriteTimeout() const
+	{
+		return (int)(end_connecttime_ + ReadWriteAbsTimeout() - gettickcount());
+	}
 
-  protected:
+    virtual int ConnectAbsTimeout() const
+	{
+		return connect_timeout_;
+	}
+
+    virtual int ReadWriteAbsTimeout() const
+	{
+		return std::max(1000, std::min(6 * Rtt(), ConnectAbsTimeout() - Rtt()));
+	}
+
+protected:
     const unsigned int connect_timeout_;
     const unsigned int index_;
     MComplexConnect* observer_;
@@ -151,64 +208,82 @@ class ConnectCheckFSM : public TcpClientFSM {
 };
     
     
-class ConnectHttpTunelCheckFSM : public ConnectCheckFSM {
+class ConnectHttpTunelCheckFSM : public ConnectCheckFSM
+{
 public:
     ConnectHttpTunelCheckFSM(const socket_address& _destaddr, const socket_address& _proxy_addr, const std::string& _proxy_username,
                              const std::string& _proxy_pwd, unsigned int _connect_timeout, unsigned int _index, MComplexConnect* _observer)
-    : ConnectCheckFSM(_proxy_addr, _connect_timeout,_index,_observer), destaddr_(_destaddr), username_(_proxy_username), password_(_proxy_pwd){
+    : ConnectCheckFSM(_proxy_addr, _connect_timeout,_index,_observer), destaddr_(_destaddr), username_(_proxy_username), password_(_proxy_pwd)
+	{
         check_status_ = ECheckInit;
         xinfo2(TSF"http tunel proxy info:%_:%_ username:%_", _proxy_addr.ip(), _proxy_addr.port(), username_);
     }
     
 protected:
-    virtual void _OnConnected(int _rtt) {
+    virtual void _OnConnected(int _rtt)
+	{
         checkfintime_ = ::gettickcount();
-        
-        if (observer_) {
+        if (observer_)
+		{
             observer_->OnConnected(index_, addr_, sock_, 0, _rtt);
         }
         
-        if (ECheckOK == CheckStatus()) {
+        if (ECheckOK == CheckStatus())
+		{
             return;
         }
         request_send_ = true;
         check_status_ = EConnProxySucc;
     }
     
-    virtual void _OnRecv(AutoBuffer& _recv_buff, ssize_t _recv_len) {
-        if (ECheckOK == CheckStatus()) return;
-        if (check_status_ == EProxyHttpTunelConnSvrReq) {
+    virtual void _OnRecv(AutoBuffer& _recv_buff, ssize_t _recv_len)
+	{
+		if (ECheckOK == CheckStatus())
+		{
+			return;
+		}
 
+        if (check_status_ == EProxyHttpTunelConnSvrReq)
+		{
             http::Parser parser;
             http::Parser::TRecvStatus parse_status = parser.Recv(_recv_buff.Ptr(), _recv_buff.Length());
 
-            if (parse_status != http::Parser::kEnd) {
+            if (parse_status != http::Parser::kEnd)
+			{
                 xinfo2(TSF"proxy response continue:%_", _recv_buff.Length());
                 return;
             }
             
-            if (200 == parser.Status().StatusCode()) {
+            if (200 == parser.Status().StatusCode())
+			{
                 check_status_ = (observer_ && observer_->OnShouldVerify(index_, addr_)) ? EProxyConnSvrSucc : ECheckOK;
                 request_send_ = true;
                 checkfintime_ = gettickcount();
                 _recv_buff.Reset();
-            } else {
+            }
+			else
+			{
 				xwarn2(TSF"proxy error, proxy status code:%_, proxy info:%_:%_ resp:%_", parser.Status().StatusCode(), addr_.ip(), addr_.port(), xdump(_recv_buff.Ptr(), _recv_buff.Length()));
                 check_status_ = ECheckFail;
             }
             
-        } else if (check_status_ == EProxyConnSvrSucc) {
+        }
+		else if (check_status_ == EProxyConnSvrSucc)
+		{
             check_status_ = (observer_ && observer_->OnVerifyRecv(index_, destaddr_, sock_, _recv_buff)) ? ECheckOK : ECheckFail;
             checkfintime_ = gettickcount();
-        } else {
+        }
+		else
+		{
             xassert2(false, "status:%d", check_status_);
         }
         
     }
     
-    virtual void _OnRequestSend(AutoBuffer& _send_buff){
-        if (check_status_ == EConnProxySucc) {
-            
+    virtual void _OnRequestSend(AutoBuffer& _send_buff)
+	{
+        if (check_status_ == EConnProxySucc)
+		{
             char ip_port[64] = {0};
             snprintf(ip_port, sizeof(ip_port), "%s:%" PRIu16, destaddr_.ip(), destaddr_.port());
             http::Builder req_builder(http::kRequest);
@@ -219,7 +294,8 @@ protected:
             req_builder.Fields().HeaderFiled(http::HeaderFields::kStringProxyConnection, "keep-alive");
             req_builder.Fields().HeaderFiled(http::HeaderFields::KStringUserAgent, http::HeaderFields::KStringMicroMessenger);
             
-            if (!username_.empty() && !password_.empty()) {
+            if (!username_.empty() && !password_.empty())
+			{
                 std::string account_info = username_ + ":" + password_;
                 size_t dstlen = modp_b64_encode_len(account_info.length());
                 
@@ -237,13 +313,18 @@ protected:
             
             req_builder.HeaderToBuffer(_send_buff);
             check_status_ = EProxyHttpTunelConnSvrReq;
-        } else if (check_status_ == EProxyConnSvrSucc) {
+        }
+		else if (check_status_ == EProxyConnSvrSucc)
+		{
             _send_buff.Length(0, 0);
             bool verifySucc = observer_->OnVerifySend(index_, destaddr_, sock_, _send_buff);
-            if (!verifySucc) {
+            if (!verifySucc)
+			{
                 check_status_ = ECheckFail;
             }
-        } else {
+        }
+		else
+		{
             xassert2(false, "status:%d", check_status_);
         }
     }
@@ -260,62 +341,80 @@ public:
     
     ConnectSocks5CheckFSM(const socket_address& _destaddr, const socket_address& _proxy_addr, const std::string& _proxy_username,
                           const std::string& _proxy_pwd, unsigned int _connect_timeout, unsigned int _index, MComplexConnect* _observer)
-    : ConnectCheckFSM(_proxy_addr, _connect_timeout,_index,_observer), destaddr_(_destaddr), username_(_proxy_username), password_(_proxy_pwd){
+    : ConnectCheckFSM(_proxy_addr, _connect_timeout,_index,_observer), destaddr_(_destaddr), username_(_proxy_username), password_(_proxy_pwd)
+	{
         check_status_ = ECheckInit;
         xinfo2(TSF"socks5 proxy info:%_:%_ username:%_", _proxy_addr.ip(), _proxy_addr.port(), username_);
     }
     
 protected:
-    virtual void _OnConnected(int _rtt) {
+    virtual void _OnConnected(int _rtt)
+	{
         checkfintime_ = ::gettickcount();
         
-        if (observer_) {
+        if (observer_)
+		{
             observer_->OnConnected(index_, addr_, sock_, 0, _rtt);
         }
         
-        if (ECheckOK == CheckStatus()) {
+        if (ECheckOK == CheckStatus())
+		{
             return;
         }
         request_send_ = true;
         check_status_ = EConnProxySucc;
     }
     
-    virtual void _OnRecv(AutoBuffer& _recv_buff, ssize_t _recv_len) {
+    virtual void _OnRecv(AutoBuffer& _recv_buff, ssize_t _recv_len)
+	{
         if (ECheckOK == CheckStatus()) return;
-        if (check_status_ == EProxySocks5GreetReq) {
+        if (check_status_ == EProxySocks5GreetReq)
+		{
             
-            if (_recv_buff.Length() < 2) {
+            if (_recv_buff.Length() < 2)
+			{
                 xinfo2(TSF"proxy response continue:%_", _recv_buff.Length());
                 return;
             }
             
             uint8_t ver = ((uint8_t*)_recv_buff.Ptr())[0];
             uint8_t method = ((uint8_t*)_recv_buff.Ptr())[1];
-            if (kSocks5Version != ver) {
+            if (kSocks5Version != ver)
+			{
                 check_status_ = ECheckFail;
                 return;
             }
             
-            if (kSocks5NoAuth == method) {   //NO AUTHENTICATION REQUIRED
+            if (kSocks5NoAuth == method)
+			{   //NO AUTHENTICATION REQUIRED
                 check_status_ = EProxySocks5AuthSucc;
                 request_send_ = true;
-            } else if (kSocks5UsrNamePwdAuth == method) { //USERNAME/PASSWORD
+            }
+			else if (kSocks5UsrNamePwdAuth == method)
+			{
+				//USERNAME/PASSWORD
                 check_status_ = EProxySocks5GreetSucc;
                 request_send_ = true;
-            } else {
+            }
+			else
+			{
                 xwarn2("auth method not support:%d", method);
                 check_status_ = ECheckFail;
             }
             recv_buf_.Length(0, 0);
-        } else if(check_status_ == EProxySocks5AuthReq) {
-            if (_recv_buff.Length() < 2) {
+        }
+		else if(check_status_ == EProxySocks5AuthReq)
+		{
+            if (_recv_buff.Length() < 2)
+			{
                 xinfo2(TSF"proxy response continue:%_", _recv_buff.Length());
                 return;
             }
             
             uint8_t ver = ((uint8_t*)_recv_buff.Ptr())[0];
             uint8_t status = ((uint8_t*)_recv_buff.Ptr())[1];
-            if(kSocks5AuthVersion != ver || kSocks5RespStatus != status) {
+            if(kSocks5AuthVersion != ver || kSocks5RespStatus != status)
+			{
                 check_status_ = ECheckFail;
                 xwarn2("socks5 proxy auth fail: %d %d", ver, status);
                 return;
@@ -324,25 +423,31 @@ protected:
             check_status_ = EProxySocks5AuthSucc;
             request_send_ = true;
             recv_buf_.Length(0, 0);
-        } else if (check_status_ == EProxySocks5ConnSvrReq) {
-            if (_recv_buff.Length() < 4) {
+        }
+		else if (check_status_ == EProxySocks5ConnSvrReq)
+		{
+            if (_recv_buff.Length() < 4)
+			{
                 xinfo2(TSF"proxy response continue:%_", _recv_buff.Length());
                 return;
             }
             
             uint8_t atyp = ((uint8_t*)_recv_buff.Ptr())[3];
             
-            if (kSocksATYPIPv4 == atyp && _recv_buff.Length() < 6+4) {
+            if (kSocksATYPIPv4 == atyp && _recv_buff.Length() < 6+4)
+			{
                 xinfo2(TSF"proxy response continue:%_", _recv_buff.Length());
                 return;
             }
             
-            if (kSocksATYPHost == atyp && _recv_buff.Length() < (size_t)(6+1+((uint8_t*)_recv_buff.Ptr())[4])) {
+            if (kSocksATYPHost == atyp && _recv_buff.Length() < (size_t)(6+1+((uint8_t*)_recv_buff.Ptr())[4]))
+			{
                 xinfo2(TSF"proxy response continue:%_", _recv_buff.Length());
                 return;
             }
             
-            if (kSocksATYPIPv6 == atyp && _recv_buff.Length() < 6+16) {
+            if (kSocksATYPIPv6 == atyp && _recv_buff.Length() < 6+16)
+			{
                 xinfo2(TSF"proxy response continue:%_", _recv_buff.Length());
                 return;
             }
@@ -350,7 +455,8 @@ protected:
             uint8_t ver = ((uint8_t*)_recv_buff.Ptr())[0];
             uint8_t status = ((uint8_t*)_recv_buff.Ptr())[1];
             
-            if(kSocks5Version != ver || kSocks5RespStatus != status) {
+            if(kSocks5Version != ver || kSocks5RespStatus != status)
+			{
                 check_status_ = ECheckFail;
                 xwarn2("socks5 proxy connect server fail: %d %d", ver, status);
                 return;
@@ -360,22 +466,31 @@ protected:
             checkfintime_ = gettickcount();
             request_send_ = true;
             recv_buf_.Length(0, 0);
-        } else if (check_status_ == EProxyConnSvrSucc) {
+        }
+		else if (check_status_ == EProxyConnSvrSucc)
+		{
             check_status_ = (observer_ && observer_->OnVerifyRecv(index_, destaddr_, sock_, _recv_buff)) ? ECheckOK : ECheckFail;
             checkfintime_ = gettickcount();
-        } else {
+        }
+		else
+		{
             xassert2(false, "socks5 proxy checkfsm status:%d", check_status_);
         }
     }
     
-    virtual void _OnRequestSend(AutoBuffer& _send_buff){
-        if (check_status_ == EConnProxySucc) {
+    virtual void _OnRequestSend(AutoBuffer& _send_buff)
+	{
+        if (check_status_ == EConnProxySucc)
+		{
             uint8_t socks5_greet_data[] = {kSocks5Version, kSockstNAuthMethos, (username_.empty()||password_.empty())?kSocks5NoAuth:kSocks5UsrNamePwdAuth};
             _send_buff.Length(0, 0);
             _send_buff.Write(socks5_greet_data, sizeof(socks5_greet_data));
             check_status_ = EProxySocks5GreetReq;
-        } else if (check_status_ == EProxySocks5GreetSucc) {
-            if (username_.empty() || password_.empty() || username_.size() > 255 || password_.size() > 255) {
+        }
+		else if (check_status_ == EProxySocks5GreetSucc)
+		{
+            if (username_.empty() || password_.empty() || username_.size() > 255 || password_.size() > 255)
+			{
                 xwarn2(TSF"username/password error:%_ %_", username_.size(), password_.size());
                 check_status_ = ECheckFail;
                 return;
@@ -391,7 +506,9 @@ protected:
             _send_buff.Write(&len, 1);
             _send_buff.Write(password_.c_str(), password_.size());
             check_status_ = EProxySocks5AuthReq;
-        } else if (check_status_ == EProxySocks5AuthSucc) {
+        }
+		else if (check_status_ == EProxySocks5AuthSucc)
+		{
             uint8_t head_data[] = {kSocks5Version, kSocks5ConnectCmd, kSocks5RsvVal, kSocksATYPIPv4};
             _send_buff.Length(0, 0);
             _send_buff.Write(head_data, sizeof(head_data));
@@ -403,16 +520,20 @@ protected:
             _send_buff.Write(&net_port, sizeof(net_port));
             check_status_ = EProxySocks5ConnSvrReq;
             
-        } else if (check_status_ == EProxyConnSvrSucc) {
-            if (observer_ && !observer_->OnVerifySend(index_, destaddr_, sock_, send_buf_)) {
+        }
+		else if (check_status_ == EProxyConnSvrSucc)
+		{
+            if (observer_ && !observer_->OnVerifySend(index_, destaddr_, sock_, send_buf_))
+			{
                 check_status_ = ECheckFail;
             }
-        } else {
+        }
+		else
+		{
             xassert2(false, "socks5 proxy checkfsm status:%d", check_status_);
         }
     }
 
-    
 protected:
     const socket_address& destaddr_;
     std::string username_;
@@ -445,7 +566,8 @@ SOCKET ComplexConnect::ConnectImpatient(const std::vector<socket_address>& _veca
     index_conn_totalcost_ = 0;
     totalcost_ = 0;
 
-    if (_vecaddr.empty()) {
+    if (_vecaddr.empty())
+	{
         xwarn2(TSF"_vecaddr size:%_, m_timeout:%_, m_interval:%_, m_error_interval:%_, m_max_connect:%_, @%_", _vecaddr.size(), timeout_, interval_, error_interval_, max_connect_, this);
         return INVALID_SOCKET;
     }
@@ -455,15 +577,21 @@ SOCKET ComplexConnect::ConnectImpatient(const std::vector<socket_address>& _veca
     uint64_t  starttime = gettickcount();
     std::vector<ConnectCheckFSM*> vecsocketfsm;
 
-    for (unsigned int i = 0; i < _vecaddr.size(); ++i) {
+    for (unsigned int i = 0; i < _vecaddr.size(); ++i)
+	{
         xinfo2(TSF"complex.conn %_", _vecaddr[i].url());
 
         ConnectCheckFSM* ic = NULL;
-        if (mars::comm::kProxyHttpTunel == _proxy_type) {
+        if (mars::comm::kProxyHttpTunel == _proxy_type)
+		{
             ic = new ConnectHttpTunelCheckFSM(_vecaddr[i], *_proxy_addr, _proxy_username, _proxy_pwd, timeout_, i, _observer);
-        } else if (mars::comm::kProxySocks5 == _proxy_type) {
+        }
+		else if (mars::comm::kProxySocks5 == _proxy_type)
+		{
             ic = new ConnectSocks5CheckFSM(_vecaddr[i], *_proxy_addr, _proxy_username, _proxy_pwd, timeout_, i, _observer);
-        } else {
+        }
+		else
+		{
             ic = new ConnectCheckFSM(_vecaddr[i], timeout_, i, _observer);
         }
 
@@ -479,7 +607,8 @@ SOCKET ComplexConnect::ConnectImpatient(const std::vector<socket_address>& _veca
     unsigned int index = 0;
     SOCKET retsocket = INVALID_SOCKET;
 
-    do {
+    do
+	{
         curtime = gettickcount();
         // timeout and connect
         SocketSelect sel(_breaker);
@@ -492,14 +621,16 @@ SOCKET ComplexConnect::ConnectImpatient(const std::vector<socket_address>& _veca
 
         if (index < vecsocketfsm.size()
                 && 0 < next_connect_timeout
-                && runing_count < max_connect_) {
+                && runing_count < max_connect_)
+		{
             timeout = std::min(timeout, next_connect_timeout);
         }
 
         // connect
         if (index < vecsocketfsm.size()
                 && 0 >= next_connect_timeout
-                && runing_count < max_connect_) {
+                && runing_count < max_connect_)
+		{
             if (runing_count + 1 < max_connect_) timeout = std::min(timeout, (int)interval_);
 
             laststart_connecttime = gettickcount();
@@ -509,7 +640,8 @@ SOCKET ComplexConnect::ConnectImpatient(const std::vector<socket_address>& _veca
             ++index;
         }
 
-        for (unsigned int i = 0; i < index; ++i) {
+        for (unsigned int i = 0; i < index; ++i)
+		{
             if (NULL == vecsocketfsm[i]) continue;
 
             xgroup2_define(group);
@@ -521,41 +653,55 @@ SOCKET ComplexConnect::ConnectImpatient(const std::vector<socket_address>& _veca
         xdebug2(TSF"timeout:%_, @%_", timeout, this);
         int ret = 0;
 
-        if (INT_MAX == timeout) {
+        if (INT_MAX == timeout)
+		{
             ret = sel.Select();
-        } else {
+        }
+		else
+		{
             timeout = std::max(0, timeout);
             ret = sel.Select(timeout);
         }
 
         // select error
-        if (ret < 0) {
+        if (ret < 0)
+		{
             xerror2(TSF"sel ret:(%_, %_, %_), @%_", ret, sel.Errno(), socket_strerror(sel.Errno()), this);
             break;
         }
 
         // user break
-        if (sel.IsException()) {
+        if (sel.IsException())
+		{
             xerror2(TSF"sel exception @%_", this);
             break;
         }
 
-        if (sel.IsBreak()) {
+        if (sel.IsBreak())
+		{
             xinfo2(TSF"sel breaker @%_", this);
             break;
         }
 
         // socket
-        for (unsigned int i = 0; i < index; ++i) {
-            if (NULL == vecsocketfsm[i]) continue;
+        for (unsigned int i = 0; i < index; ++i)
+		{
+			if (NULL == vecsocketfsm[i])
+			{
+				continue;
+			}
 
             xgroup2_define(group);
             vecsocketfsm[i]->AfterSelect(sel, group);
             xgroup2_if(!group.Empty(), TSF"index:%_, @%_, ", i, this) << group;
 
-            if (TcpClientFSM::EEnd == vecsocketfsm[i]->Status()) {
-                if (_observer) _observer->OnFinished(i, socket_address(&vecsocketfsm[i]->Address()), vecsocketfsm[i]->Socket(), vecsocketfsm[i]->Error(),
-                                                         vecsocketfsm[i]->Rtt(), vecsocketfsm[i]->TotalRtt(), (int)(gettickcount() - starttime));
+            if (TcpClientFSM::EEnd == vecsocketfsm[i]->Status())
+			{
+				if (_observer)
+				{
+					_observer->OnFinished(i, socket_address(&vecsocketfsm[i]->Address()), vecsocketfsm[i]->Socket(), vecsocketfsm[i]->Error(),
+						vecsocketfsm[i]->Rtt(), vecsocketfsm[i]->TotalRtt(), (int)(gettickcount() - starttime));
+				}
 
                 vecsocketfsm[i]->Close();
                 delete vecsocketfsm[i];
@@ -564,9 +710,13 @@ SOCKET ComplexConnect::ConnectImpatient(const std::vector<socket_address>& _veca
                 continue;
             }
 
-            if (TcpClientFSM::EReadWrite == vecsocketfsm[i]->Status() && ConnectCheckFSM::ECheckFail == vecsocketfsm[i]->CheckStatus()) {
-                if (_observer) _observer->OnFinished(i, socket_address(&vecsocketfsm[i]->Address()), vecsocketfsm[i]->Socket(), vecsocketfsm[i]->Error(),
-                                                         vecsocketfsm[i]->Rtt(), vecsocketfsm[i]->TotalRtt(), (int)(gettickcount() - starttime));
+            if (TcpClientFSM::EReadWrite == vecsocketfsm[i]->Status() && ConnectCheckFSM::ECheckFail == vecsocketfsm[i]->CheckStatus())
+			{
+				if (_observer)
+				{
+					_observer->OnFinished(i, socket_address(&vecsocketfsm[i]->Address()), vecsocketfsm[i]->Socket(), vecsocketfsm[i]->Error(),
+						vecsocketfsm[i]->Rtt(), vecsocketfsm[i]->TotalRtt(), (int)(gettickcount() - starttime));
+				}
 
                 vecsocketfsm[i]->Close();
                 delete vecsocketfsm[i];
@@ -575,9 +725,13 @@ SOCKET ComplexConnect::ConnectImpatient(const std::vector<socket_address>& _veca
                 continue;
             }
 
-            if (TcpClientFSM::EReadWrite == vecsocketfsm[i]->Status() && ConnectCheckFSM::ECheckOK == vecsocketfsm[i]->CheckStatus()) {
-                if (_observer) _observer->OnFinished(i, socket_address(&vecsocketfsm[i]->Address()), vecsocketfsm[i]->Socket(), vecsocketfsm[i]->Error(),
-                                                         vecsocketfsm[i]->Rtt(), vecsocketfsm[i]->TotalRtt(), (int)(gettickcount() - starttime));
+            if (TcpClientFSM::EReadWrite == vecsocketfsm[i]->Status() && ConnectCheckFSM::ECheckOK == vecsocketfsm[i]->CheckStatus())
+			{
+				if (_observer)
+				{
+					_observer->OnFinished(i, socket_address(&vecsocketfsm[i]->Address()), vecsocketfsm[i]->Socket(), vecsocketfsm[i]->Error(),
+						vecsocketfsm[i]->Rtt(), vecsocketfsm[i]->TotalRtt(), (int)(gettickcount() - starttime));
+				}
 
                 xinfo2(TSF"index:%_, sock:%_, suc ConnectImpatient:%_:%_, RTT:(%_, %_), @%_", i, vecsocketfsm[i]->Socket(),
                        vecsocketfsm[i]->IP(), vecsocketfsm[i]->Port(), vecsocketfsm[i]->Rtt(), vecsocketfsm[i]->TotalRtt(), this);
@@ -595,18 +749,25 @@ SOCKET ComplexConnect::ConnectImpatient(const std::vector<socket_address>& _veca
         // end of loop
         bool all_invalid = true;
 
-        for (unsigned int i = 0; i < vecsocketfsm.size(); ++i) {
-            if (NULL != vecsocketfsm[i]) {
+        for (unsigned int i = 0; i < vecsocketfsm.size(); ++i)
+		{
+            if (NULL != vecsocketfsm[i])
+			{
                 all_invalid = false;
                 break;
             }
         }
 
-        if (all_invalid || INVALID_SOCKET != retsocket) break;
+		if (all_invalid || INVALID_SOCKET != retsocket)
+		{
+			break;
+		}
     } while (true);
 
-    for (unsigned int i = 0; i < vecsocketfsm.size(); ++i) {
-        if (NULL != vecsocketfsm[i]) {
+    for (unsigned int i = 0; i < vecsocketfsm.size(); ++i)
+	{
+        if (NULL != vecsocketfsm[i])
+		{
             vecsocketfsm[i]->Close(false);
             delete vecsocketfsm[i];
             vecsocketfsm[i] = NULL;

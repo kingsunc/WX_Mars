@@ -35,9 +35,10 @@ class AutoBuffer;
 namespace COMPLEX_CONNECT_NAMESPACE {
 #endif
 
-class MComplexConnect {
-  public:
-    virtual ~MComplexConnect() {}
+class MComplexConnect
+{
+public:
+    virtual ~MComplexConnect(){}
 
     virtual void OnCreated(unsigned int _index, const socket_address& _addr, SOCKET _socket) {}
     virtual void OnConnect(unsigned int _index, const socket_address& _addr, SOCKET _socket)  {}
@@ -52,8 +53,9 @@ class MComplexConnect {
                             int _error, int _conn_rtt, int _conn_totalcost, int _complex_totalcost) {}
 };
 
-class ComplexConnect {
-  public:
+class ComplexConnect
+{
+public:
     ComplexConnect(unsigned int _timeout /*ms*/, unsigned int _interval /*ms*/);
     ComplexConnect(unsigned int _timeout /*ms*/, unsigned int _interval /*ms*/, unsigned int _error_interval /*ms*/, unsigned int _max_connect);
     ~ComplexConnect();
@@ -70,23 +72,23 @@ class ComplexConnect {
     unsigned int IndexTotalCost() const { return index_conn_totalcost_;}
     unsigned int TotalCost() const { return totalcost_;}
 
-  private:
+private:
     int __ConnectTime(unsigned int _index) const;
     int __ConnectTimeout(unsigned int _index) const;
 
-  private:
+private:
     ComplexConnect(const ComplexConnect&);
     ComplexConnect& operator=(const ComplexConnect&);
 
-  private:
+private:
     const unsigned int timeout_;
     const unsigned int interval_;
     const unsigned int error_interval_;
     const unsigned int max_connect_;
 
-    unsigned int trycount_;  // tried ip count
-    int index_;  // used ip index
-    int errcode_;  // errcode
+    unsigned int trycount_;	// tried ip count
+    int index_;				// used ip index
+    int errcode_;			// errcode
 
     int index_conn_rtt_;
     int index_conn_totalcost_;

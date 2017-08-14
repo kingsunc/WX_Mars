@@ -58,6 +58,7 @@ enum
     kCallFromZombie,
 };
 
+// ÍøÂçºËĞÄ;
 class NetCore
 {
 public:

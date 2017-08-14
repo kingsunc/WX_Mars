@@ -40,22 +40,34 @@ public:
     void AddCapacity(size_t _len);
 
     template<class T> void Write(const T& _val)
-    { Write(&_val, sizeof(_val));}
+    {
+		Write(&_val, sizeof(_val));
+	}
 
     template<class T> void Write(off_t& _pos, const T& _val)
-    { Write(_pos, &_val, sizeof(_val));}
+    {
+		Write(_pos, &_val, sizeof(_val));
+	}
 
     template<class T> void Write(const off_t& _pos, const T& _val)
-    { Write(_pos, &_val, sizeof(_val));}
+    {
+		Write(_pos, &_val, sizeof(_val));
+	}
 
     void Write(const char* const _val)
-    { Write(_val, strlen(_val));}
+    {
+		Write(_val, strlen(_val));
+	}
 
     void Write(off_t& _pos, const char* const _val)
-    { Write(_pos, _val, strlen(_val));}
+    {
+		Write(_pos, _val, strlen(_val));
+	}
 
     void Write(const off_t& _pos, const char* const _val)
-    { Write(_pos, _val, strlen(_val));}
+    {
+		Write(_pos, _val, strlen(_val));
+	}
 
     void Write(const AutoBuffer& _buffer);
     void Write(const void* _pbuffer, size_t _len);
@@ -66,13 +78,19 @@ public:
     void Write(TSeek _seek, const void* _pbuffer, size_t _len);
 
     template<class T> size_t Read(T& _val)
-    { return Read(&_val, sizeof(_val)); }
+    {
+		return Read(&_val, sizeof(_val));
+	}
 
     template<class T> size_t Read(off_t& _pos, T& _val) const
-    { return Read(_pos, &_val, sizeof(_val)); }
+    {
+		return Read(_pos, &_val, sizeof(_val));
+	}
 
     template<class T> size_t Read(const off_t& _pos, T& _val) const
-    { return Read(_pos, &_val, sizeof(_val)); }
+    {
+		return Read(_pos, &_val, sizeof(_val));
+	}
 
     size_t Read(void* _pbuffer, size_t _len);
     size_t Read(AutoBuffer& _rhs , size_t _len);
@@ -120,7 +138,6 @@ private:
 };
 
 extern const AutoBuffer KNullAtuoBuffer;
-
 template <class S> class copy_wrapper_helper;
 
 template <>
@@ -128,12 +145,18 @@ class copy_wrapper_helper<AutoBuffer>
 {
 public:
     static void copy_constructor(AutoBuffer& _lhs, AutoBuffer& _rhs)
-    { _lhs.Attach(_rhs); }
+    {
+		_lhs.Attach(_rhs);
+	}
 
     static void copy_constructor(AutoBuffer& _lhs, const AutoBuffer& _rhs)
-    { _lhs.Attach(const_cast<AutoBuffer&>(_rhs)); }
+    {
+		_lhs.Attach(const_cast<AutoBuffer&>(_rhs));
+	}
 
-    static void destructor(AutoBuffer& _delobj) {}
+    static void destructor(AutoBuffer& _delobj)
+	{
+	}
 };
 
 #define MY_DATA
@@ -157,6 +180,5 @@ struct __STNetMsgXpHeader
 };
 #define MSCP_PKG_HEADER_LEN		12
 #endif
-
 
 #endif	//COMM_AUTOBUFFER_H_
