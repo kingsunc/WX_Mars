@@ -23,13 +23,7 @@
 #include <map>
 #include <string>
 #include "mars/comm/autobuffer.h"
-
-#ifndef IN
-#define IN
-#endif
-#ifndef OUT
-#define OUT
-#endif
+#include "PSDefs.h"
 
 #define NO_APP_SERVER		// 暂时没有业务服务器;
 
@@ -41,6 +35,7 @@ enum ChannelType
 	ChannelType_All						= 3			// 长短连接全支持;
 };
 
+// 命令类型;
 enum MsgCmd
 {
 	MSGCMD_BOTH_INVALID					= -2,		// 无效;
@@ -101,11 +96,11 @@ public:
 	// buff->响应数据;
 	virtual int Buf2Resp(IN uint32_t _taskid, IN void* const _user_context, IN const AutoBuffer& _inbuffer, IN const AutoBuffer& _extend, IN int& _error_code, IN const int _channel_select) = 0;
 
-	uint32_t taskid_;
-	ChannelType channel_select_;
-	uint32_t cmdid_;
-	std::string cgi_;
-	std::string host_;
+	uint32_t		taskid_;
+	ChannelType		channel_select_;
+	uint32_t		cmdid_;
+	std::string		cgi_;
+	std::string		host_;
 };
 
 #endif

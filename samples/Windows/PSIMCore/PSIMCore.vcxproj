@@ -91,7 +91,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\Wrapper;$(ProjectDir);$(ProjectDir)../../../;$(ProjectDir)../../../mars;$(ProjectDir)../../../mars/comm/windows;$(ProjectDir)../../../mars/comm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Wrapper;$(ProjectDir);$(ProjectDir)../../../;$(ProjectDir)../../../mars;$(ProjectDir)../../../mars/comm/windows;$(ProjectDir)../../../mars/comm;$(ProjectDir)../Wrapper/protocol/;$(ProjectDir)../Wrapper/idl/;$(ProjectDir)../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>

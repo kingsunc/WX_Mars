@@ -79,7 +79,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;WRAPPER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)../../../;$(ProjectDir)../../../mars;$(ProjectDir)../../../mars/comm/windows;$(ProjectDir)../../../mars/comm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)../../../;$(ProjectDir)../../../mars;$(ProjectDir)../../../mars/comm/windows;$(ProjectDir)../../../mars/comm;$(ProjectDir)../Wrapper/protocol/;$(ProjectDir)../Wrapper/idl/;$(ProjectDir)../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -107,6 +107,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>./protocol;./idl;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -139,7 +140,10 @@
     <ClInclude Include="component\shortlink_packer.h" />
     <ClInclude Include="component\stnproto_logic.h" />
     <ClInclude Include="component\stn_callback.h" />
-    <ClInclude Include="idl\tars\request.h" />
+    <ClInclude Include="idl\tars\access_tars.h" />
+    <ClInclude Include="idl\tars\msgresp_tars.h" />
+    <ClInclude Include="idl\tars\msg_tars.h" />
+    <ClInclude Include="idl\tars\offmsg_tars.h" />
     <ClInclude Include="MarsWrapper.h" />
     <ClInclude Include="NetworkObserver.h" />
     <ClInclude Include="NetworkService.h" />
@@ -149,6 +153,8 @@
     <ClInclude Include="protocol\tars\tup.h" />
     <ClInclude Include="task\CGITask.h" />
     <ClInclude Include="task\Login_Task.h" />
+    <ClInclude Include="task\Msg_Task.h" />
+    <ClInclude Include="task\OffMsg_Task.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="component\app_callback.cpp" />
@@ -158,6 +164,8 @@
     <ClCompile Include="MarsWrapper.cpp" />
     <ClCompile Include="NetworkService.cpp" />
     <ClCompile Include="task\Login_Task.cpp" />
+    <ClCompile Include="task\Msg_Task.cpp" />
+    <ClCompile Include="task\OffMsg_Task.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

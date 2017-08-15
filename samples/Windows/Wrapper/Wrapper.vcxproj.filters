@@ -72,9 +72,6 @@
     <ClInclude Include="task\CGITask.h">
       <Filter>task</Filter>
     </ClInclude>
-    <ClInclude Include="idl\tars\request.h">
-      <Filter>idl\tars</Filter>
-    </ClInclude>
     <ClInclude Include="protocol\tars\Tars.h">
       <Filter>protocol\tars</Filter>
     </ClInclude>
@@ -86,6 +83,24 @@
     </ClInclude>
     <ClInclude Include="protocol\tars\tup.h">
       <Filter>protocol\tars</Filter>
+    </ClInclude>
+    <ClInclude Include="idl\tars\access_tars.h">
+      <Filter>idl\tars</Filter>
+    </ClInclude>
+    <ClInclude Include="idl\tars\msg_tars.h">
+      <Filter>idl\tars</Filter>
+    </ClInclude>
+    <ClInclude Include="idl\tars\msgresp_tars.h">
+      <Filter>idl\tars</Filter>
+    </ClInclude>
+    <ClInclude Include="task\Msg_Task.h">
+      <Filter>task</Filter>
+    </ClInclude>
+    <ClInclude Include="task\OffMsg_Task.h">
+      <Filter>task</Filter>
+    </ClInclude>
+    <ClInclude Include="idl\tars\offmsg_tars.h">
+      <Filter>idl\tars</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -108,6 +123,12 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="task\Login_Task.cpp">
+      <Filter>task</Filter>
+    </ClCompile>
+    <ClCompile Include="task\Msg_Task.cpp">
+      <Filter>task</Filter>
+    </ClCompile>
+    <ClCompile Include="task\OffMsg_Task.cpp">
       <Filter>task</Filter>
     </ClCompile>
   </ItemGroup>

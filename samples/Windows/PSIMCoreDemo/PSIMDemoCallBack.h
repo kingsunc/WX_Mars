@@ -7,5 +7,12 @@ public:
 	CPSIMDemoCallBack();
 	~CPSIMDemoCallBack();
 
+	// 登录-回调处理;
 	virtual void OnLoginResponse(const int& iCode, const char* strInfo);
+
+	// 发送消息-回调处理;
+	virtual void OnSendMsgResponse(const int& iCode, const char* strInfo);
+
+	// 获取离线消息-回调处理;
+	virtual void OnGetOffMsgResponse(const int& iCode, const char* strInfo);
 };

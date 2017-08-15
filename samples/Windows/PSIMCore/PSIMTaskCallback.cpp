@@ -50,3 +50,25 @@ void CPSIMTaskCallback::OnResponse(Login_Task* task, MessageService::LoginResp& 
 	}
 	m_pPSIMCallBack->OnLoginResponse(response.code, response.info.c_str());
 }
+
+void CPSIMTaskCallback::OnResponse(Msg_Task * task, MessageService::SendMsgResp & response)
+{
+	CPSIMCallBack*	m_pPSIMCallBack = GetPSIMCallBack();
+	if (!m_pPSIMCallBack)
+	{
+		// 异常处理;
+		return;
+	}
+	m_pPSIMCallBack->OnSendMsgResponse(response.code, response.info.c_str());
+}
+
+void CPSIMTaskCallback::OnResponse(OffMsg_Task * task, MessageService::OfflineMsgResp & response)
+{
+	CPSIMCallBack*	m_pPSIMCallBack = GetPSIMCallBack();
+	if (!m_pPSIMCallBack)
+	{
+		// 异常处理;
+		return;
+	}
+	m_pPSIMCallBack->OnGetOffMsgResponse(response.code, response.info.c_str());
+}

@@ -103,46 +103,48 @@ void MarsWrapper::MsgLogout()
 
 }
 
-//void MarsWrapper::pingServer(const std::string& _name, const std::string& _text, boost::weak_ptr<HelloCGICallback> _callback)
-//{
-//	HelloCGITask* task = new HelloCGITask();
-//	task->user_ = _name;
-//	task->text_ = _text;
-//	task->callback_ = _callback;
-//
-//	//task->channel_select_ = ChannelType_All;
-//	task->channel_select_ = ChannelType_LongConn;
-//	//task->cmdid_ = com::tencent::mars::sample::proto::CMD_ID_HELLO;
-//	task->cgi_ = "/mars/hello";
-//	task->host_ = g_host;
-//	NetworkService::Instance().startTask(task);
-//}
-//
+void MarsWrapper::SendTextMessage(OUT int& iReqID,
+	IN const PS_SendMode& eSendMode,
+	IN const char* strFrom,
+	IN const char* strTo,
+	IN const char* strContent,
+	IN const int& iContentLen,
+	IN const char* strPushInfo,
+	IN Msg_Callback* pCallback)
+{
+	Msg_Task* pTask = new Msg_Task();
+	pTask->from = strFrom;
+	pTask->to = strTo;
+	pTask->pushInfo = strPushInfo;
+	pTask->sendMode = eSendMode;
+	pTask->type = PS_MessageType_Text;
+	pTask->priority = 0;
+	for (int i = 0; i < iContentLen; i++)
+	{
+		pTask->content.push_back(strContent[i]);
+	}
+	pTask->handleOption = PS_SendOption_OfflineSave + PS_SendOption_IosPush;
+	pTask->pCallback = pCallback;
 
-//void MarsWrapper::sendChatMsg(const ChatMsg& _chat_msg)
-//{
-//	ChatCGITask* task = new ChatCGITask();
-//	task->channel_select_ = ChannelType_LongConn;
-//	//task->cmdid_ = com::tencent::mars::sample::proto::CMD_ID_SEND_MESSAGE;
-//	task->cgi_ = "/mars/sendmessage";
-//	task->host_ = g_host;
-//	task->text_ = _chat_msg.content_;
-//
-//	task->user_ = _chat_msg.from_;
-//	task->to_ = "all";
-//	task->access_token_ = "123456";
-//	task->topic_ = _chat_msg.topic_;
-//
-//	NetworkService::Instance().startTask(task);
-//}
-//void MarsWrapper::getConversationList(boost::weak_ptr<GetConvListCGICallback> _callback)
-//{
-//	GetConvListCGITask* task = new GetConvListCGITask();
-//	task->channel_select_ = ChannelType_ShortConn;
-//	//task->cmdid_ = com::tencent::mars::sample::proto::CMD_ID_CONVERSATION_LIST;
-//	task->cgi_ = "/mars/getconvlist";
-//	task->host_ = g_host;
-//	task->access_token_ = "";
-//	task->callback_ = _callback;
-//	NetworkService::Instance().startTask(task);
-//}
+	pTask->channel_select_ = ChannelType_LongConn;
+	pTask->cmdid_ = MsgCmd::MSGCMD_C2S_SEND_MESSAGE_REP;
+	pTask->cgi_ = "/psmsg/msg";
+	pTask->host_ = g_host;
+	NetworkService::GetInstance().StartTask(pTask);
+
+	//GetOfflineMsgs();
+}
+
+void MarsWrapper::GetOfflineMsgs(OUT std::vector<PS_OffMsgDesc_t>& vecMsgDesc,
+	IN OffMsg_Callback* pCallback)
+{
+	OffMsg_Task* pTask = new OffMsg_Task();
+	pTask->vecMsgDesc = vecMsgDesc;
+	pTask->pCallback = pCallback;
+
+	pTask->channel_select_ = ChannelType_LongConn;
+	pTask->cmdid_ = MsgCmd::MSGCMD_C2S_HISTORY_REQ;
+	pTask->cgi_ = "/psmsg/offmsg";
+	pTask->host_ = g_host;
+	NetworkService::GetInstance().StartTask(pTask);
+}
