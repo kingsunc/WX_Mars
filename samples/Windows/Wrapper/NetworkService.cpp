@@ -77,15 +77,15 @@ void NetworkService::Init()
 
 int NetworkService::StartTask(CGITask* task)
 {
-	mars::stn::Task ctask;
-	ctask.cmdid = task->cmdid_;
-	ctask.channel_select = task->channel_select_;
-	ctask.shortlink_host_list.push_back(task->host_);
-	ctask.cgi = task->cgi_;
-	ctask.user_context = (void*)task;
-	mars::stn::StartTask(ctask);
-	m_mapTasks[ctask.taskid] = task;
-	return ctask.taskid;
+	mars::stn::Task stnTask(task->taskid_);
+	stnTask.cmdid = task->cmdid_;
+	stnTask.channel_select = task->channel_select_;
+	stnTask.shortlink_host_list.push_back(task->host_);
+	stnTask.cgi = task->cgi_;
+	stnTask.user_context = (void*)task;
+	mars::stn::StartTask(stnTask);
+	m_mapTasks[stnTask.taskid] = task;
+	return stnTask.taskid;
 }
 
 bool NetworkService::Req2Buf(uint32_t _taskid, void* const _user_context, AutoBuffer& _outbuffer, AutoBuffer& _extend, int& _error_code, const int _channel_select)

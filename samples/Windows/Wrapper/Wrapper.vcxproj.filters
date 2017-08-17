@@ -90,9 +90,6 @@
     <ClInclude Include="idl\tars\msg_tars.h">
       <Filter>idl\tars</Filter>
     </ClInclude>
-    <ClInclude Include="idl\tars\msgresp_tars.h">
-      <Filter>idl\tars</Filter>
-    </ClInclude>
     <ClInclude Include="task\Msg_Task.h">
       <Filter>task</Filter>
     </ClInclude>
@@ -100,6 +97,15 @@
       <Filter>task</Filter>
     </ClInclude>
     <ClInclude Include="idl\tars\offmsg_tars.h">
+      <Filter>idl\tars</Filter>
+    </ClInclude>
+    <ClInclude Include="task\NoBody_Task.h">
+      <Filter>task</Filter>
+    </ClInclude>
+    <ClInclude Include="idl\tars\msg_resp_tars.h">
+      <Filter>idl\tars</Filter>
+    </ClInclude>
+    <ClInclude Include="idl\tars\msg_result_tars.h">
       <Filter>idl\tars</Filter>
     </ClInclude>
   </ItemGroup>
@@ -129,6 +135,9 @@
       <Filter>task</Filter>
     </ClCompile>
     <ClCompile Include="task\OffMsg_Task.cpp">
+      <Filter>task</Filter>
+    </ClCompile>
+    <ClCompile Include="task\NoBody_Task.cpp">
       <Filter>task</Filter>
     </ClCompile>
   </ItemGroup>

@@ -26,7 +26,8 @@ namespace mars
 {
 namespace stn
 {
-        
+ 
+// stn-callback
 class StnCallBack : public Callback
 {
 private:

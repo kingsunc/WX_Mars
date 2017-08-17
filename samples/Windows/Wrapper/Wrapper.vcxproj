@@ -141,7 +141,8 @@
     <ClInclude Include="component\stnproto_logic.h" />
     <ClInclude Include="component\stn_callback.h" />
     <ClInclude Include="idl\tars\access_tars.h" />
-    <ClInclude Include="idl\tars\msgresp_tars.h" />
+    <ClInclude Include="idl\tars\msg_resp_tars.h" />
+    <ClInclude Include="idl\tars\msg_result_tars.h" />
     <ClInclude Include="idl\tars\msg_tars.h" />
     <ClInclude Include="idl\tars\offmsg_tars.h" />
     <ClInclude Include="MarsWrapper.h" />
@@ -153,6 +154,7 @@
     <ClInclude Include="protocol\tars\tup.h" />
     <ClInclude Include="task\CGITask.h" />
     <ClInclude Include="task\Login_Task.h" />
+    <ClInclude Include="task\NoBody_Task.h" />
     <ClInclude Include="task\Msg_Task.h" />
     <ClInclude Include="task\OffMsg_Task.h" />
   </ItemGroup>
@@ -164,6 +166,7 @@
     <ClCompile Include="MarsWrapper.cpp" />
     <ClCompile Include="NetworkService.cpp" />
     <ClCompile Include="task\Login_Task.cpp" />
+    <ClCompile Include="task\NoBody_Task.cpp" />
     <ClCompile Include="task\Msg_Task.cpp" />
     <ClCompile Include="task\OffMsg_Task.cpp" />
   </ItemGroup>

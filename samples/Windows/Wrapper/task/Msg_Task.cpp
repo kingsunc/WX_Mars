@@ -7,7 +7,7 @@ using namespace std;
 bool Msg_Task::Req2Buf(uint32_t _taskid, void* const _user_context, AutoBuffer& _outbuffer, AutoBuffer& _extend, int& _error_code, const int _channel_select)
 {
 	MessageService::Message req;
-	req.seqId = msgId;
+	req.msgId = msgId;
 	req.from = from;
 	req.to = to;
 	req.sendMode = sendMode;

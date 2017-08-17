@@ -36,7 +36,7 @@
 #endif
 
 class AutoBuffer;
-class __STNetMsgXpHeader;
+class PSMsgHeader;
 
 namespace mars
 {

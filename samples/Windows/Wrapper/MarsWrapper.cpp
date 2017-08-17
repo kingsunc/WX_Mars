@@ -35,23 +35,44 @@ MarsWrapper& MarsWrapper::GetInstance()
 	return instance_;
 }
 
-MarsWrapper::MarsWrapper()
+MarsWrapper::MarsWrapper(): m_pMsgPush(nullptr)
 {
 }
 
 void MarsWrapper::OnPush(uint64_t _channel_id, uint32_t _cmdid, uint32_t _taskid, const AutoBuffer& _body, const AutoBuffer& _extend)
 {
-	int i = 0;
-	/*com::tencent::mars::sample::chat::proto::MessagePush msg;
-	msg.ParseFromArray(_body.Ptr(), _body.Length());
-	if (chat_msg_observer_)
+	tars::TarsInputStream<tars::BufferReader> inStream;
+	inStream.setBuffer((const char*)(_body.Ptr()), _body.Length());
+
+	MessageService::Message response;
+	response.readFrom(inStream);
+
+	MessageItem msgItem;
+	msgItem.iMsgId = response.msgId;
+	msgItem.strFrom = (char*)response.from.c_str();
+	msgItem.strTo = (char*)response.to.c_str();
+	msgItem.iSendMode = response.sendMode;
+	msgItem.iType = response.type;
+	msgItem.iPriority = response.priority;
+	msgItem.iHandleOption = response.handleOption;
+	msgItem.strPushInfo = (char*)response.pushInfo.c_str();
+	msgItem.iTimestamp = response.timestamp;
+	msgItem.iExpireTime = response.expireTime;
 	{
-		ChatMsg chat_msg;
-		chat_msg.topic_ = msg.topic();
-		chat_msg.from_ = msg.from();
-		chat_msg.content_ = msg.content();
-		chat_msg_observer_->OnRecvChatMsg(chat_msg);
-	}*/
+		const int iLen = response.content.size();
+		msgItem.psBuff.pBuff = new char[iLen + 1];
+		memset(msgItem.psBuff.pBuff, 0, (iLen + 1) * sizeof(char));
+		for (int i = 0; i < iLen; i++)
+		{
+			msgItem.psBuff.pBuff[i] = response.content[i];
+		}
+		msgItem.psBuff.iLen = iLen;
+	}
+
+	if (m_pMsgPush)
+	{
+		m_pMsgPush->OnRecvMessage(msgItem);
+	}
 }
 
 void MarsWrapper::Start()
@@ -60,6 +81,13 @@ void MarsWrapper::Start()
 	NetworkService::GetInstance().setShortLinkDebugIP(g_host, g_shortlink_port);
 	NetworkService::GetInstance().setLongLinkAddress(g_host, g_longlink_port, "");
 	NetworkService::GetInstance().Start();	
+
+	NetworkService::GetInstance().SetPushObserver(MSGCMD_S2C_RECV_MESSAGE_REP, this);
+}
+
+void MarsWrapper::SetMsgPushObserver(MessagePush* pMsgPush)
+{
+	m_pMsgPush = pMsgPush;
 }
 
 void MarsWrapper::MsgLogin(const char* strAppID, const char* strAppToken, const char* strUserID, const char* strUserName, const int iDeviceType, const char* strDeviceToken, Login_Callback* pCallback)
@@ -100,10 +128,16 @@ void MarsWrapper::MsgLogin(const char* strAppID, const char* strAppToken, const 
 // ×¢Ïú
 void MarsWrapper::MsgLogout()
 {
+	NoBody_Task* pTask = new NoBody_Task();
 
+	pTask->channel_select_ = ChannelType_LongConn;
+	pTask->cmdid_ = MsgCmd::MSGCMD_BOTH_LOGOUT;
+	pTask->cgi_ = "/psmsg/logout";
+	pTask->host_ = g_host;
+	NetworkService::GetInstance().StartTask(pTask);
 }
 
-void MarsWrapper::SendTextMessage(OUT int& iReqID,
+bool MarsWrapper::SendTextMessage(OUT int& iReqID,
 	IN const PS_SendMode& eSendMode,
 	IN const char* strFrom,
 	IN const char* strTo,
@@ -112,6 +146,14 @@ void MarsWrapper::SendTextMessage(OUT int& iReqID,
 	IN const char* strPushInfo,
 	IN Msg_Callback* pCallback)
 {
+	if ((!strFrom) || (!strTo) || (!strContent) ||
+		(0 == strlen(strFrom)) || 
+		(0 == strlen(strTo)) ||
+		(0 == strlen(strContent)) )
+	{
+		return false;
+	}
+
 	Msg_Task* pTask = new Msg_Task();
 	pTask->from = strFrom;
 	pTask->to = strTo;
@@ -132,7 +174,8 @@ void MarsWrapper::SendTextMessage(OUT int& iReqID,
 	pTask->host_ = g_host;
 	NetworkService::GetInstance().StartTask(pTask);
 
-	//GetOfflineMsgs();
+	iReqID = pTask->taskid_;
+	return true;
 }
 
 void MarsWrapper::GetOfflineMsgs(OUT std::vector<PS_OffMsgDesc_t>& vecMsgDesc,

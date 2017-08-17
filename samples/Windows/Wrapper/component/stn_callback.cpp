@@ -87,6 +87,8 @@ int StnCallBack::OnTaskEnd(uint32_t _taskid, void* const _user_context, int _err
 
 void StnCallBack::ReportConnectStatus(int _status, int longlink_status)
 {
+	xinfo2(TSF"StnCallBack::ReportConnectStatus(_status: %_, longlink_status: %_) ", _status, longlink_status);
+
     switch (longlink_status)
 	{
         case mars::stn::kServerFailed:
@@ -102,7 +104,6 @@ void StnCallBack::ReportConnectStatus(int _status, int longlink_status)
         default:
             return;
     }
-    
 }
 
 // synccheck：长链成功后由网络组件触发

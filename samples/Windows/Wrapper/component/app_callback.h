@@ -28,6 +28,7 @@ namespace mars
 namespace app
 {
 
+// app-callback
 class AppCallBack : public Callback
 {
 private:

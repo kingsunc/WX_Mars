@@ -23,6 +23,7 @@
 #include <map>
 #include <string>
 #include "mars/comm/autobuffer.h"
+#include "mars/comm/thread/atomic_oper.h"
 #include "PSDefs.h"
 
 #define NO_APP_SERVER		// 暂时没有业务服务器;
@@ -44,7 +45,8 @@ enum MsgCmd
 
 	MSGCMD_C2S_LOGIN_REQ				= 1,		// 客户端登录
 	MSGCMD_S2C_LOGIN_RESP				= 2,		// 服务器返回登录响应
-	MSGCMD_BOTH_LOGIN					= 3,		// 客户端或者服务器退出
+	MSGCMD_BOTH_LOGOUT					= 3,		// 客户端或者服务器退出
+	MSGCMD_S2C_KICKOUT					= 4,		// 服务器踢出客户端(账号重复登录)
 
 	MSGCMD_C2S_CREATE_GROUP_REQ			= 6,		// 请求创建一个群
 	MSGCMD_S2C_CREATE_GROUP_RESP		= 7,		// 创建群的响应
@@ -84,11 +86,16 @@ enum MsgCmd
 	MSGCMD_S2C_PUSH						= 10001		// 服务器推送给客户端;
 };
 
+static uint32_t gs_taskid = 1;
+
 // 任务基类;
 class CGITask
 {
 public:
-	CGITask() {};
+	CGITask()
+	{
+		taskid_ = atomic_inc32(&gs_taskid);
+	}
 	virtual ~CGITask() {};
 	
 	// 请求数据->buff;

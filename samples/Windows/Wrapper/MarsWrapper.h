@@ -23,17 +23,27 @@
 #include "NetworkObserver.h"
 #include "NetworkService.h"
 #include "task/Login_Task.h"
+#include "task/NoBody_Task.h"
 #include "task/Msg_Task.h"
 #include "task/OffMsg_Task.h"
 
+class MessagePush
+{
+public:
+	virtual void OnRecvMessage(const MessageItem& msgItem) = 0;
+};
+
 // 业务包装类;
-class MarsWrapper
+class MarsWrapper: public PushObserver
 {
 public:
 	// 单例 非线程安全;
 	static MarsWrapper& GetInstance();
 	// 启动;
 	void Start();
+
+	// 设置接收消息的回调类;
+	void SetMsgPushObserver(MessagePush* pMsgPush);
 
 	// 客户端请求;
 	// 登录
@@ -72,7 +82,7 @@ public:
 	//virtual void InviteGroupUsers(const char* strGroupID);
 
 	// 发送文本消息
-	virtual void SendTextMessage(OUT int& iReqID,
+	virtual bool SendTextMessage(OUT int& iReqID,
 		IN const PS_SendMode& eSendMode,
 		IN const char* strFrom,
 		IN const char* strTo,
@@ -93,6 +103,8 @@ protected:
 
 private:
 	MarsWrapper();
+
+	MessagePush*	m_pMsgPush;
 };
 
 #endif

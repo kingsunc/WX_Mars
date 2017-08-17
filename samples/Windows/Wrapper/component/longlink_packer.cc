@@ -54,37 +54,20 @@ void SetClientVersion(uint32_t _client_version)
 
 static int __unpack_header(const void* _packed, size_t _packed_len, uint32_t& _cmdid, uint32_t& _seq, size_t& _package_len, size_t& _body_len)
 {
-    __STNetMsgXpHeader st = {0};
-    if (_packed_len < sizeof(__STNetMsgXpHeader))
+    PSMsgHeader st = {0};
+    if (_packed_len < sizeof(PSMsgHeader))
 	{
         _package_len = 0;
         _body_len = 0;
         return LONGLINK_UNPACK_CONTINUE;
     }
-    
-    memcpy(&st, _packed, sizeof(__STNetMsgXpHeader));
+    memcpy(&st, _packed, sizeof(PSMsgHeader));
 
-#ifndef MY_DATA
-    uint32_t head_len = ntohl(st.head_length);
-    uint32_t client_version = ntohl(st.client_version);
-    if (client_version != sg_client_version)
-	{
-        _package_len = 0;
-        _body_len = 0;
-    	return LONGLINK_UNPACK_FALSE;
-    }
-    _cmdid = ntohl(st.cmdid);
-	_seq = ntohl(st.seq);
-	_body_len = ntohl(st.body_length);
-	_package_len = head_len + _body_len;
-#else
 	_body_len = ntohl(st.body_length);
 	_cmdid = ntohs(st.cmd_id);
 	_seq = ntohl(st.seqid);
 	uint32_t version = st.version;
-
-	_package_len = sizeof(__STNetMsgXpHeader) + _body_len;
-#endif
+	_package_len = sizeof(PSMsgHeader) + _body_len;
 
     if(_package_len > 1024*1024)
 	{
@@ -102,22 +85,13 @@ static int __unpack_header(const void* _packed, size_t _packed_len, uint32_t& _c
 void (*longlink_pack)(uint32_t _cmdid, uint32_t _seq, const AutoBuffer& _body, const AutoBuffer& _extension, AutoBuffer& _packed, longlink_tracker* _tracker)
 = [](uint32_t _cmdid, uint32_t _seq, const AutoBuffer& _body, const AutoBuffer& _extension, AutoBuffer& _packed, longlink_tracker* _tracker)
 {
-#ifndef MY_DATA
-    __STNetMsgXpHeader st = {0};
-    st.head_length = htonl(sizeof(__STNetMsgXpHeader));
-    st.client_version = htonl(sg_client_version);
-    st.cmdid = htonl(_cmdid);
-    st.seq = htonl(_seq);
-    st.body_length = htonl(_body.Length());
-#else
-	__STNetMsgXpHeader st = { 0 };
+	PSMsgHeader st = { 0 };
 	st.body_length = htonl(_body.Length());
 	st.cmd_id = htons(_cmdid);
 	st.version = sg_client_version;
 	st.seqid = htonl(_seq);
-#endif
 
-    _packed.AllocWrite(sizeof(__STNetMsgXpHeader) + _body.Length());
+    _packed.AllocWrite(sizeof(PSMsgHeader) + _body.Length());
     _packed.Write(&st, sizeof(st));
     
 	if (NULL != _body.Ptr())
@@ -127,7 +101,7 @@ void (*longlink_pack)(uint32_t _cmdid, uint32_t _seq, const AutoBuffer& _body, c
 
 #ifdef _DEBUG
 	int iLen = _packed.Length();
-	printf("send packet Header: %d , Body : %d \n", sizeof(__STNetMsgXpHeader), _body.Length());
+	printf("send packet Header: %d , Body : %d \n", sizeof(PSMsgHeader), _body.Length());
 	unsigned char* ch = (unsigned char*)_packed.Ptr(0);
 	for (int i = 0; i < iLen; i++)
 	{
@@ -144,7 +118,7 @@ int (*longlink_unpack)(const AutoBuffer& _packed, uint32_t& _cmdid, uint32_t& _s
 = [](const AutoBuffer& _packed, uint32_t& _cmdid, uint32_t& _seq, size_t& _package_len, AutoBuffer& _body, AutoBuffer& _extension, longlink_tracker* _tracker)
 {
 #ifdef _DEBUG
-	int iHeaderLen = sizeof(__STNetMsgXpHeader);
+	int iHeaderLen = sizeof(PSMsgHeader);
 	printf("recv packet Header: %d , Body : %d \n", iHeaderLen, _packed.Length() - iHeaderLen);
 	unsigned char* ch = (unsigned char*)(_packed.Ptr());
 	for (int i = 0; i < _packed.Length(); i++)
@@ -167,7 +141,6 @@ int (*longlink_unpack)(const AutoBuffer& _packed, uint32_t& _cmdid, uint32_t& _s
 
 #define MSGCMD_HANDSHAKE 10000
 #define SIGNALKEEP_CMDID 243
-#define PUSH_DATA_TASKID 0
 
 uint32_t (*longlink_noop_cmdid)()
 = []()
@@ -192,11 +165,13 @@ uint32_t (*signal_keep_cmdid)()
 void (*longlink_noop_req_body)(AutoBuffer& _body, AutoBuffer& _extend)
 = [](AutoBuffer& _body, AutoBuffer& _extend)
 {
+	printf("longlink_noop_req_body");
 };
     
 void (*longlink_noop_resp_body)(const AutoBuffer& _body, const AutoBuffer& _extend)
 = [](const AutoBuffer& _body, const AutoBuffer& _extend)
 {
+	printf("longlink_noop_resp_body");
 };
 
 uint32_t (*longlink_noop_interval)()
@@ -212,12 +187,13 @@ bool (*longlink_complexconnect_need_verify)()
     return false;
 };
 
+const int sg_iRecvMessageCmdID = 20;
+
 bool (*longlink_ispush)(uint32_t _cmdid, uint32_t _taskid, const AutoBuffer& _body, const AutoBuffer& _extend)
 = [](uint32_t _cmdid, uint32_t _taskid, const AutoBuffer& _body, const AutoBuffer& _extend)
 {
 	// 确认是否推送消息, 暂时不需要;
-	return false;
-    //return PUSH_DATA_TASKID == _taskid;
+    return sg_iRecvMessageCmdID == _cmdid;
 };
     
 bool (*longlink_identify_isresp)(uint32_t _sent_seq, uint32_t _cmdid, uint32_t _recv_seq, const AutoBuffer& _body, const AutoBuffer& _extend)

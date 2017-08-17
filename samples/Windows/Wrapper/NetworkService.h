@@ -36,23 +36,29 @@ class NetworkService
 public:
 	// 单例类，非线程安全;
 	static NetworkService& GetInstance();
-	// 设置回调类;
-	void SetPushObserver(uint32_t iCmdID, PushObserver* pObserver);
+	// 启动;
 	void Start();
 
+	// 任务处理: 开始->发送->接收->结束
+	// 任务开始;
 	int StartTask(CGITask* task);
-
+	// 任务发送 请求转buff
 	bool Req2Buf(uint32_t _taskid, void* const _user_context, AutoBuffer& _outbuffer, AutoBuffer& _extend, int& _error_code, const int _channel_select);
+	// 任务应答 buff转响应
 	int Buf2Resp(uint32_t _taskid, void* const _user_context, const AutoBuffer& _inbuffer, const AutoBuffer& _extend, int& _error_code, const int _channel_select);
-	
+	// 任务结束
 	int OnTaskEnd(uint32_t _taskid, void* const _user_context, int _error_type, int _error_code);
-	void OnPush(uint64_t _channel_id, uint32_t _cmdid, uint32_t _taskid, const AutoBuffer& _body, const AutoBuffer& _extend);
-
+	
 	// 设置相关信息;
 	void setClientVersion(uint32_t _client_version);
 	void setShortLinkDebugIP(const std::string& _ip, unsigned short _port);
 	void setShortLinkPort(unsigned short _port);
 	void setLongLinkAddress(const std::string& _ip, unsigned short _port, const std::string& _debug_ip = "");
+
+	// 设置回调类;
+	void SetPushObserver(uint32_t iCmdID, PushObserver* pObserver);
+	// 回调接收;
+	void OnPush(uint64_t _channel_id, uint32_t _cmdid, uint32_t _taskid, const AutoBuffer& _body, const AutoBuffer& _extend);
 
 protected:
 	NetworkService();

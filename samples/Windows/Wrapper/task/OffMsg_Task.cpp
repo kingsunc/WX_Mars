@@ -13,7 +13,7 @@ bool OffMsg_Task::Req2Buf(uint32_t _taskid, void* const _user_context, AutoBuffe
 		desc.queue.from = vecMsgDesc[i].strFrom;
 		desc.queue.to = vecMsgDesc[i].strTo;
 		desc.queue.sendMode = vecMsgDesc[i].iSendMode;
-		desc.startSeqId = vecMsgDesc[i].iStartMsgID;
+		desc.startMsgId = vecMsgDesc[i].iStartMsgID;
 		desc.count = vecMsgDesc[i].iMsgCount;
 		req.reqs.push_back(desc);
 	}

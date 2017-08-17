@@ -1,5 +1,5 @@
-#ifndef _HELLO_CGI_TASK_H_
-#define _HELLO_CGI_TASK_H_
+#ifndef _LOGININ_CGI_TASK_H_
+#define _LOGININ_CGI_TASK_H_
 
 #include "task/CGITask.h"
 #include "mars/boost/weak_ptr.hpp"
@@ -14,7 +14,7 @@ public:
 	virtual void OnResponse(Login_Task* task, MessageService::LoginResp& response) = 0;
 };
 
-// Hello任务;
+// Login任务;
 class Login_Task : public CGITask 
 {
 public:
