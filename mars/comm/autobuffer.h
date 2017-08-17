@@ -159,18 +159,7 @@ public:
 	}
 };
 
-#define MY_DATA
-#ifndef MY_DATA
-struct __STNetMsgXpHeader
-{
-	uint32_t    head_length;
-	uint32_t    client_version;
-	uint32_t    cmdid;
-	uint32_t    seq;
-	uint32_t	body_length;
-};
-#else
-struct __STNetMsgXpHeader
+struct PSMsgHeader
 {
 	uint32_t	body_length;
 	uint16_t	cmd_id;
@@ -178,7 +167,6 @@ struct __STNetMsgXpHeader
 	uint8_t		format;
 	uint32_t	seqid;
 };
-#define MSCP_PKG_HEADER_LEN		12
-#endif
+#define PSMSG_HEADER_LEN		12
 
 #endif	//COMM_AUTOBUFFER_H_

@@ -66,7 +66,9 @@ public:
     static const uint32_t kLongLinkIdentifyCheckerTaskID = 0xFFFFFFFE;
     static const uint32_t kSignallingKeeperTaskID = 0xFFFFFFFD;
 
+private:
     Task();
+public:
     Task(uint32_t _taskid);
 
     // 请求

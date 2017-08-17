@@ -2,7 +2,8 @@
 #include "MarsWrapper.h"
 #include "PSIMCallBack.h"
 
-class CPSIMTaskCallback: public Login_Callback, public Msg_Callback, public OffMsg_Callback
+class CPSIMTaskCallback: public MessagePush, 
+	public Login_Callback, public Msg_Callback, public OffMsg_Callback
 {
 private:
 	CPSIMTaskCallback();
@@ -15,6 +16,9 @@ public:
 	static void ReleaseInstance();
 
 protected:
+	// 接收消息-回调处理;
+	virtual void OnRecvMessage(const MessageItem& msgItem);
+
 	// 登录-回调处理;
 	virtual void OnResponse(Login_Task* task, MessageService::LoginResp& response);
 
@@ -23,6 +27,8 @@ protected:
 
 	// 获取离线消息-回调处理;
 	virtual void OnResponse(OffMsg_Task* task, MessageService::OfflineMsgResp& response);
+
+	
 
 private:
 	CPSIMCallBack* GetPSIMCallBack();

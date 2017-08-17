@@ -25,16 +25,16 @@
 
 #include "mars/comm/autobuffer.h"
 
-
-class LogCrypt {
+class LogCrypt
+{
 public:
     LogCrypt(const char* _pubkey);
     virtual ~LogCrypt() {}
-    
+
 private:
     LogCrypt(const LogCrypt&);
     LogCrypt& operator=(const LogCrypt&);
-    
+
 public:
     static uint32_t GetHeaderLen();
     static uint32_t GetTailerLen();
@@ -61,9 +61,6 @@ private:
     uint32_t tea_key_[4];
     char client_pubkey_[64];
     bool is_crypt_;
-
 };
-
-
 
 #endif /* LOG_CRYPT_H_ */

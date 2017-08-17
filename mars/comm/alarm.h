@@ -29,16 +29,18 @@
 #include "android/wakeuplock.h"
 #endif
 
-class Alarm {
-  public:
-    enum {
+class Alarm
+{
+public:
+    enum
+	{
         kInit,
         kStart,
         kCancel,
         kOnAlarm,
     };
 
-  public:
+public:
     template<class T>
     explicit Alarm(const T& _op, bool _inthread = true)
         : target_(detail::transform(_op))
@@ -71,7 +73,8 @@ class Alarm {
         xinfo2(TSF"handler:(%_,%_)", reg_async_.Get().queue, reg_async_.Get().seq);
     }
 
-    virtual ~Alarm() {
+    virtual ~Alarm()
+	{
         Cancel();
         reg_.CancelAndWait();
         reg_async_.CancelAndWait();
@@ -92,14 +95,14 @@ class Alarm {
 
     const Thread& RunThread() const;
 
-  private:
+private:
     Alarm(const Alarm&);
     Alarm& operator=(const Alarm&);
 
     void OnAlarm(const MessageQueue::MessagePost_t& _id, MessageQueue::Message& _message);
     virtual void    __Run();
 
-  private:
+ private:
     Runnable*                   target_;
     MessageQueue::ScopeRegister reg_async_;
     Thread                      runthread_;

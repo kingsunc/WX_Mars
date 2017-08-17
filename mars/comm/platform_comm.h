@@ -27,34 +27,37 @@
 #include "mars/comm/thread/mutex.h"
 #endif
 
-
 #ifndef __cplusplus
 #error "C++ only"
 #endif
 
-enum NetType {
-    kNoNet = -1,
-    kWifi = 1,
-    kMobile = 2,
-    kOtherNet = 3
+enum NetType
+{
+    kNoNet		= -1,
+    kWifi		= 1,
+    kMobile		= 2,
+    kOtherNet	= 3
 };
 int getNetInfo();
 
 bool getCurRadioAccessNetworkInfo(struct RadioAccessNetworkInfo& _info);
 
-struct WifiInfo {
+struct WifiInfo
+{
     std::string ssid;
     std::string bssid;
 };
 bool getCurWifiInfo(WifiInfo& _wifi_info);
 
-struct SIMInfo {
+struct SIMInfo
+{
     std::string isp_code;
     std::string isp_name;
 };
 bool getCurSIMInfo(SIMInfo& _sim_info);
 
-struct APNInfo {
+struct APNInfo
+{
     APNInfo(): nettype(kNoNet-1), sub_nettype(0), extra_info("") {}
     int nettype;
     int sub_nettype;
@@ -67,25 +70,26 @@ bool getAPNInfo(APNInfo& info);
 #  define __CXX11_CONSTEXPR__
 #endif
 
-__CXX11_CONSTEXPR__ static const char* const GPRS = "GPRS";
-__CXX11_CONSTEXPR__ static const char* const Edge = "Edge";
-__CXX11_CONSTEXPR__ static const char* const WCDMA = "WCDMA";
-__CXX11_CONSTEXPR__ static const char* const HSDPA = "HSDPA";
-__CXX11_CONSTEXPR__ static const char* const HSUPA = "HSUPA";
-__CXX11_CONSTEXPR__ static const char* const CDMA1x = "CDMA1x";
-__CXX11_CONSTEXPR__ static const char* const CDMAEVDORev0 = "CDMAEVDORev0";
-__CXX11_CONSTEXPR__ static const char* const CDMAEVDORevA = "CDMAEVDORevA";
-__CXX11_CONSTEXPR__ static const char* const CDMAEVDORevB = "CDMAEVDORevB";
-__CXX11_CONSTEXPR__ static const char* const eHRPD = "eHRPD";
-__CXX11_CONSTEXPR__ static const char* const LTE  = "LTE";
-__CXX11_CONSTEXPR__ static const char* const UMTS  = "UMTS";
-__CXX11_CONSTEXPR__ static const char* const CDMA  = "CDMA";
-__CXX11_CONSTEXPR__ static const char* const HSPA = "HSPA";
-__CXX11_CONSTEXPR__ static const char* const IDEN = "IDEN";
-__CXX11_CONSTEXPR__ static const char* const HSPAP = "HSPA+";
+__CXX11_CONSTEXPR__ static const char* const GPRS			= "GPRS";
+__CXX11_CONSTEXPR__ static const char* const Edge			= "Edge";
+__CXX11_CONSTEXPR__ static const char* const WCDMA			= "WCDMA";
+__CXX11_CONSTEXPR__ static const char* const HSDPA			= "HSDPA";
+__CXX11_CONSTEXPR__ static const char* const HSUPA			= "HSUPA";
+__CXX11_CONSTEXPR__ static const char* const CDMA1x			= "CDMA1x";
+__CXX11_CONSTEXPR__ static const char* const CDMAEVDORev0	= "CDMAEVDORev0";
+__CXX11_CONSTEXPR__ static const char* const CDMAEVDORevA	= "CDMAEVDORevA";
+__CXX11_CONSTEXPR__ static const char* const CDMAEVDORevB	= "CDMAEVDORevB";
+__CXX11_CONSTEXPR__ static const char* const eHRPD			= "eHRPD";
+__CXX11_CONSTEXPR__ static const char* const LTE			= "LTE";
+__CXX11_CONSTEXPR__ static const char* const UMTS			= "UMTS";
+__CXX11_CONSTEXPR__ static const char* const CDMA			= "CDMA";
+__CXX11_CONSTEXPR__ static const char* const HSPA			= "HSPA";
+__CXX11_CONSTEXPR__ static const char* const IDEN			= "IDEN";
+__CXX11_CONSTEXPR__ static const char* const HSPAP			= "HSPA+";
 
 
-struct RadioAccessNetworkInfo {
+struct RadioAccessNetworkInfo
+{
     /***
         一、制式演进路线
 
@@ -174,10 +178,23 @@ struct RadioAccessNetworkInfo {
 
     std::string  radio_access_network;
 
-    bool Is2G() const { return radio_access_network == GPRS || radio_access_network == CDMA1x || radio_access_network == Edge || radio_access_network == CDMAEVDORev0 || radio_access_network == UMTS || radio_access_network == CDMA;}
-    bool Is3G() const { return radio_access_network == WCDMA || radio_access_network == CDMAEVDORevA || radio_access_network == HSDPA || radio_access_network == HSUPA || radio_access_network == CDMAEVDORevB || radio_access_network == eHRPD || radio_access_network == HSPAP || radio_access_network == HSPA;}
-    bool Is4G() const { return radio_access_network == LTE;}
-    bool IsUnknown() const { return !Is2G() && !Is3G() && !Is4G();}
+    bool Is2G() const
+	{
+		return radio_access_network == GPRS || radio_access_network == CDMA1x || radio_access_network == Edge || radio_access_network == CDMAEVDORev0 || radio_access_network == UMTS || radio_access_network == CDMA;
+	}
+    bool Is3G() const
+	{
+		return radio_access_network == WCDMA || radio_access_network == CDMAEVDORevA || radio_access_network == HSDPA || radio_access_network == HSUPA || radio_access_network == CDMAEVDORevB || radio_access_network == eHRPD || radio_access_network == HSPAP || radio_access_network == HSPA;
+	}
+    bool Is4G() const
+	{
+		return radio_access_network == LTE;
+	}
+
+    bool IsUnknown() const
+	{
+		return !Is2G() && !Is3G() && !Is4G();
+	}
 };
 
 bool getCurRadioAccessNetworkInfo(RadioAccessNetworkInfo& _raninfo);
@@ -187,48 +204,52 @@ bool isNetworkConnected();
 
 bool getifaddrs_ipv4_hotspot(std::string& _ifname, std::string& _ifip);
 
-inline int getCurrNetLabel(std::string& netInfo) {
+inline int getCurrNetLabel(std::string& netInfo)
+{
     netInfo = "defalut";
     int netId = getNetInfo();
-
-    if (netId == kNoNet) {
+    if (netId == kNoNet)
+	{
         netInfo = "";
         return netId;
     }
 
-    switch (netId) {
-    case kWifi: {
-        WifiInfo wifiInfo;
+    switch (netId)
+	{
+	case kWifi:
+		{
+			WifiInfo wifiInfo;
 
-        if (getCurWifiInfo(wifiInfo)) {
-            netInfo = wifiInfo.ssid;
-        } else {
-            netInfo = "no_ssid_wifi";
-        }
-
+			if (getCurWifiInfo(wifiInfo))
+			{
+				netInfo = wifiInfo.ssid;
+			}
+			else
+			{
+				netInfo = "no_ssid_wifi";
+			}
+		}
+		break;
+    case kMobile:
+		{
+			SIMInfo simInfo;
+			if (getCurSIMInfo(simInfo))
+			{
+				netInfo = simInfo.isp_code;
+			}
+			else
+			{
+				netInfo = "no_ispCode_mobile";
+			}
+		}
+		break;
+    case kOtherNet:
+		{
+			netInfo = "other";
+		}
+		break;
+    default:
         break;
-    }
-
-    case kMobile: {
-        SIMInfo simInfo;
-
-        if (getCurSIMInfo(simInfo)) {
-            netInfo = simInfo.isp_code;
-        } else {
-            netInfo = "no_ispCode_mobile";
-        }
-
-        break;
-    }
-
-    case kOtherNet: {
-        netInfo = "other";
-        break;
-    }
-
-    default: {
-        break;
-    }
     }
 
     return netId;

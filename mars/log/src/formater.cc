@@ -36,26 +36,29 @@
 #include <inttypes.h>
 #endif
 
-void log_formater(const XLoggerInfo* _info, const char* _logbody, PtrBuffer& _log) {
-    static const char* levelStrings[] = {
-        "V",
-        "D",  // debug
-        "I",  // info
-        "W",  // warn
-        "E",  // error
-        "F"  // fatal
-    };
+static const char* sg_arrLevelStrings[] =
+{
+	"all  ",
+	"debug",	// debug
+	"info ",	// info
+	"warn ",	// warn
+	"error",	// error
+	"fatal"		// fatal
+};
 
+void log_formater(const XLoggerInfo* _info, const char* _logbody, PtrBuffer& _log)
+{
     assert((unsigned int)_log.Pos() == _log.Length());
 
     static int error_count = 0;
     static int error_size = 0;
+    if (_log.MaxLength() <= _log.Length() + 5 * 1024)
+	{ // allowd len(_log) <= 11K(16K - 5K)
 
-    if (_log.MaxLength() <= _log.Length() + 5 * 1024) {  // allowd len(_log) <= 11K(16K - 5K)
         ++error_count;
         error_size = (int)strnlen(_logbody, 1024 * 1024);
-
-        if (_log.MaxLength() >= _log.Length() + 128) {
+        if (_log.MaxLength() >= _log.Length() + 128)
+		{
             int ret = snprintf((char*)_log.PosPtr(), 1024, "[F]log_size <= 5*1024, err(%d, %d)\n", error_count, error_size);  // **CPPLINT SKIP**
             _log.Length(_log.Pos() + ret, _log.Length() + ret);
             _log.Write("");
@@ -68,14 +71,15 @@ void log_formater(const XLoggerInfo* _info, const char* _logbody, PtrBuffer& _lo
         return;
     }
 
-    if (NULL != _info) {
+    if (NULL != _info)
+	{
         const char* filename = ExtractFileName(_info->filename);
         char strFuncName [128] = {0};
         ExtractFunctionName(_info->func_name, strFuncName, sizeof(strFuncName));
 
         char temp_time[64] = {0};
-
-        if (0 != _info->timeval.tv_sec) {
+        if (0 != _info->timeval.tv_sec)
+		{
             time_t sec = _info->timeval.tv_sec;
             tm tm = *localtime((const time_t*)&sec);
 #ifdef ANDROID
@@ -92,7 +96,7 @@ void log_formater(const XLoggerInfo* _info, const char* _logbody, PtrBuffer& _lo
 
         // _log.AllocWrite(30*1024, false);
         int ret = snprintf((char*)_log.PosPtr(), 1024, "[%s][%s][%" PRIdMAX ", %" PRIdMAX "%s][%s][%s, %s, %d][",  // **CPPLINT SKIP**
-                           _logbody ? levelStrings[_info->level] : levelStrings[kLevelFatal], temp_time,
+                           _logbody ? sg_arrLevelStrings[_info->level] : sg_arrLevelStrings[kLevelFatal], temp_time,
                            _info->pid, _info->tid, _info->tid == _info->maintid ? "*" : "", _info->tag ? _info->tag : "",
                            filename, strFuncName, _info->line);
 
@@ -103,7 +107,8 @@ void log_formater(const XLoggerInfo* _info, const char* _logbody, PtrBuffer& _lo
         assert((unsigned int)_log.Pos() == _log.Length());
     }
 
-    if (NULL != _logbody) {
+    if (NULL != _logbody)
+	{
         // in android 64bit, in strnlen memchr,  const unsigned char*  end = p + n;  > 4G!!!!! in stack array
 
         size_t bodylen =  _log.MaxLength() - _log.Length() > 130 ? _log.MaxLength() - _log.Length() - 130 : 0;
@@ -111,12 +116,15 @@ void log_formater(const XLoggerInfo* _info, const char* _logbody, PtrBuffer& _lo
         bodylen = strnlen(_logbody, bodylen);
         bodylen = bodylen > 0xFFFFU ? 0xFFFFU : bodylen;
         _log.Write(_logbody, bodylen);
-    } else {
+    }
+	else
+	{
         _log.Write("error!! NULL==_logbody");
     }
 
     char nextline = '\n';
-
-    if (*((char*)_log.PosPtr() - 1) != nextline) _log.Write(&nextline, 1);
+	if (*((char*)_log.PosPtr() - 1) != nextline)
+	{
+		_log.Write(&nextline, 1);
+	}
 }
-

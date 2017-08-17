@@ -1,7 +1,7 @@
 #pragma once
 #include "PSIMCall.h"
 
-class CPSIMDemoCallBack: public CPSIMCallBack
+class CPSIMDemoCallBack : public CPSIMCallBack
 {
 public:
 	CPSIMDemoCallBack();
@@ -15,4 +15,6 @@ public:
 
 	// 获取离线消息-回调处理;
 	virtual void OnGetOffMsgResponse(const int& iCode, const char* strInfo);
+
+	virtual void OnRecvMessage(const MessageItem& msgItem);
 };

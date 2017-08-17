@@ -45,45 +45,54 @@
 
 #undef min
 
-namespace MessageQueue {
+namespace MessageQueue
+{
 
-static unsigned int __MakeSeq() {
+static unsigned int __MakeSeq()
+{
     static unsigned int s_seq = 0;
-
     return ++s_seq;
 }
 
-struct MessageWrapper {
-    MessageWrapper(const MessageHandler_t& _handlerid, const Message& _message, const MessageTiming& _timing, unsigned int _seq)
-        : message(_message), timing(_timing) {
-        postid.reg = _handlerid;
-        postid.seq = _seq;
-        periodstatus = kImmediately;
-        record_time = 0;
+struct MessageWrapper
+{
+	MessageWrapper(const MessageHandler_t& _handlerid, const Message& _message, const MessageTiming& _timing, unsigned int _seq)
+		: message(_message), timing(_timing)
+	{
+		postid.reg = _handlerid;
+		postid.seq = _seq;
+		periodstatus = kImmediately;
+		record_time = 0;
 
-        if (kImmediately != _timing.type) {
-            periodstatus = kAfter;
-            record_time = ::gettickcount();
-        }
-    }
+		if (kImmediately != _timing.type)
+		{
+			periodstatus = kAfter;
+			record_time = ::gettickcount();
+		}
+	}
 
-    ~MessageWrapper() {
-        if (wait_end_cond)
-            wait_end_cond->notifyAll();
-    }
+	~MessageWrapper()
+	{
+		if (wait_end_cond)
+		{
+			wait_end_cond->notifyAll();
+		}
+	}
 
-    MessagePost_t postid;
-    Message message;
+	MessagePost_t postid;
+	Message message;
 
-    MessageTiming timing;
-    TMessageTiming periodstatus;
-    uint64_t record_time;
-    boost::shared_ptr<Condition> wait_end_cond;
+	MessageTiming timing;
+	TMessageTiming periodstatus;
+	uint64_t record_time;
+	boost::shared_ptr<Condition> wait_end_cond;
 };
 
-struct HandlerWrapper {
+struct HandlerWrapper
+{
     HandlerWrapper(const MessageHandler& _handler, bool _recvbroadcast, const MessageQueue_t& _messagequeueid, unsigned int _seq)
-        : handler(_handler), recvbroadcast(_recvbroadcast) {
+        : handler(_handler), recvbroadcast(_recvbroadcast)
+	{
         reg.seq = _seq;
         reg.queue = _messagequeueid;
     }
@@ -93,28 +102,36 @@ struct HandlerWrapper {
     bool recvbroadcast;
 };
 
-struct RunLoopInfo {
-    RunLoopInfo():runing_message(NULL) { runing_cond = boost::make_shared<Condition>();}
-    
+struct RunLoopInfo
+{
+    RunLoopInfo() : runing_message(NULL)
+	{
+		runing_cond = boost::make_shared<Condition>();
+	}
+
     boost::shared_ptr<Condition> runing_cond;
     MessagePost_t runing_message_id;
     Message* runing_message;
     std::list <MessageHandler_t> runing_handler;
 };
     
-class Cond : public RunloopCond {
+class Cond : public RunloopCond
+{
 public:
     Cond(){}
-    
+
 public:
-    const boost::typeindex::type_info& type() const {
+    const boost::typeindex::type_info& type() const
+	{
         return boost::typeindex::type_id<Cond>().type_info();
     }
     
-    virtual void Wait(ScopedLock& _lock, long _millisecond) {
+    virtual void Wait(ScopedLock& _lock, long _millisecond)
+	{
         cond_.wait(_lock, _millisecond);
     }
-    virtual void Notify(ScopedLock& _lock) {
+    virtual void Notify(ScopedLock& _lock)
+	{
         cond_.notifyAll(_lock);
     }
     
@@ -126,7 +143,8 @@ private:
     Condition cond_;
 };
     
-struct MessageQueueContent {
+struct MessageQueueContent
+{
     MessageQueueContent(): breakflag(false) {}
 
 #if defined(ANDROID)
@@ -150,65 +168,89 @@ private:
 };
 
 #define sg_messagequeue_map_mutex messagequeue_map_mutex()
-static Mutex& messagequeue_map_mutex() {
+static Mutex& messagequeue_map_mutex()
+{
     static Mutex* mutex = new Mutex;
     return *mutex;
 }
 #define sg_messagequeue_map messagequeue_map()
-static std::map<MessageQueue_t, MessageQueueContent>& messagequeue_map() {
+static std::map<MessageQueue_t, MessageQueueContent>& messagequeue_map()
+{
     static std::map<MessageQueue_t, MessageQueueContent>* mq_map = new std::map<MessageQueue_t, MessageQueueContent>;
     return *mq_map;
 }
 
-MessageQueue_t CurrentThreadMessageQueue() {
+MessageQueue_t CurrentThreadMessageQueue()
+{
     ScopedLock lock(sg_messagequeue_map_mutex);
     MessageQueue_t id = (MessageQueue_t)ThreadUtil::currentthreadid();
 
-    if (sg_messagequeue_map.end() == sg_messagequeue_map.find(id)) id = KInvalidQueueID;
+	if (sg_messagequeue_map.end() == sg_messagequeue_map.find(id))
+	{
+		id = KInvalidQueueID;
+	}
 
     return id;
 }
 
-MessageQueue_t TID2MessageQueue(thread_tid _tid) {
+MessageQueue_t TID2MessageQueue(thread_tid _tid)
+{
     ScopedLock lock(sg_messagequeue_map_mutex);
     MessageQueue_t id = (MessageQueue_t)_tid;
 
-    if (sg_messagequeue_map.end() == sg_messagequeue_map.find(id))id = KInvalidQueueID;
+	if (sg_messagequeue_map.end() == sg_messagequeue_map.find(id))
+	{
+		id = KInvalidQueueID;
+	}
 
     return id;
 }
     
-thread_tid  MessageQueue2TID(MessageQueue_t _id) {
+thread_tid  MessageQueue2TID(MessageQueue_t _id)
+{
     ScopedLock lock(sg_messagequeue_map_mutex);
     MessageQueue_t& id = _id;
     
-    if (sg_messagequeue_map.end() == sg_messagequeue_map.find(id)) return 0;
+	if (sg_messagequeue_map.end() == sg_messagequeue_map.find(id))
+	{
+		return 0;
+	}
     
     return (thread_tid)id;
 }
 
-void WaitForRunningLockEnd(const MessagePost_t&  _message) {
-    if (Handler2Queue(Post2Handler(_message)) == CurrentThreadMessageQueue()) return;
+void WaitForRunningLockEnd(const MessagePost_t&  _message)
+{
+	if (Handler2Queue(Post2Handler(_message)) == CurrentThreadMessageQueue())
+	{
+		return;
+	}
 
     ScopedLock lock(sg_messagequeue_map_mutex);
     const MessageQueue_t& id = Handler2Queue(Post2Handler(_message));
-
     std::map<MessageQueue_t, MessageQueueContent>::iterator pos = sg_messagequeue_map.find(id);
-    if (sg_messagequeue_map.end() == pos) return;
+	if (sg_messagequeue_map.end() == pos)
+	{
+		return;
+	}
     MessageQueueContent& content = pos->second;
+	if (content.lst_runloop_info.empty())
+	{
+		return;
+	}
     
-    if (content.lst_runloop_info.empty()) return;
-    
-    auto find_it = std::find_if(content.lst_runloop_info.begin(), content.lst_runloop_info.end(),
-                                [&_message](const RunLoopInfo& _v){ return _message == _v.runing_message_id; });
-    
-    if (find_it == content.lst_runloop_info.end()) return;
+    auto find_it = std::find_if(content.lst_runloop_info.begin(), content.lst_runloop_info.end(), [&_message](const RunLoopInfo& _v){ return _message == _v.runing_message_id; });
+	if (find_it == content.lst_runloop_info.end())
+	{
+		return;
+	}
 
     boost::shared_ptr<Condition> runing_cond = find_it->runing_cond;
     runing_cond->wait(lock);
 }
 
-void WaitForRunningLockEnd(const MessageQueue_t&  _messagequeueid) {
+void WaitForRunningLockEnd(const MessageQueue_t&  _messagequeueid)
+{
     if (_messagequeueid == CurrentThreadMessageQueue()) return;
 
     ScopedLock lock(sg_messagequeue_map_mutex);

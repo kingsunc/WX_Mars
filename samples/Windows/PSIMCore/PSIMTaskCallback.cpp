@@ -40,6 +40,17 @@ CPSIMCallBack* CPSIMTaskCallback::GetPSIMCallBack()
 	return pConcrete->GetIMPSCallBack();
 }
 
+void CPSIMTaskCallback::OnRecvMessage(const MessageItem & msgItem)
+{
+	CPSIMCallBack*	m_pPSIMCallBack = GetPSIMCallBack();
+	if (!m_pPSIMCallBack)
+	{
+		// Òì³£´¦Àí;
+		return;
+	}
+	m_pPSIMCallBack->OnRecvMessage(msgItem);
+}
+
 void CPSIMTaskCallback::OnResponse(Login_Task* task, MessageService::LoginResp& response)
 {
 	CPSIMCallBack*	m_pPSIMCallBack = GetPSIMCallBack();

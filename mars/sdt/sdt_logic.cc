@@ -52,11 +52,13 @@ static void onDestroy() {
     SdtCore::Singleton::Release();
 }
 
-static void __initbind_baseprjevent() {
-
+// main()前调用 将函数与信号绑定
+static void __initbind_baseprjevent()
+{
 #ifdef ANDROID
 	mars::baseevent::addLoadModule(kLibName);
 #endif
+
 	GetSignalOnCreate().connect(&onCreate);
 	GetSignalOnDestroy().connect(5, &onDestroy);
 }
@@ -64,22 +66,26 @@ static void __initbind_baseprjevent() {
 BOOT_RUN_STARTUP(__initbind_baseprjevent);
 
 //active netcheck interface
-void StartActiveCheck(CheckIPPorts& _longlink_check_items, CheckIPPorts& _shortlink_check_items, int _mode, int _timeout) {
+void StartActiveCheck(CheckIPPorts& _longlink_check_items, CheckIPPorts& _shortlink_check_items, int _mode, int _timeout)
+{
 	SDT_WEAK_CALL(StartCheck(_longlink_check_items, _shortlink_check_items, _mode, _timeout));
 }
 
-void CancelActiveCheck() {
+void CancelActiveCheck()
+{
 	SDT_WEAK_CALL(CancelCheck());
 }
 
-void SetCallBack(Callback* const callback) {
+void SetCallBack(Callback* const callback)
+{
 	sg_callback = callback;
 }
 
 #ifndef ANDROID
 
 void (*ReportNetCheckResult)(const std::vector<CheckResultProfile>& _check_results)
-= [](const std::vector<CheckResultProfile>& _check_results) {
+= [](const std::vector<CheckResultProfile>& _check_results)
+{
 
 };
 

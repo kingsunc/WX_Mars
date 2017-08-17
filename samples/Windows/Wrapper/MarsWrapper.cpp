@@ -58,20 +58,20 @@ void MarsWrapper::OnPush(uint64_t _channel_id, uint32_t _cmdid, uint32_t _taskid
 	msgItem.strPushInfo = (char*)response.pushInfo.c_str();
 	msgItem.iTimestamp = response.timestamp;
 	msgItem.iExpireTime = response.expireTime;
+
+	const int iLen = response.content.size();
+	msgItem.psBuff.pBuff = new char[iLen + 1];
+	memset(msgItem.psBuff.pBuff, 0, (iLen + 1) * sizeof(char));
+	for (int i = 0; i < iLen; i++)
 	{
-		const int iLen = response.content.size();
-		msgItem.psBuff.pBuff = new char[iLen + 1];
-		memset(msgItem.psBuff.pBuff, 0, (iLen + 1) * sizeof(char));
-		for (int i = 0; i < iLen; i++)
-		{
-			msgItem.psBuff.pBuff[i] = response.content[i];
-		}
-		msgItem.psBuff.iLen = iLen;
+		msgItem.psBuff.pBuff[i] = response.content[i];
 	}
+	msgItem.psBuff.iLen = iLen;
 
 	if (m_pMsgPush)
 	{
 		m_pMsgPush->OnRecvMessage(msgItem);
+		delete []msgItem.psBuff.pBuff;
 	}
 }
 

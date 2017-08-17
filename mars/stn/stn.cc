@@ -23,24 +23,27 @@
 #include "mars/comm/thread/atomic_oper.h"
 
 
-namespace mars{
-    namespace stn{
-        
-static uint32_t gs_taskid = 1;
-Task::Task():Task(atomic_inc32(&gs_taskid)) {}
-        
-Task::Task(uint32_t _taskid) {
-    
+namespace mars
+{
+namespace stn
+{
+
+Task::Task():Task()
+{
+}
+
+Task::Task(uint32_t _taskid)
+{
     taskid = _taskid;
     cmdid = 0;
     channel_id = 0;
     channel_select = 0;
-    
+
     send_only = false;
     need_authed = false;
     limit_flow = true;
     limit_frequency = true;
-    
+
     channel_strategy = kChannelNormalStrategy;
     network_status_sensitive = false;
     priority = kTaskPriorityNormal;
@@ -49,8 +52,6 @@ Task::Task(uint32_t _taskid) {
     server_process_cost = -1;
     total_timetout = -1;
     user_context = NULL;
+}
 
-}
-        
-    }
-}
+}}

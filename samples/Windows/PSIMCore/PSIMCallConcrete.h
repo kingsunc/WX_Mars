@@ -52,7 +52,7 @@ public:
 	virtual void InviteGroupUsers(const char* strGroupID);
 
 	// 发送文本消息
-	virtual void SendTextMessage(OUT int& iReqID,
+	virtual bool SendTextMessage(OUT int& iReqID,
 		IN const PS_SendMode& eSendMode,
 		IN const char* strFrom,
 		IN const char* strTo,

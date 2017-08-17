@@ -18,27 +18,28 @@
  */
 
 #include "mmap_util.h"
-
 #include <unistd.h>
 #include <stdio.h>
-
 #include "boost/filesystem.hpp"
 
-bool IsMmapFileOpenSucc(const boost::iostreams::mapped_file& _mmmap_file) {
+bool IsMmapFileOpenSucc(const boost::iostreams::mapped_file& _mmmap_file)
+{
     return !_mmmap_file.operator !() && _mmmap_file.is_open();
 }
 
-bool OpenMmapFile(const char* _filepath, unsigned int _size, boost::iostreams::mapped_file& _mmmap_file) {
-
-    if (NULL == _filepath || 0 == strnlen(_filepath, 128) || 0 == _size) {
+bool OpenMmapFile(const char* _filepath, unsigned int _size, boost::iostreams::mapped_file& _mmmap_file)
+{
+    if (NULL == _filepath || 0 == strnlen(_filepath, 128) || 0 == _size)
+	{
         return false;
     }
 
-    if (IsMmapFileOpenSucc(_mmmap_file)) {
+    if (IsMmapFileOpenSucc(_mmmap_file))
+	{
         CloseMmapFile(_mmmap_file);
     }
-    
-    if (_mmmap_file.is_open() && _mmmap_file.operator!()) {
+    if (_mmmap_file.is_open() && _mmmap_file.operator!())
+	{
         return false;
     }
 
@@ -47,20 +48,20 @@ bool OpenMmapFile(const char* _filepath, unsigned int _size, boost::iostreams::m
     param.flags = boost::iostreams::mapped_file_base::readwrite;
 
     bool file_exist = boost::filesystem::exists(_filepath);
-    if (!file_exist) {
+    if (!file_exist)
+	{
         param.new_file_size = _size;
     }
 
     _mmmap_file.open(param);
-
     bool is_open = IsMmapFileOpenSucc(_mmmap_file);
-
-    if (!file_exist && is_open) {
-
+    if (!file_exist && is_open)
+	{
         //Extending a file with ftruncate, thus creating a big hole, and then filling the hole by mod-ifying a shared mmap() can lead to SIGBUS when no space left
         //the boost library uses ftruncate, so we pre-allocate the file's backing store by writing zero.
         FILE* file = fopen(_filepath, "rb+");
-        if (NULL == file) {
+        if (NULL == file)
+		{
             _mmmap_file.close();
             remove(_filepath);
             return false;
@@ -68,8 +69,8 @@ bool OpenMmapFile(const char* _filepath, unsigned int _size, boost::iostreams::m
 
         char* zero_data = new char[_size];
         memset(zero_data, 0, _size);
-
-        if (_size != fwrite(zero_data, sizeof(char), _size, file)) {
+        if (_size != fwrite(zero_data, sizeof(char), _size, file))
+		{
             _mmmap_file.close();
             fclose(file);
             remove(_filepath);
@@ -83,8 +84,10 @@ bool OpenMmapFile(const char* _filepath, unsigned int _size, boost::iostreams::m
     return is_open;
 }
 
-void CloseMmapFile(boost::iostreams::mapped_file& _mmmap_file) {
-    if (_mmmap_file.is_open()) {
+void CloseMmapFile(boost::iostreams::mapped_file& _mmmap_file)
+{
+    if (_mmmap_file.is_open())
+	{
         _mmmap_file.close();
     }
 }

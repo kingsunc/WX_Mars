@@ -630,5 +630,3 @@ void test7(int x PP_ENUM_TRAILING_BINARY_PARAMS(3, A, a)) {
 #endif
 
 #endif /* PREPROCESSOR_H_ */
-
-

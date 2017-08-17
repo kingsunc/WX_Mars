@@ -28,11 +28,14 @@
 #include "mars/comm/bootrun.h"
 #include "mars/comm/messagequeue/message_queue.h"
 
-static void onForeground(bool _isforeground) {
+static void onForeground(bool _isforeground)
+{
     ActiveLogic::Singleton::Instance()->OnForeground(_isforeground);
 }
 
-static void __initbind_baseprjevent() {
+// main()前调用 将函数与信号绑定
+static void __initbind_baseprjevent()
+{
     GetSignalOnForeground().connect(&onForeground);
 }
 
@@ -47,10 +50,10 @@ ActiveLogic::ActiveLogic()
 {
     xinfo_function();
 #ifndef __APPLE__
-        if (!alarm_.Start(INACTIVE_TIMEOUT))
-       	{
-            xerror2(TSF"m_alarm.Start false");
-    	}
+    if (!alarm_.Start(INACTIVE_TIMEOUT))
+    {
+        xerror2(TSF"m_alarm.Start false");
+    }
 #endif
 }
 

@@ -42,33 +42,67 @@ const struct XLoggerTag {XLoggerTag(){}} __xlogger_tag__;
 const struct XLoggerInfoNull {XLoggerInfoNull(){}} __xlogger_info_null__;
 
 
-class XMessage {
+class XMessage
+{
 public:
-	XMessage(): m_message() { m_message.reserve(512); }
-	XMessage(std::string& _holder):m_message(_holder){}
-	~XMessage() {}
+	XMessage() : m_message()
+	{
+		m_message.reserve(512);
+	}
+	XMessage(std::string& _holder) : m_message(_holder)
+	{
+	}
+	~XMessage()
+	{
+	}
 
 public:
-	const std::string& Message() const { return m_message;}
-	std::string& Message() { return m_message;}
+	const std::string& Message() const
+	{
+		return m_message;
+	}
+	std::string& Message()
+	{
+		return m_message;
+	}
 
-	const std::string& String() const { return m_message;}
-	std::string& String() { return m_message;}
+	const std::string& String() const
+	{
+		return m_message;
+	}
+	std::string& String()
+	{
+		return m_message;
+	}
 
 #ifdef __GNUC__
 	__attribute__((__format__ (printf, 2, 0)))
 #endif
-	XMessage&  WriteNoFormat(const char* _log) { m_message+= _log; return *this;}
+	XMessage&  WriteNoFormat(const char* _log)
+	{
+		m_message+= _log;
+		return *this;
+	}
 #ifdef __GNUC__
 	__attribute__((__format__ (printf, 3, 0)))
 #endif
-	XMessage&  WriteNoFormat(const TypeSafeFormat&, const char* _log) { m_message+= _log; return *this;}
+	XMessage&  WriteNoFormat(const TypeSafeFormat&, const char* _log)
+	{
+		m_message+= _log;
+		return *this;
+	}
 
 	XMessage& operator<<(const string_cast& _value);
 	XMessage& operator>>(const string_cast& _value);
 
-	XMessage& operator()() {return *this;}
-	void operator+=(const string_cast& _value) { m_message += _value.str();}
+	XMessage& operator()()
+	{
+		return *this;
+	}
+	void operator+=(const string_cast& _value)
+	{
+		m_message += _value.str();
+	}
 #ifdef __GNUC__
 	__attribute__((__format__ (printf, 2, 3)))
 #endif
@@ -110,10 +144,12 @@ private:
 	std::string m_message;
 };
 
-class XLogger {
+class XLogger
+{
 public:
 	XLogger(TLogLevel _level, const char* _tag, const char* _file, const char* _func, int _line, bool (*_hook)(XLoggerInfo& _info, std::string& _log))
-	:m_info(), m_message(), m_isassert(false), m_exp(NULL),m_hook(_hook), m_isinfonull(false) {
+		: m_info(), m_message(), m_isassert(false), m_exp(NULL),m_hook(_hook), m_isinfonull(false)
+	{
 		m_info.level = _level;
 		m_info.tag = _tag;
 		m_info.filename = _file;
@@ -128,41 +164,68 @@ public:
 		m_message.reserve(512);
 	}
 	
-	~XLogger() {
-		if (!m_isassert && m_message.empty()) return;
+	~XLogger()
+	{
+		if (!m_isassert && m_message.empty())
+		{
+			return;
+		}
 
 		gettimeofday(&m_info.timeval, NULL);
-		if (m_hook && !m_hook(m_info, m_message)) return;
+		if (m_hook && !m_hook(m_info, m_message))
+		{
+			return;
+		}
 		
 		if (m_isassert)
-			xlogger_Assert(m_isinfonull?NULL:&m_info, m_exp, m_message.c_str());
+		{
+			xlogger_Assert(m_isinfonull ? NULL : &m_info, m_exp, m_message.c_str());
+		}
 		else
-			xlogger_Write(m_isinfonull?NULL:&m_info, m_message.c_str());
+		{
+			xlogger_Write(m_isinfonull ? NULL : &m_info, m_message.c_str());
+		}
 	}
 
 public:
-	XLogger& Assert(const char* _exp) {
+	XLogger& Assert(const char* _exp)
+	{
 		m_isassert = true;
 		m_exp = _exp;
 		return *this;
 	}
 	
-	bool Empty() const { return !m_isassert && m_message.empty();}
-	const std::string& Message() const { return m_message;}
+	bool Empty() const
+	{
+		return !m_isassert && m_message.empty();
+	}
+	const std::string& Message() const
+	{
+		return m_message;
+	}
 
 #ifdef __GNUC__
 	__attribute__((__format__ (printf, 2, 0)))
 #endif
-	XLogger&  WriteNoFormat(const char* _log) { m_message+= _log; return *this;}
+	XLogger&  WriteNoFormat(const char* _log)
+	{
+		m_message+= _log;
+		return *this;
+	}
 #ifdef __GNUC__
 	 __attribute__((__format__ (printf, 3, 0)))
 #endif
-	XLogger&  WriteNoFormat(const TypeSafeFormat&, const char* _log) { m_message+= _log; return *this;}
+	XLogger&  WriteNoFormat(const TypeSafeFormat&, const char* _log)
+	{
+		m_message+= _log;
+		return *this;
+	}
 
 	XLogger& operator<<(const string_cast& _value);
 	XLogger& operator>>(const string_cast& _value);
 
-	void operator>> (XLogger& _xlogger) {
+	void operator>> (XLogger& _xlogger)
+	{
 		if (_xlogger.m_info.level < m_info.level)
 		{
 			_xlogger.m_info.level = m_info.level;
@@ -177,13 +240,25 @@ public:
 		m_message.clear();
 	}
 
-	void operator<< (XLogger& _xlogger) {
+	void operator<< (XLogger& _xlogger)
+	{
 		_xlogger.operator>>(*this);
 	}
 
-	XLogger& operator()() { return *this; }
-	XLogger& operator()(const XLoggerInfoNull&) { m_isinfonull = true; return *this;}
-	XLogger& operator()(const XLoggerTag&, const char* _tag) { m_info.tag = _tag; return *this;}
+	XLogger& operator()()
+	{
+		return *this;
+	}
+	XLogger& operator()(const XLoggerInfoNull&)
+	{
+		m_isinfonull = true;
+		return *this;
+	}
+	XLogger& operator()(const XLoggerTag&, const char* _tag)
+	{
+		m_info.tag = _tag;
+		return *this;
+	}
 #ifdef __GNUC__
 	__attribute__((__format__ (printf, 2, 3)))
 #endif
@@ -216,11 +291,11 @@ public:
 
 private:
 	void DoTypeSafeFormat(const char* _format, const string_cast** _args);
-	
+
 private:
 	XLogger(const XLogger&);
 	XLogger& operator=(const XLogger&);
-	
+
 private:
 	XLoggerInfo m_info;
 	std::string m_message;
@@ -230,14 +305,16 @@ private:
 	bool m_isinfonull;
 };
 
-
-class XScopeTracer {
+class XScopeTracer
+{
 public:
 	XScopeTracer(TLogLevel _level, const char* _tag, const char* _name, const char* _file, const char* _func, int _line, const char* _log)
-	:m_enable(xlogger_IsEnabledFor(_level)), m_info(), m_tv() {
+		: m_enable(xlogger_IsEnabledFor(_level)), m_info(), m_tv()
+	{
 		m_info.level = _level;
 
-		if (m_enable) {
+		if (m_enable)
+		{
 			m_info.tag = _tag;
 			m_info.filename = _file;
 			m_info.func_name = _func;
@@ -257,8 +334,10 @@ public:
 		}
 	}
 
-	~XScopeTracer() {
-		if (m_enable) {
+	~XScopeTracer()
+	{
+		if (m_enable)
+		{
 			timeval tv;
 			gettimeofday(&tv, NULL);
 			m_info.timeval = tv;
@@ -269,7 +348,10 @@ public:
 		}
 	}
 	
-	void Exit(const std::string& _exitmsg) { m_exitmsg += _exitmsg; }
+	void Exit(const std::string& _exitmsg)
+	{
+		m_exitmsg += _exitmsg;
+	}
 	
 private:
 	XScopeTracer(const XScopeTracer&);
@@ -280,31 +362,41 @@ private:
 	XLoggerInfo m_info;
 	char m_name[128];
 	timeval m_tv;
-	
+
 	std::string m_exitmsg;
 };
 
 ///////////////////////////XMessage////////////////////
-inline XMessage& XMessage::operator<< (const string_cast& _value) {
-	if (NULL != _value.str()) {
+inline XMessage& XMessage::operator<< (const string_cast& _value)
+{
+	if (NULL != _value.str())
+	{
 		m_message += _value.str();
-	} else {
+	}
+	else
+	{
 		assert(false);
 	}
 	return *this;
 }
 
-inline XMessage& XMessage::operator>> (const string_cast& _value) {
-	if (NULL != _value.str()) {
+inline XMessage& XMessage::operator>> (const string_cast& _value)
+{
+	if (NULL != _value.str())
+	{
 		m_message.insert(0,  _value.str());
-	} else {
+	}
+	else
+	{
 		assert(false);
 	}
 	return *this;
 }
 
-inline XMessage& XMessage::VPrintf(const char* _format, va_list _list) {
-	if (_format == NULL) {
+inline XMessage& XMessage::VPrintf(const char* _format, va_list _list)
+{
+	if (_format == NULL)
+	{
 		assert(false);
 		return *this;
 	}
@@ -315,8 +407,10 @@ inline XMessage& XMessage::VPrintf(const char* _format, va_list _list) {
 	return *this;
 }
 
-inline XMessage& XMessage::operator()(const char* _format, ...) {
-	if (_format == NULL) {
+inline XMessage& XMessage::operator()(const char* _format, ...)
+{
+	if (_format == NULL)
+	{
 		assert(false);
 		return *this;
 	}
@@ -332,13 +426,15 @@ inline XMessage& XMessage::operator()(const char* _format, ...) {
 #define XLOGGER_VARIANT_ARGS(n) PP_ENUM_PARAMS(n, &a)
 #define XLOGGER_VARIANT_ARGS_NULL(n) PP_ENUM(n, NULL)
 #define XLOGGER_TYPESAFE_FORMAT_IMPLEMENT(n, m) \
-		inline XMessage& XMessage::operator()(const TypeSafeFormat&, const char* _format XLOGGER_FORMAT_ARGS(n)) { \
-		if (_format != NULL) { \
-			const string_cast* args[16] = { XLOGGER_VARIANT_ARGS(n) PP_COMMA_IF(PP_AND(n, m)) XLOGGER_VARIANT_ARGS_NULL(m) }; \
-			DoTypeSafeFormat(_format, args); \
-		} \
-		return *this;\
-	}
+		inline XMessage& XMessage::operator()(const TypeSafeFormat&, const char* _format XLOGGER_FORMAT_ARGS(n)) \
+		{ \
+			if (_format != NULL) \
+			{ \
+				const string_cast* args[16] = { XLOGGER_VARIANT_ARGS(n) PP_COMMA_IF(PP_AND(n, m)) XLOGGER_VARIANT_ARGS_NULL(m) }; \
+				DoTypeSafeFormat(_format, args); \
+			} \
+			return *this;\
+		}
 
 XLOGGER_TYPESAFE_FORMAT_IMPLEMENT(0, 16)
 XLOGGER_TYPESAFE_FORMAT_IMPLEMENT(1, 15)
@@ -363,44 +459,54 @@ XLOGGER_TYPESAFE_FORMAT_IMPLEMENT(16, 0)
 #undef XLOGGER_VARIANT_ARGS_NULL
 #undef XLOGGER_TYPESAFE_FORMAT_IMPLEMENT
 
-inline void XMessage::DoTypeSafeFormat(const char* _format, const string_cast** _args) {
-
+inline void XMessage::DoTypeSafeFormat(const char* _format, const string_cast** _args)
+{
 	const char* current = _format;
 	int count = 0;
 	while ('\0' != *current)
 	{
-	   if ('%' != *current)
-	   {
-		   m_message += *current;
+		if ('%' != *current)
+		{
+			m_message += *current;
 			++current;
 			continue;
-	   }
+		}
 
 		char nextch = *(current+1);
 		if (('0' <=nextch  && nextch <= '9') || nextch == '_')
 		{
 			int argIndex = count;
-			if (nextch != '_') argIndex = nextch - '0';
+			if (nextch != '_')
+			{
+				argIndex = nextch - '0';
+			}
 
 			if (_args[argIndex] != NULL)
 			{
 				if (NULL != _args[argIndex]->str())
 				{
 					m_message += _args[argIndex]->str();
-				} else {
+				}
+				else 
+				{
 					m_message += "(null)";
 					assert(false);
 				}
-			} else {
+			}
+			else
+			{
 				assert(false);
 			}
 			count++;
 			current += 2;
 		}
-		else if (nextch == '%') {
+		else if (nextch == '%')
+		{
 			m_message += '%';
 			current += 2;
-		} else {
+		}
+		else
+		{
 			++current;
 			assert(false);
 		}
@@ -408,10 +514,14 @@ inline void XMessage::DoTypeSafeFormat(const char* _format, const string_cast** 
 }
 
 ///////////////////////////XLogger////////////////////
-inline XLogger& XLogger::operator<< (const string_cast& _value) {
-	if (NULL != _value.str()) {
+inline XLogger& XLogger::operator<< (const string_cast& _value)
+{
+	if (NULL != _value.str())
+	{
 		m_message += _value.str();
-	} else {
+	}
+	else
+	{
 		m_info.level = kLevelFatal;
 		m_message += "{!!! XLogger& XLogger::operator<<(const string_cast& _value): _value.str() == NULL !!!}";
 		assert(false);
@@ -419,10 +529,14 @@ inline XLogger& XLogger::operator<< (const string_cast& _value) {
 	return *this;
 }
 
-inline XLogger& XLogger::operator>>(const string_cast& _value) {
-	if (NULL != _value.str()) {
+inline XLogger& XLogger::operator>>(const string_cast& _value)
+{
+	if (NULL != _value.str())
+	{
 		m_message.insert(0,  _value.str());
-	} else {
+	}
+	else
+	{
 		m_info.level = kLevelFatal;
 		m_message.insert(0,  "{!!! XLogger& XLogger::operator>>(const string_cast& _value): _value.str() == NULL !!!}");
 		assert(false);
@@ -430,7 +544,8 @@ inline XLogger& XLogger::operator>>(const string_cast& _value) {
 	return *this;
 }
 
-inline XLogger& XLogger::VPrintf(const char* _format, va_list _list) {
+inline XLogger& XLogger::VPrintf(const char* _format, va_list _list)
+{
 	if (_format == NULL)
 	{
 		m_info.level = kLevelFatal;
@@ -445,7 +560,8 @@ inline XLogger& XLogger::VPrintf(const char* _format, va_list _list) {
 	return *this;
 }
 
-inline XLogger& XLogger::operator()(const char* _format, ...) {
+inline XLogger& XLogger::operator()(const char* _format, ...)
+{
 	if (_format == NULL)
 	{
 		m_info.level = kLevelFatal;
@@ -465,13 +581,15 @@ inline XLogger& XLogger::operator()(const char* _format, ...) {
 #define XLOGGER_VARIANT_ARGS(n) PP_ENUM_PARAMS(n, &a)
 #define XLOGGER_VARIANT_ARGS_NULL(n) PP_ENUM(n, NULL)
 #define XLOGGER_TYPESAFE_FORMAT_IMPLEMENT(n, m) \
-		inline XLogger& XLogger::operator()(const TypeSafeFormat&, const char* _format XLOGGER_FORMAT_ARGS(n)) { \
-		if (_format != NULL) { \
-			const string_cast* args[16] = { XLOGGER_VARIANT_ARGS(n) PP_COMMA_IF(PP_AND(n, m)) XLOGGER_VARIANT_ARGS_NULL(m) }; \
-			DoTypeSafeFormat(_format, args); \
-		} \
-		return *this;\
-	}
+		inline XLogger& XLogger::operator()(const TypeSafeFormat&, const char* _format XLOGGER_FORMAT_ARGS(n)) \
+		{ \
+			if (_format != NULL) \
+			{ \
+				const string_cast* args[16] = { XLOGGER_VARIANT_ARGS(n) PP_COMMA_IF(PP_AND(n, m)) XLOGGER_VARIANT_ARGS_NULL(m) }; \
+				DoTypeSafeFormat(_format, args); \
+			} \
+			return *this;\
+		}
 
 XLOGGER_TYPESAFE_FORMAT_IMPLEMENT(0, 16)
 XLOGGER_TYPESAFE_FORMAT_IMPLEMENT(1, 15)
@@ -491,14 +609,13 @@ XLOGGER_TYPESAFE_FORMAT_IMPLEMENT(14, 2)
 XLOGGER_TYPESAFE_FORMAT_IMPLEMENT(15, 1)
 XLOGGER_TYPESAFE_FORMAT_IMPLEMENT(16, 0)
 
-
 #undef XLOGGER_FORMAT_ARGS
 #undef XLOGGER_VARIANT_ARGS
 #undef XLOGGER_VARIANT_ARGS_NULL
 #undef XLOGGER_TYPESAFE_FORMAT_IMPLEMENT
 
-inline void XLogger::DoTypeSafeFormat(const char* _format, const string_cast** _args) {
-
+inline void XLogger::DoTypeSafeFormat(const char* _format, const string_cast** _args)
+{
 	const char* current = _format;
 	int count = 0;
 	while ('\0' != *current)
@@ -513,23 +630,29 @@ inline void XLogger::DoTypeSafeFormat(const char* _format, const string_cast** _
 		char nextch = *(current+1);
 		if (('0' <=nextch  && nextch <= '9') || nextch == '_')
 		{
-
 			int argIndex = count;
-			if (nextch != '_') argIndex = nextch - '0';
+			if (nextch != '_')
+			{
+				argIndex = nextch - '0';
+			}
 
 			if (_args[argIndex] != NULL)
 			{
 				if (NULL != _args[argIndex]->str())
 				{
 					m_message += _args[argIndex]->str();
-				} else {
+				}
+				else
+				{
 					m_info.level = kLevelFatal;
 					m_message += "{!!! void XLogger::DoTypeSafeFormat: _args[";
 					m_message += string_cast(argIndex).str();
 					m_message += "]->str() == NULL !!!}";
 					assert(false);
 				}
-			} else {
+			}
+			else
+			{
 				m_info.level = kLevelFatal;
 				m_message += "{!!! void XLogger::DoTypeSafeFormat: _args[";
 				m_message += string_cast(argIndex).str();
@@ -539,10 +662,13 @@ inline void XLogger::DoTypeSafeFormat(const char* _format, const string_cast** _
 			count++;
 			current += 2;
 		}
-		else if (nextch == '%') {
+		else if (nextch == '%')
+		{
 			m_message += '%';
 			current += 2;
-		} else {
+		}
+		else
+		{
 			++current;
 			m_info.level = kLevelFatal;
 			m_message += "{!!! void XLogger::DoTypeSafeFormat: %";
@@ -554,7 +680,6 @@ inline void XLogger::DoTypeSafeFormat(const char* _format, const string_cast** _
 }
 
 #endif //cpp
-
 
 #define __CONCAT_IMPL__(x, y)		x##y
 #define __CONCAT__(x, y)			__CONCAT_IMPL__(x, y)

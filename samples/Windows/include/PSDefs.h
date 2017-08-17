@@ -1,4 +1,5 @@
 #pragma once
+#include <stdint.h>
 
 #ifndef IN
 #define IN			// 传入参数;
@@ -71,3 +72,25 @@ typedef struct PS_OffMsgDesc
 	int64_ps		iStartMsgID;
 	int32_ps		iMsgCount;
 }PS_OffMsgDesc_t;
+
+struct PSBuffer
+{
+	char*	pBuff;
+	int		iLen;
+};
+
+class MessageItem
+{
+public:
+	int64_t		iMsgId;
+	char*		strFrom;
+	char*		strTo;
+	int16_t		iSendMode;
+	int16_t		iType;
+	int8_t		iPriority;
+	int16_t		iHandleOption;
+	char*		strPushInfo;
+	int32_t		iTimestamp;
+	int32_t		iExpireTime;
+	PSBuffer	psBuff;
+};

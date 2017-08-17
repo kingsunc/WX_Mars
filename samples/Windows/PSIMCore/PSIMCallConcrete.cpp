@@ -35,16 +35,15 @@ bool CPSIMCallConcrete::Init()
 	// init xlog
 	std::string logPath = "D://Log";	//use your log path
 	std::string pubKey = "aaa";			//use you pubkey for log encrypt						 
-#if _DEBUG
-	xlogger_SetLevel(kLevelAll);
-	appender_set_console_log(true);
-#else
+
+	//xlogger_SetLevel(kLevelAll);
+	//xlogger_SetLevel(kLevelWarn);
 	xlogger_SetLevel(kLevelInfo);
-	appender_set_console_log(false);
-#endif
+	appender_set_console_log(true);
 	appender_open(kAppednerAsync, logPath.c_str(), "Test", pubKey.c_str());
 
 	MarsWrapper::GetInstance().Start();
+	MarsWrapper::GetInstance().SetMsgPushObserver(CPSIMTaskCallback::GetInstance());
 
 	return true;
 }
@@ -74,7 +73,7 @@ void CPSIMCallConcrete::MsgLogin(IN const char* strAppID,
 // 注销
 void CPSIMCallConcrete::MsgLogout()
 {
-
+	MarsWrapper::GetInstance().MsgLogout();
 }
 
 // 获取群信息;
@@ -132,7 +131,7 @@ void CPSIMCallConcrete::InviteGroupUsers(const char* strGroupID)
 }
 
 // 发送文本消息
-void CPSIMCallConcrete::SendTextMessage(OUT int& iReqID,
+bool CPSIMCallConcrete::SendTextMessage(OUT int& iReqID,
 	IN const PS_SendMode& eSendMode,
 	IN const char* strFrom,
 	IN const char* strTo,
@@ -140,7 +139,7 @@ void CPSIMCallConcrete::SendTextMessage(OUT int& iReqID,
 	IN const int& iContentLen,
 	IN const char* strPushInfo)
 {
-	MarsWrapper::GetInstance().SendTextMessage(iReqID, eSendMode, strFrom, strTo, strContent, iContentLen, strPushInfo, CPSIMTaskCallback::GetInstance());
+	return MarsWrapper::GetInstance().SendTextMessage(iReqID, eSendMode, strFrom, strTo, strContent, iContentLen, strPushInfo, CPSIMTaskCallback::GetInstance());
 }
 
 // 获取离线消息

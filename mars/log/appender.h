@@ -27,8 +27,8 @@
 
 enum TAppenderMode
 {
-    kAppednerAsync,
-    kAppednerSync,
+    kAppednerAsync,		// “Ï≤Ω
+    kAppednerSync,		// Õ¨≤Ω
 };
 
 void appender_open(TAppenderMode _mode, const char* _dir, const char* _nameprefix, const char* _pub_key);
@@ -49,6 +49,5 @@ void appender_set_console_log(bool _is_open);
  * @param _max_byte_size    Max byte size of single log file, default is 0, meaning do not split.
  */
 void appender_set_max_file_size(uint64_t _max_byte_size);
-
 
 #endif /* APPENDER_H_ */
