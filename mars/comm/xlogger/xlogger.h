@@ -305,6 +305,7 @@ private:
 	bool m_isinfonull;
 };
 
+// 统计函数进出栈的时间耗时;
 class XScopeTracer
 {
 public:

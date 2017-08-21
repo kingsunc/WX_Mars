@@ -166,12 +166,10 @@
     <ClInclude Include="..\bootrun.h" />
     <ClInclude Include="..\comm_frequency_limit.h" />
     <ClInclude Include="..\compiler_util.h" />
-    <ClInclude Include="..\copy_wrapper.h" />
     <ClInclude Include="..\corepattern\coreservice_base.h" />
     <ClInclude Include="..\corepattern\service_base.h" />
     <ClInclude Include="..\crypt\ibase64.h" />
     <ClInclude Include="..\crypt\pkcs7_padding.h" />
-    <ClInclude Include="..\cxxnamespacefix.h" />
     <ClInclude Include="..\debugger\spy_base.h" />
     <ClInclude Include="..\dns\dns.h" />
     <ClInclude Include="..\has_member.h" />
@@ -207,7 +205,6 @@
     <ClInclude Include="..\socket\unix_socket.h" />
     <ClInclude Include="..\strutil.h" />
     <ClInclude Include="..\thread\atomic_oper.h" />
-    <ClInclude Include="..\thread\bind.h" />
     <ClInclude Include="..\thread\condition.h" />
     <ClInclude Include="..\thread\lock.h" />
     <ClInclude Include="..\thread\mutex.h" />

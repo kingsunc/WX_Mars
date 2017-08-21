@@ -26,11 +26,13 @@
 #include "task/NoBody_Task.h"
 #include "task/Msg_Task.h"
 #include "task/OffMsg_Task.h"
+#include "task/CreateGroup_Task.h"
+#include "task/AddGroupUser_Task.h"
 
 class MessagePush
 {
 public:
-	virtual void OnRecvMessage(const MessageItem& msgItem) = 0;
+	virtual void OnRecvMessage(const PSMessageItem& msgItem) = 0;
 };
 
 // 业务包装类;
@@ -58,15 +60,17 @@ public:
 	// 注销
 	void MsgLogout();
 
+	bool CreateGroup(IN const PSGroupInfo& groupInfo, IN CreateGroup_Callback* pCallback);
+
 	//// 获取群信息;
 	//virtual void GetGroupInfo(const char* strGroupID);
 
 	//// 获取群成员;
 	//virtual void GetGroupUsers(const char* strGroupID, const int iPageNum, const int iPageSize);
-	//// 添加群成员;
-	//virtual void AddGroupUsers(const char* strGroupID);
-	//// 添加群成员;
-	//virtual void DeleteGroupUsers(const char* strGroupID);
+	// 添加群成员;
+	virtual bool AddGroupUsers(IN const char* strGroupID, IN const PSUserInfo* userInfo, IN const int iAddCount, IN AddGroupUser_Callback* pCallback);
+	// 移除群成员;
+	virtual bool RemoveGroupUsers(IN const char* strGroupID, IN const PSUserInfo* userInfo, IN const int iRemoveCount);
 
 	//// 设置群成员角色
 	//virtual void SetGroupUserRole(const char* strGroupID);
@@ -82,7 +86,7 @@ public:
 	//virtual void InviteGroupUsers(const char* strGroupID);
 
 	// 发送文本消息
-	virtual bool SendTextMessage(OUT int& iReqID,
+	bool SendTextMessage(OUT int& iReqID,
 		IN const PS_SendMode& eSendMode,
 		IN const char* strFrom,
 		IN const char* strTo,
@@ -92,7 +96,7 @@ public:
 		IN Msg_Callback* pCallback);
 
 	// 获取离线消息
-	virtual void GetOfflineMsgs(OUT std::vector<PS_OffMsgDesc_t>& vecMsgDesc,
+	void GetOfflineMsgs(OUT std::vector<PSOffMsgDesc>& vecMsgDesc,
 		IN OffMsg_Callback* pCallback);
 
 	// 消息撤回

@@ -28,13 +28,13 @@ public:
 	// 注销
 	virtual void MsgLogout();
 
-	// 获取群信息;
-	virtual void GetGroupInfo(const char* strGroupID);
+	// 创建群组
+	virtual bool CreateGroup(IN const PSGroupInfo& groupInfo);
 
 	// 获取群成员;
 	virtual void GetGroupUsers(const char* strGroupID, const int iPageNum, const int iPageSize);
 	// 添加群成员;
-	virtual void AddGroupUsers(const char* strGroupID);
+	virtual bool AddGroupUsers(IN const char* strGroupID, IN const PSUserInfo* pUsers, IN const int iAddCount);
 	// 添加群成员;
 	virtual void DeleteGroupUsers(const char* strGroupID);
 
@@ -61,7 +61,7 @@ public:
 		IN const char* strPushInfo);
 
 	// 获取离线消息
-	virtual void GetOfflineMsgs(OUT PS_OffMsgDesc_t* pOffMsgDescs,
+	virtual void GetOfflineMsgs(OUT PSOffMsgDesc* pOffMsgDescs,
 		IN const int& iDescCount);
 
 	// 消息撤回

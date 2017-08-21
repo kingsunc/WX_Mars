@@ -19,27 +19,21 @@
  */
 
 #include "net_core.h"
-
 #include <stdlib.h>
-
 #include "boost/bind.hpp"
 #include "boost/ref.hpp"
-
-
 #include "mars/comm/messagequeue/message_queue.h"
 #include "mars/comm/network/netinfo_util.h"
 #include "mars/comm/socket/local_ipstack.h"
 #include "mars/comm/xlogger/xlogger.h"
 #include "mars/comm/singleton.h"
 #include "mars/comm/platform_comm.h"
-
 #include "mars/app/app.h"
 #include "mars/baseevent/active_logic.h"
 #include "mars/baseevent/baseprjevent.h"
 #include "mars/stn/config.h"
 #include "mars/stn/task_profile.h"
 #include "mars/stn/proto/longlink_packer.h"
-
 #include "net_source.h"
 #include "net_check_logic.h"
 #include "anti_avalanche.h"

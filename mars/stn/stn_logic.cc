@@ -385,5 +385,4 @@ void (*ReportDnsProfile)(const DnsProfile& _dns_profile)
 };
 #endif
 
-}
-}
+}}

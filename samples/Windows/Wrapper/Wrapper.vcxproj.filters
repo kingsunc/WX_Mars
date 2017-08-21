@@ -37,6 +37,12 @@
     <Filter Include="idl\tars">
       <UniqueIdentifier>{5de17444-2a96-4bd3-b69f-f97cd6817209}</UniqueIdentifier>
     </Filter>
+    <Filter Include="idl\json">
+      <UniqueIdentifier>{a87928b9-9e9d-401b-89a2-92331a179410}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="idl\json\json">
+      <UniqueIdentifier>{79230ec8-20c9-4e92-b19d-d3bb86c1ae29}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -108,6 +114,30 @@
     <ClInclude Include="idl\tars\msg_result_tars.h">
       <Filter>idl\tars</Filter>
     </ClInclude>
+    <ClInclude Include="task\CreateGroup_Task.h">
+      <Filter>task</Filter>
+    </ClInclude>
+    <ClInclude Include="task\DeleteGroup_Task.h">
+      <Filter>task</Filter>
+    </ClInclude>
+    <ClInclude Include="task\RemoveGroupUser_Task.h">
+      <Filter>task</Filter>
+    </ClInclude>
+    <ClInclude Include="idl\json\JsonObjectBase.h">
+      <Filter>idl\json</Filter>
+    </ClInclude>
+    <ClInclude Include="idl\json\HttpRespBase.h">
+      <Filter>idl\json</Filter>
+    </ClInclude>
+    <ClInclude Include="idl\json\CreateGroupResp_Json.h">
+      <Filter>idl\json</Filter>
+    </ClInclude>
+    <ClInclude Include="idl\json\AddGroupUserResp_Json.h">
+      <Filter>idl\json</Filter>
+    </ClInclude>
+    <ClInclude Include="task\AddGroupUser_Task.h">
+      <Filter>task</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="component\app_callback.cpp">
@@ -138,6 +168,39 @@
       <Filter>task</Filter>
     </ClCompile>
     <ClCompile Include="task\NoBody_Task.cpp">
+      <Filter>task</Filter>
+    </ClCompile>
+    <ClCompile Include="task\CreateGroup_Task.cpp">
+      <Filter>task</Filter>
+    </ClCompile>
+    <ClCompile Include="task\DeleteGroup_Task.cpp">
+      <Filter>task</Filter>
+    </ClCompile>
+    <ClCompile Include="task\RemoveGroupUser_Task.cpp">
+      <Filter>task</Filter>
+    </ClCompile>
+    <ClCompile Include="idl\json\json\json_reader.cpp">
+      <Filter>idl\json\json</Filter>
+    </ClCompile>
+    <ClCompile Include="idl\json\json\json_value.cpp">
+      <Filter>idl\json\json</Filter>
+    </ClCompile>
+    <ClCompile Include="idl\json\json\json_writer.cpp">
+      <Filter>idl\json\json</Filter>
+    </ClCompile>
+    <ClCompile Include="idl\json\JsonObjectBase.cpp">
+      <Filter>idl\json</Filter>
+    </ClCompile>
+    <ClCompile Include="idl\json\HttpRespBase.cpp">
+      <Filter>idl\json</Filter>
+    </ClCompile>
+    <ClCompile Include="idl\json\CreateGroupResp_Json.cpp">
+      <Filter>idl\json</Filter>
+    </ClCompile>
+    <ClCompile Include="idl\json\AddGroupUserResp_Json.cpp">
+      <Filter>idl\json</Filter>
+    </ClCompile>
+    <ClCompile Include="task\AddGroupUser_Task.cpp">
       <Filter>task</Filter>
     </ClCompile>
   </ItemGroup>

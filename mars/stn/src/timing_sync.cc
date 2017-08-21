@@ -20,9 +20,7 @@
  */
 
 #include "timing_sync.h"
-
 #include "boost/bind.hpp"
-
 #include "mars/app/app.h"
 #include "mars/comm/thread/lock.h"
 #include "mars/comm/xlogger/xlogger.h"
@@ -37,11 +35,10 @@ using namespace mars::app;
 #define INACTIVE_SYNC_INTERVAL (10*60*1000)
 #define NONET_SALT_RATE  (3)
 
-
 static int GetAlarmTime(bool _is_actived)
 {
     int time = 0;
-    //todo
+    // todo
     if (_is_actived && !::GetAccountInfo().is_logoned)
     {
         time = UNLOGIN_SYNC_INTERVAL;
@@ -60,7 +57,7 @@ static int GetAlarmTime(bool _is_actived)
 }
 
 TimingSync::TimingSync(ActiveLogic& _active_logic)
-:alarm_(boost::bind(&TimingSync::__OnAlarm, this), false)
+: alarm_(boost::bind(&TimingSync::__OnAlarm, this), false)
 , active_logic_(_active_logic)
 {
     timing_sync_active_connection_ = _active_logic.SignalActive.connect(boost::bind(&TimingSync::OnActiveChanged, this, _1));
@@ -94,10 +91,14 @@ void TimingSync::OnNetworkChange()
 void TimingSync::OnLongLinkStatuChanged(LongLink::TLongLinkStatus _status)
 {
     xverbose_function();
-    if (_status == LongLink::kConnected)
+	if (_status == LongLink::kConnected)
+	{
         alarm_.Cancel();
-    else if (_status == LongLink::kDisConnected)
-        alarm_.Start(GetAlarmTime(active_logic_.IsActive()));
+	}
+	else if (_status == LongLink::kDisConnected)
+	{
+		alarm_.Start(GetAlarmTime(active_logic_.IsActive()));
+	}
 }
 
 void TimingSync::__OnAlarm()
@@ -112,4 +113,3 @@ void TimingSync::__OnAlarm()
 
     alarm_.Start(GetAlarmTime(active_logic_.IsActive()));
 }
-

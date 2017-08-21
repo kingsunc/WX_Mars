@@ -88,6 +88,7 @@ static std::string sg_current_dir;
 static Mutex sg_mutex_buffer_async;
 #ifdef _WIN32
 static Condition& sg_cond_buffer_async = *(new Condition());  // 改成引用, 避免在全局释放时执行析构导致crash
+//static Condition sg_cond_buffer_async;
 #else
 static Condition sg_cond_buffer_async;
 #endif

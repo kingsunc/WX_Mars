@@ -78,7 +78,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;WRAPPER_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;WRAPPER_EXPORTS;JSON_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir);$(ProjectDir)../../../;$(ProjectDir)../../../mars;$(ProjectDir)../../../mars/comm/windows;$(ProjectDir)../../../mars/comm;$(ProjectDir)../Wrapper/protocol/;$(ProjectDir)../Wrapper/idl/;$(ProjectDir)../include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -140,6 +140,10 @@
     <ClInclude Include="component\shortlink_packer.h" />
     <ClInclude Include="component\stnproto_logic.h" />
     <ClInclude Include="component\stn_callback.h" />
+    <ClInclude Include="idl\json\AddGroupUserResp_Json.h" />
+    <ClInclude Include="idl\json\CreateGroupResp_Json.h" />
+    <ClInclude Include="idl\json\JsonObjectBase.h" />
+    <ClInclude Include="idl\json\HttpRespBase.h" />
     <ClInclude Include="idl\tars\access_tars.h" />
     <ClInclude Include="idl\tars\msg_resp_tars.h" />
     <ClInclude Include="idl\tars\msg_result_tars.h" />
@@ -152,23 +156,38 @@
     <ClInclude Include="protocol\tars\TarsDisplayer.h" />
     <ClInclude Include="protocol\tars\TarsType.h" />
     <ClInclude Include="protocol\tars\tup.h" />
+    <ClInclude Include="task\AddGroupUser_Task.h" />
     <ClInclude Include="task\CGITask.h" />
+    <ClInclude Include="task\CreateGroup_Task.h" />
+    <ClInclude Include="task\DeleteGroup_Task.h" />
     <ClInclude Include="task\Login_Task.h" />
     <ClInclude Include="task\NoBody_Task.h" />
     <ClInclude Include="task\Msg_Task.h" />
     <ClInclude Include="task\OffMsg_Task.h" />
+    <ClInclude Include="task\RemoveGroupUser_Task.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="component\app_callback.cpp" />
     <ClCompile Include="component\longlink_packer.cc" />
     <ClCompile Include="component\shortlink_packer.cc" />
     <ClCompile Include="component\stn_callback.cpp" />
+    <ClCompile Include="idl\json\AddGroupUserResp_Json.cpp" />
+    <ClCompile Include="idl\json\CreateGroupResp_Json.cpp" />
+    <ClCompile Include="idl\json\JsonObjectBase.cpp" />
+    <ClCompile Include="idl\json\json\json_reader.cpp" />
+    <ClCompile Include="idl\json\json\json_value.cpp" />
+    <ClCompile Include="idl\json\json\json_writer.cpp" />
+    <ClCompile Include="idl\json\HttpRespBase.cpp" />
     <ClCompile Include="MarsWrapper.cpp" />
     <ClCompile Include="NetworkService.cpp" />
+    <ClCompile Include="task\AddGroupUser_Task.cpp" />
+    <ClCompile Include="task\CreateGroup_Task.cpp" />
+    <ClCompile Include="task\DeleteGroup_Task.cpp" />
     <ClCompile Include="task\Login_Task.cpp" />
     <ClCompile Include="task\NoBody_Task.cpp" />
     <ClCompile Include="task\Msg_Task.cpp" />
     <ClCompile Include="task\OffMsg_Task.cpp" />
+    <ClCompile Include="task\RemoveGroupUser_Task.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -262,18 +262,18 @@ namespace MessageService
         return !(l == r);
     }
 
-    struct GroupInfo : public tars::TarsStructBase
+    struct PSGroupInfo : public tars::TarsStructBase
     {
     public:
         static string className()
         {
-            return "MessageService.GroupInfo";
+            return "MessageService.PSGroupInfo";
         }
         static string MD5()
         {
             return "30c96586005d02cb7abec84c48d2d1f8";
         }
-        GroupInfo()
+        PSGroupInfo()
         {
         }
         void resetDefautlt()
@@ -310,11 +310,11 @@ namespace MessageService
         MessageService::GroupBaseInfo base;
         vector<std::string> users;
     };
-    inline bool operator==(const GroupInfo&l, const GroupInfo&r)
+    inline bool operator==(const PSGroupInfo&l, const PSGroupInfo&r)
     {
         return l.base == r.base && l.users == r.users;
     }
-    inline bool operator!=(const GroupInfo&l, const GroupInfo&r)
+    inline bool operator!=(const PSGroupInfo&l, const PSGroupInfo&r)
     {
         return !(l == r);
     }

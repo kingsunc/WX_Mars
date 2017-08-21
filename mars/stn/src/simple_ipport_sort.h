@@ -30,13 +30,17 @@
 #include "mars/comm/tickcount.h"
 #include "mars/stn/stn.h"
 
-namespace mars {
-namespace stn {
+namespace mars
+{
+namespace stn
+{
 
 struct BanItem;
-    
-class SimpleIPPortSort {
-  public:
+
+// ¼òµ¥IP¶Ë¿ÚÅÅÐò
+class SimpleIPPortSort
+{
+public:
     SimpleIPPortSort();
     ~SimpleIPPortSort();
 
@@ -47,8 +51,8 @@ class SimpleIPPortSort {
     void SortandFilter(std::vector<IPPortItem>& _items, int _needcount) const;
 
     void AddServerBan(const std::string& _ip);
-    
-  private:
+
+private:
     void __LoadXml();
     void __SaveXml();
     void __RemoveTimeoutXml();
@@ -62,12 +66,12 @@ class SimpleIPPortSort {
     void __FilterbyBanned(std::vector<IPPortItem>& _items) const;
     void __SortbyBanned(std::vector<IPPortItem>& _items) const;
     bool __IsServerBan(const std::string& _ip) const;
-    
-  private:
+
+private:
     SimpleIPPortSort(const SimpleIPPortSort&);
     SimpleIPPortSort& operator=(const SimpleIPPortSort&);
 
-  private:
+private:
     std::string hostpath_;
     tinyxml2::XMLDocument recordsxml_;
 
@@ -77,4 +81,5 @@ class SimpleIPPortSort {
 };
 
 }}
+
 #endif // STN_SRC_SIMPLE_IPPORT_SORT_H_

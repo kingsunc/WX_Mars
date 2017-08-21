@@ -19,9 +19,7 @@
  */
 
 #include "flow_limit.h"
-
 #include <algorithm>
-
 #include "mars/comm/xlogger/xlogger.h"
 #include "mars/comm/time_utils.h"
 #include "mars/stn/stn.h"

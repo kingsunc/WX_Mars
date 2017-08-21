@@ -23,16 +23,18 @@
 
 #include <string>
 #include <map>
-
 #include "autobuffer.h"
 
-namespace http {
+namespace http
+{
 
-struct less {
+struct less
+{
 	bool operator()(const std::string& __x, const std::string& __y) const;
 };
 
-enum THttpVersion {
+enum THttpVersion
+{
     kVersion_0_9,
     kVersion_1_0,
     kVersion_1_1,
@@ -40,7 +42,8 @@ enum THttpVersion {
     kVersion_Unknow,
 };
 
-const char* const kHttpVersionString[] = {
+const char* const kHttpVersionString[] =
+{
     "HTTP/0.9",
     "HTTP/1.0",
     "HTTP/1.1",
@@ -48,14 +51,17 @@ const char* const kHttpVersionString[] = {
     "version_unknown",
 };
 
-enum TCsMode {
+enum TCsMode
+{
     kRequest,
     kRespond,
 };
 
-class RequestLine {
-  public:
-    enum THttpMethod {
+class RequestLine
+{
+public:
+    enum THttpMethod
+	{
         kUnknown = 0,
         kGet,
         kPost,
@@ -70,13 +76,13 @@ class RequestLine {
 
     static const char* const kHttpMethodString[kMax];
 
-  public:
+public:
     RequestLine();
     RequestLine(THttpMethod _httpMethod, const char* _url, THttpVersion _httpVersion);
     // RequestLine(const RequestLine&);
     // RequestLine& operator=(const RequestLine&);
 
-  public:
+public:
     void Method(THttpMethod _method);
     THttpMethod Method() const;
 
@@ -89,20 +95,21 @@ class RequestLine {
     std::string ToString() const;
     bool FromString(const std::string& _requestline);
 
-  private:
+private:
     THttpMethod http_method_;
     std::string req_url_;
     THttpVersion http_version_;
 };
 
-class StatusLine {
-  public:
+class StatusLine
+{
+public:
     StatusLine();
     StatusLine(THttpVersion _httpversion, int _statuscode, const std::string& _reasonphrase);
     // StatusLine(const StatusLine&);
     // StatusLine& operator=(const StatusLine&);
 
-  public:
+public:
     void Version(THttpVersion _version);
     THttpVersion Version() const;
 
@@ -115,19 +122,19 @@ class StatusLine {
     std::string ToString() const;
     bool FromString(const std::string& _statusline);
 
-  private:
+private:
     THttpVersion http_version_;
     int statuscode_;
     std::string reason_phrase_;
 };
 
-
-class HeaderFields {
-  public:
+class HeaderFields
+{
+public:
     // HeaderFields(const HeaderFields&);
     // HeaderFields& operator=(const HeaderFields&);
 
-  public:
+public:
     static std::pair<const std::string, std::string> MakeContentLength(int _len);
     static std::pair<const std::string, std::string> MakeTransferEncodingChunked();
     static std::pair<const std::string, std::string> MakeConnectionClose();
@@ -160,7 +167,11 @@ class HeaderFields {
     void HeaderFiled(const std::pair<const std::string, std::string>& _headerfield);
     void HeaderFiled(const HeaderFields& _headerfields);
     const char* HeaderField(const char* _key) const;
-    std::map<const std::string, std::string, less>& GetHeaders() {return headers_;}
+
+    std::map<const std::string, std::string, less>& GetHeaders()
+	{
+		return headers_;
+	}
 
     bool IsTransferEncodingChunked();
     int ContentLength();
@@ -169,12 +180,13 @@ class HeaderFields {
 
     const std::string ToString() const;
 
-  private:
+private:
     std::map<const std::string, std::string, less> headers_;
 };
 
-class IBlockBodyProvider {
-  public:
+class IBlockBodyProvider
+{
+public:
     virtual ~IBlockBodyProvider() {}
 
     virtual bool Data(AutoBuffer& _body) = 0;
@@ -182,31 +194,47 @@ class IBlockBodyProvider {
     virtual size_t Length() const = 0;
 };
 
-class BufferBodyProvider : public IBlockBodyProvider {
-  public:
-    bool Data(AutoBuffer& _body) {
+class BufferBodyProvider : public IBlockBodyProvider
+{
+public:
+    bool Data(AutoBuffer& _body)
+	{
         if (!buffer_.Ptr()) return false;
 
         _body.Write(buffer_.Ptr(), buffer_.Length());
         buffer_.Reset();
         return true;
     }
-    bool FillData(AutoBuffer& _body) {
+
+    bool FillData(AutoBuffer& _body)
+	{
         if (!buffer_.Ptr()) return false;
 
         _body.Write(buffer_.Ptr(), buffer_.Length());
         buffer_.Reset();
         return true;
     }
-    size_t Length() const {return buffer_.Length();}
-    AutoBuffer& Buffer() {return buffer_;}
-  private:
+
+    size_t Length() const
+	{
+		return buffer_.Length();
+	}
+
+    AutoBuffer& Buffer()
+	{
+		return buffer_;
+	}
+
+private:
     AutoBuffer buffer_;
 };
 
-class IStreamBodyProvider {
-  public:
-    virtual ~IStreamBodyProvider() {}
+class IStreamBodyProvider
+{
+public:
+    virtual ~IStreamBodyProvider()
+	{
+	}
 
     virtual bool HaveData() const = 0;
     virtual bool Data(AutoBuffer& _body) = 0;
@@ -214,21 +242,22 @@ class IStreamBodyProvider {
     virtual bool Eof() const = 0;
     const char* EofData();
 
-  protected:
+protected:
     static void AppendHeader(AutoBuffer& _body, size_t _length);
     static void AppendTail(AutoBuffer& _body);
 };
 
-class Builder {
-  public:
+class Builder
+{
+public:
     Builder(TCsMode _csmode);
     ~Builder();
 
-  private:
+private:
     Builder(const Builder&);
     Builder& operator=(const Builder&);
 
-  public:
+public:
     RequestLine& Request();
     StatusLine& Status();
     const RequestLine& Request() const;
@@ -247,7 +276,7 @@ class Builder {
     bool HeaderToBuffer(AutoBuffer& _header);
     bool HttpToBuffer(AutoBuffer& _http);
 
-  private:
+private:
     TCsMode csmode_;
 
     StatusLine statusline_;
@@ -260,36 +289,60 @@ class Builder {
     bool is_manage_body_;
 };
 
-class BodyReceiver {
-  public:
-    BodyReceiver(): total_length_(0) {}
-    virtual ~BodyReceiver() {}
+class BodyReceiver
+{
+public:
+    BodyReceiver(): total_length_(0)
+	{
+	}
+    virtual ~BodyReceiver()
+	{
+	}
 
-    virtual void AppendData(const void* _body, size_t _length) { total_length_ += _length;}
-    virtual void EndData() {}
-    size_t Length() const {return total_length_;}
+    virtual void AppendData(const void* _body, size_t _length)
+	{
+		total_length_ += _length;
+	}
 
-  private:
+    virtual void EndData()
+	{
+	}
+
+    size_t Length() const
+	{
+		return total_length_;
+	}
+
+private:
     size_t total_length_;
 };
 
-class MemoryBodyReceiver : public BodyReceiver {
-  public:
+class MemoryBodyReceiver : public BodyReceiver
+{
+public:
 	MemoryBodyReceiver(AutoBuffer& _buf)
-    : body_(_buf) {}
-    virtual void AppendData(const void* _body, size_t _length) {
+		: body_(_buf)
+	{
+	}
+    virtual void AppendData(const void* _body, size_t _length)
+	{
         BodyReceiver::AppendData(_body, _length);
         body_.Write(_body, _length);
     }
-    virtual void EndData() {}
 
-  private:
+    virtual void EndData()
+	{
+	}
+
+private:
     AutoBuffer& body_;
 };
 
-class Parser {
-  public:
-    enum TRecvStatus {
+class Parser
+{
+public:
+    enum TRecvStatus
+	{
         kStart,
         kFirstLine,
         kFirstLineError,
@@ -300,15 +353,15 @@ class Parser {
         kEnd,
     };
 
-  public:
+public:
     Parser(BodyReceiver* _body = new BodyReceiver(), bool _manage = true);
     ~Parser();
 
-  private:
+private:
     Parser(const Parser&);
     Parser& operator=(const Parser&);
 
-  public:
+public:
     TRecvStatus Recv(const void* _buffer, size_t _length);
     TRecvStatus Recv(AutoBuffer& _recv_buffer);
     TRecvStatus RecvStatus() const;
@@ -332,7 +385,7 @@ class Parser {
     bool Error() const;
     bool Success() const;
 
-  private:
+private:
     TRecvStatus recvstatus_;
     AutoBuffer  recvbuf_;
     AutoBuffer  headerbuf_;
@@ -351,6 +404,6 @@ class Parser {
 
 // void testChunk();
 
-
 } /* namespace http */
+
 #endif /* HTTPREQUEST_H_ */

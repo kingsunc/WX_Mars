@@ -14,6 +14,8 @@
 HWND	g_hwndMain;
 #define SENDMESSGAE_RESP	(WM_USER+102)
 #define RECVMESSGAE_RESP	(WM_USER+103)
+#define CREATEGROUP_RESP	(WM_USER+104)
+#define ADDGROUPUSER_RESP	(WM_USER+105)
 
 // 用于应用程序“关于”菜单项的 CAboutDlg 对话框
 class CAboutDlg : public CDialogEx
@@ -57,10 +59,15 @@ CPSIMCoreDemoDlg::CPSIMCoreDemoDlg(CWnd* pParent /*=NULL*/)
 void CPSIMCoreDemoDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
-	DDX_Control(pDX, IDC_EDIT_APPNAME, m_edtFrom);
-	DDX_Control(pDX, IDC_EDIT_APPNAME2, m_edtTo);
-	DDX_Control(pDX, IDC_EDIT_APPNAME3, m_edtContent);
-	DDX_Control(pDX, IDC_RICHEDIT21, m_edtInfo);
+	DDX_Control(pDX, IDC_EDIT_FROM_USERID, m_edtFromUser);
+	DDX_Control(pDX, IDC_EDIT_TO_USERID, m_edtToUser);
+	DDX_Control(pDX, IDC_EDIT_SINGLE_CONTENT, m_edtContent);
+	DDX_Control(pDX, IDC_RICHEDIT_INFO, m_edtInfo);
+	DDX_Control(pDX, IDC_EDIT_GROUP_ID, m_edtGroup);
+	DDX_Control(pDX, IDC_EDIT_GROUP_MEMBER_ID, m_edtGroupMember);
+	DDX_Control(pDX, IDC_EDIT_FROM_GUSERID, m_edtFromGUser);
+	DDX_Control(pDX, IDC_EDIT_TO_GROUPID, m_edtToGroup);
+	DDX_Control(pDX, IDC_EDIT_GROUP_CONTENT, m_edtGroupContent);
 }
 
 BEGIN_MESSAGE_MAP(CPSIMCoreDemoDlg, CDialogEx)
@@ -68,6 +75,11 @@ BEGIN_MESSAGE_MAP(CPSIMCoreDemoDlg, CDialogEx)
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
 	ON_BN_CLICKED(IDC_BUTTON_SEND, &CPSIMCoreDemoDlg::OnBnClickedButtonSend)
+	ON_BN_CLICKED(IDC_BUTTON_CREATEGROUP, &CPSIMCoreDemoDlg::OnBnClickedButtonCreategroup)
+	ON_BN_CLICKED(IDC_BUTTON_DELETEGROUP, &CPSIMCoreDemoDlg::OnBnClickedButtonDeletegroup)
+	ON_BN_CLICKED(IDC_BUTTON_GROUP_MEMBER_ADD, &CPSIMCoreDemoDlg::OnBnClickedButtonGroupMemberAdd)
+	ON_BN_CLICKED(IDC_BUTTON_GROUP_MEMBER_REMOVE, &CPSIMCoreDemoDlg::OnBnClickedButtonGroupMemberRemove)
+	ON_BN_CLICKED(IDC_BUTTON_GROUP_SEND, &CPSIMCoreDemoDlg::OnBnClickedButtonGroupSend)
 END_MESSAGE_MAP()
 
 
@@ -101,12 +113,12 @@ BOOL CPSIMCoreDemoDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);			// 设置大图标
 	SetIcon(m_hIcon, FALSE);		// 设置小图标
 
-	m_edtFrom.SetWindowText(CA2CT(theApp.m_strUserID));
-
+	m_edtFromUser.SetWindowText(CA2CT(theApp.m_strUserID));
+	m_edtFromGUser.SetWindowText(CA2CT(theApp.m_strUserID));
 	/*
 	const int iDescCount = 3;
-	PS_OffMsgDesc_t* pOffMsgDesc = new PS_OffMsgDesc_t[iDescCount];
-	memset(pOffMsgDesc, 0, iDescCount * sizeof(PS_OffMsgDesc_t));
+	PSOffMsgDesc* pOffMsgDesc = new PSOffMsgDesc[iDescCount];
+	memset(pOffMsgDesc, 0, iDescCount * sizeof(PSOffMsgDesc));
 	{
 		pOffMsgDesc[0].strFrom = "1101";
 		pOffMsgDesc[0].strTo = "1102";
@@ -132,28 +144,24 @@ BOOL CPSIMCoreDemoDlg::OnInitDialog()
 	return TRUE;
 }
 
+static int sg_iCount = 0;
 LRESULT CPSIMCoreDemoDlg::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message)
 	{
 	case SENDMESSGAE_RESP:
 		{
-			int* pCode = (int*)wParam;
-			char* pInfo = (char*)lParam;
-			if (0 == *pCode)
-			{
-			
-			}
-			else
-			{
-				CString strInfo = CA2CT(pInfo);
-				MessageBox(strInfo, _T("提示"), MB_OK);
-			}
+			PSMsgResp* pMsgResp = (PSMsgResp*)wParam;
+			assert(pMsgResp);
+
+			CString strInfo;
+			strInfo.Format(_T(" seq(%d) has resp: Code(%d), count(%d), Info(%s), \n"), pMsgResp->iSeqId, pMsgResp->iCode, ++sg_iCount, CA2CT(pMsgResp->strInfo));
+			AppendInfo(strInfo);
 		}
 		break;
 	case RECVMESSGAE_RESP:
 		{
-			MessageItem* pMsgItem = (MessageItem*)wParam;
+			PSMessageItem* pMsgItem = (PSMessageItem*)wParam;
 			assert(pMsgItem);
 
 			CStringA strInfoA;
@@ -161,9 +169,33 @@ LRESULT CPSIMCoreDemoDlg::DefWindowProc(UINT message, WPARAM wParam, LPARAM lPar
 			CString strInfo = CA2CT(strInfoA);
 			AppendInfo(strInfo);
 		}
+		break;
+	case CREATEGROUP_RESP:
+		{
+			CreateGroupResp* respCreateGroup = (CreateGroupResp*)wParam;
+			assert(respCreateGroup);
+
+			CStringA strInfoA;
+			strInfoA.Format("creategroup :  status(%d) message(%s) \n", respCreateGroup->iStatus, respCreateGroup->strMessage);
+			CString strInfo = CA2CT(strInfoA);
+			AppendInfo(strInfo);
+		}
+		break;
+	case ADDGROUPUSER_RESP :
+		{
+			BaseResp* respAddGroupUser = (BaseResp*)wParam;
+			assert(respAddGroupUser);
+
+			CStringA strInfoA;
+			strInfoA.Format("addgroupuser :  status(%d) message(%s) \n", respAddGroupUser->iStatus, respAddGroupUser->strMessage);
+			CString strInfo = CA2CT(strInfoA);
+			AppendInfo(strInfo);
+		}
+		break;
 	default:
 		break;
 	}
+
 	return CDialogEx::DefWindowProc(message, wParam, lParam);
 }
 
@@ -219,17 +251,20 @@ HCURSOR CPSIMCoreDemoDlg::OnQueryDragIcon()
 void CPSIMCoreDemoDlg::OnBnClickedButtonSend()
 {
 	CString strFrom, strTo, strContent;
-	m_edtFrom.GetWindowText(strFrom);
-	m_edtTo.GetWindowText(strTo);
+	m_edtFromUser.GetWindowText(strFrom);
+	m_edtToUser.GetWindowText(strTo);
 	m_edtContent.GetWindowText(strContent);
 
 	int iSeqID = 0;
-	bool iRes = AfxGetPSIMCall()->SendTextMessage(iSeqID, PS_SendMode_P2P, CT2CA(strFrom), CT2CA(strTo), CT2CA(strContent), strContent.GetLength(), "");
-	if (iRes && (iSeqID > 0))
+	//for (int i = 0; i < 1000; i++)
 	{
-		CString strInfo;
-		strInfo.Format(_T("from: %s -> to: %s seqid: %d \n content: %s \n"), strFrom, strTo, iSeqID, strContent);
-		AppendInfo(strInfo);
+		bool iRes = AfxGetPSIMCall()->SendTextMessage(iSeqID, PS_SendMode_P2P, CT2CA(strFrom), CT2CA(strTo), CT2CA(strContent), strContent.GetLength(), "");
+		if (iRes && (iSeqID > 0))
+		{
+			CString strInfo;
+			strInfo.Format(_T("from: %s -> to: %s seqid: %d \n content: %s \n"), strFrom, strTo, iSeqID, strContent);
+			AppendInfo(strInfo);
+		}
 	}
 }
 
@@ -241,20 +276,116 @@ void CPSIMCoreDemoDlg::AppendInfo(CString strInfo)
 	m_edtInfo.SetSel(nTextLength, nTextLength);
 	// 写入文本;
 	m_edtInfo.ReplaceSel(strInfo);
+
+	m_edtInfo.LineScroll(m_edtInfo.GetLineCount());
 }
 
 
-void CPSIMDemoCallBack::OnSendMsgResponse(const int & iCode, const char * strInfo)
+void CPSIMCoreDemoDlg::OnBnClickedButtonCreategroup()
 {
-	printf("CPSIMDemoCallBack::OnSendMsgResponse: iCode(%d), strInfo(%s) \n", iCode, strInfo);
+	CString strGroupID;
+	m_edtGroup.GetWindowText(strGroupID);
+	CStringA strGroupIDA;
+	strGroupIDA = CT2CA(strGroupID);
+	if (strGroupID.IsEmpty())
+	{
+		MessageBox(_T("groupid 不能为空！"));
+		return;
+	}
 
-	SendMessage(g_hwndMain, SENDMESSGAE_RESP, (WPARAM)&iCode, (LPARAM)strInfo);
+	PSGroupInfo groupInfo;
+	groupInfo.strGroupID = (char*)strGroupIDA.GetString();
+	AfxGetPSIMCall()->CreateGroup(groupInfo);
 }
 
-void CPSIMDemoCallBack::OnRecvMessage(const MessageItem & msgItem)
+void CPSIMCoreDemoDlg::OnBnClickedButtonDeletegroup()
 {
-	printf("CPSIMDemoCallBack::OnRecvMessage");
+	// TODO: 在此添加控件通知处理程序代码
+}
+
+
+void CPSIMCoreDemoDlg::OnBnClickedButtonGroupMemberAdd()
+{
+	CString strGroupID;
+	m_edtGroup.GetWindowText(strGroupID);
+	CStringA strGroupIDA;
+	strGroupIDA = CT2CA(strGroupID);
+	if (strGroupID.IsEmpty())
+	{
+		MessageBox(_T("groupid 不能为空！"));
+		return;
+	}
+
+	CString strMemberID;
+	m_edtGroupMember.GetWindowText(strMemberID);
+	CStringA strMemberIDA;
+	strMemberIDA = CT2CA(strMemberID);
+	if (strMemberID.IsEmpty())
+	{
+		MessageBox(_T("Group Member 不能为空！"));
+		return;
+	}
+
+	const int iCount = 1;
+	PSUserInfo* pUser = new PSUserInfo[iCount];
+	pUser[0].strUserID = (char*)strMemberID.GetString();
+	AfxGetPSIMCall()->AddGroupUsers(strGroupIDA.GetString(), pUser, iCount);
+	delete []pUser;
+	pUser = NULL;
+}
+
+
+void CPSIMCoreDemoDlg::OnBnClickedButtonGroupMemberRemove()
+{
+	// TODO: 在此添加控件通知处理程序代码
+}
+
+
+void CPSIMCoreDemoDlg::OnBnClickedButtonGroupSend()
+{
+	CString strFromGUser, strToGroup, strGroupContent;
+	m_edtFromGUser.GetWindowText(strFromGUser);
+	m_edtToGroup.GetWindowText(strToGroup);
+	m_edtGroupContent.GetWindowText(strGroupContent);
+
+	int iSeqID = 0;
+	//for (int i = 0; i < 1000; i++)
+	{
+		bool iRes = AfxGetPSIMCall()->SendTextMessage(iSeqID, PS_SendMode_Group, CT2CA(strFromGUser), CT2CA(strToGroup), CT2CA(strGroupContent), strGroupContent.GetLength(), "");
+		if (iRes && (iSeqID > 0))
+		{
+			CString strInfo;
+			strInfo.Format(_T("from: %s -> to: %s seqid: %d \n content: %s \n"), strFromGUser, strToGroup, iSeqID, strGroupContent);
+			AppendInfo(strInfo);
+		}
+	}
+}
+
+// callback
+void CPSIMDemoCallBack::OnSendMsgResponse(const PSMsgResp& msgResp)
+{
+	printf("CPSIMDemoCallBack::OnSendMsgResponse: iSeqID:(%d), iCode(%d), strInfo(%s) \n", msgResp.iSeqId, msgResp.iCode, msgResp.strInfo);
+
+	SendMessage(g_hwndMain, SENDMESSGAE_RESP, (WPARAM)&msgResp, NULL);
+}
+
+void CPSIMDemoCallBack::OnRecvMessage(const PSMessageItem & msgItem)
+{
+	printf("CPSIMDemoCallBack::OnRecvMessage\n");
 
 	SendMessage(g_hwndMain, RECVMESSGAE_RESP, (WPARAM)&msgItem, NULL);
-	return;
+}
+
+void CPSIMDemoCallBack::OnCreateGroupResponse(const CreateGroupResp & respCreateGroup)
+{
+	printf("CPSIMDemoCallBack::OnCreateGroupResponse\n");
+
+	SendMessage(g_hwndMain, CREATEGROUP_RESP, (WPARAM)&respCreateGroup, NULL);
+}
+
+void CPSIMDemoCallBack::OnAddGroupUserResponse(const BaseResp& respAddGroupUser)
+{
+	printf("CPSIMDemoCallBack::OnAddGroupUserResponse\n");
+
+	SendMessage(g_hwndMain, ADDGROUPUSER_RESP, (WPARAM)&respAddGroupUser, NULL);
 }

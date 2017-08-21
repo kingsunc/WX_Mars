@@ -214,31 +214,36 @@ DWORD getNetworkStatus() {
     return flags;
 }
 
-bool isNetworkConnectedImpl() {
-    DWORD   flags;  //������ʽ
+bool isNetworkConnectedImpl()
+{
+	DWORD   flags = 0;
+    bool   m_bOnline = InternetGetConnectedState(&flags, 0);
 
-    BOOL   m_bOnline = InternetGetConnectedState(&flags, 0);
-    return m_bOnline;
+#ifdef _DEBUG
+    if(m_bOnline)	// 联网
+    {
+        if ((flags & INTERNET_CONNECTION_MODEM) ==INTERNET_CONNECTION_MODEM)
+        {
+            cout<<"INTERNET_CONNECTION_MODEM\n";
+        }
+        if ((flags & INTERNET_CONNECTION_LAN) ==INTERNET_CONNECTION_LAN)
+        {
+            cout<<"INTERNET_CONNECTION_LAN\n";
+        }
+        if ((flags & INTERNET_CONNECTION_PROXY) ==INTERNET_CONNECTION_PROXY)
+        {
+            cout<<"INTERNET_CONNECTION_PROXY\n";
+        }
+        if ((flags & INTERNET_CONNECTION_MODEM_BUSY) ==INTERNET_CONNECTION_MODEM_BUSY)
+        {
+            cout<<"INTERNET_CONNECTION_MODEM_BUSY \n";
+        }
+    }
+	else
+	{
+        cout<<"Not Online\n";
+	 }
+#endif
 
-    //if(m_bOnline)//����
-    //{
-    //    if ((flags & INTERNET_CONNECTION_MODEM) ==INTERNET_CONNECTION_MODEM)
-    //    {
-    //        cout<<"���ߣ���������\n";
-    //    }
-    //    if ((flags & INTERNET_CONNECTION_LAN) ==INTERNET_CONNECTION_LAN)
-    //    {
-    //        cout<<"���ߣ�ͨ��������\n";
-    //    }
-    //    if ((flags & INTERNET_CONNECTION_PROXY) ==INTERNET_CONNECTION_PROXY)
-    //    {
-    //        cout<<"���ߣ�����\n";
-    //    }
-    //    if ((flags & INTERNET_CONNECTION_MODEM_BUSY) ==INTERNET_CONNECTION_MODEM_BUSY)
-    //    {
-    //        cout<<"MODEM��������INTERNET����ռ��\n";
-    //    }
-    //}
-    // else
-    //    cout<<"������\n";
+	return m_bOnline;
 }

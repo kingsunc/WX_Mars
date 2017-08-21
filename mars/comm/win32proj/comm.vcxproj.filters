@@ -227,9 +227,6 @@
     <ClInclude Include="..\basepacker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\thread\bind.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\socket\block_socket.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -257,16 +254,10 @@
     <ClInclude Include="..\thread\condition.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\copy_wrapper.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\corepattern\coreservice_base.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\windows\zlib\crc32.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="..\cxxnamespacefix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\windows\zlib\deflate.h">

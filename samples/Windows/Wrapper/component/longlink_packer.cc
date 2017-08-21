@@ -31,6 +31,8 @@
 #include "mars/comm/autobuffer.h"
 #include "mars/stn/stn.h"
 
+#include "mars/comm/thread/lock.h"
+
 // 通信协议版本号;
 static uint32_t sg_client_version = 0;
 
@@ -81,6 +83,8 @@ static int __unpack_header(const void* _packed, size_t _packed_len, uint32_t& _c
     return LONGLINK_UNPACK_OK;
 }
 
+Mutex sg_printf_mutex;
+
 // 打包请求数据 追加头部信息;
 void (*longlink_pack)(uint32_t _cmdid, uint32_t _seq, const AutoBuffer& _body, const AutoBuffer& _extension, AutoBuffer& _packed, longlink_tracker* _tracker)
 = [](uint32_t _cmdid, uint32_t _seq, const AutoBuffer& _body, const AutoBuffer& _extension, AutoBuffer& _packed, longlink_tracker* _tracker)
@@ -100,6 +104,7 @@ void (*longlink_pack)(uint32_t _cmdid, uint32_t _seq, const AutoBuffer& _body, c
 	}
 
 #ifdef _DEBUG
+	ScopedLock lock(sg_printf_mutex);
 	int iLen = _packed.Length();
 	printf("send packet Header: %d , Body : %d \n", sizeof(PSMsgHeader), _body.Length());
 	unsigned char* ch = (unsigned char*)_packed.Ptr(0);
@@ -118,6 +123,7 @@ int (*longlink_unpack)(const AutoBuffer& _packed, uint32_t& _cmdid, uint32_t& _s
 = [](const AutoBuffer& _packed, uint32_t& _cmdid, uint32_t& _seq, size_t& _package_len, AutoBuffer& _body, AutoBuffer& _extension, longlink_tracker* _tracker)
 {
 #ifdef _DEBUG
+	ScopedLock lock(sg_printf_mutex);
 	int iHeaderLen = sizeof(PSMsgHeader);
 	printf("recv packet Header: %d , Body : %d \n", iHeaderLen, _packed.Length() - iHeaderLen);
 	unsigned char* ch = (unsigned char*)(_packed.Ptr());
@@ -139,20 +145,20 @@ int (*longlink_unpack)(const AutoBuffer& _packed, uint32_t& _cmdid, uint32_t& _s
     return ret;
 };
 
-#define MSGCMD_HANDSHAKE 10000
-#define SIGNALKEEP_CMDID 243
+#define MSGCMD_PING			0		// 心跳包;
+#define SIGNALKEEP_CMDID	243
 
 uint32_t (*longlink_noop_cmdid)()
 = []()
 {
-	uint32_t cmidid = MSGCMD_HANDSHAKE;
+	uint32_t cmidid = MSGCMD_PING;
     return cmidid;
 };
 
 bool  (*longlink_noop_isresp)(uint32_t _taskid, uint32_t _cmdid, uint32_t _recv_seq, const AutoBuffer& _body, const AutoBuffer& _extend)
 = [](uint32_t _taskid, uint32_t _cmdid, uint32_t _recv_seq, const AutoBuffer& _body, const AutoBuffer& _extend)
 {
-    return Task::kNoopTaskID == _taskid && MSGCMD_HANDSHAKE == _cmdid;
+    return Task::kNoopTaskID == _taskid && MSGCMD_PING == _cmdid;
 };
 
 uint32_t (*signal_keep_cmdid)()
@@ -162,18 +168,23 @@ uint32_t (*signal_keep_cmdid)()
 	return cmidid;
 };
 
+// 心跳包发送;
 void (*longlink_noop_req_body)(AutoBuffer& _body, AutoBuffer& _extend)
 = [](AutoBuffer& _body, AutoBuffer& _extend)
 {
-	printf("longlink_noop_req_body");
+	// 可在此添加body
+	//printf("longlink_noop_req_body");
 };
-    
+
+// 心跳包响应;
 void (*longlink_noop_resp_body)(const AutoBuffer& _body, const AutoBuffer& _extend)
 = [](const AutoBuffer& _body, const AutoBuffer& _extend)
 {
-	printf("longlink_noop_resp_body");
+	// 可在此解析body
+	//printf("longlink_noop_resp_body");
 };
 
+// 心跳包间隔时间(ms)
 uint32_t (*longlink_noop_interval)()
 = []()
 {
@@ -192,7 +203,7 @@ const int sg_iRecvMessageCmdID = 20;
 bool (*longlink_ispush)(uint32_t _cmdid, uint32_t _taskid, const AutoBuffer& _body, const AutoBuffer& _extend)
 = [](uint32_t _cmdid, uint32_t _taskid, const AutoBuffer& _body, const AutoBuffer& _extend)
 {
-	// 确认是否推送消息, 暂时不需要;
+	// 确认是否推送消息 与消息类型协议一致 此处为20;
     return sg_iRecvMessageCmdID == _cmdid;
 };
     

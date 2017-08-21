@@ -24,21 +24,13 @@ CPSIMCallBack* CPSIMCallConcrete::GetIMPSCallBack()
 // 初始化;
 bool CPSIMCallConcrete::Init()
 {
-	char strIn[100] = "abcdefghijklmnopqrstuvwxyz";
-	char strOut[100] = {0};
-	AutoBuffer strBuff;
-	strBuff.AllocWrite(strlen(strIn) + 1, true);
-	strBuff.Write(strIn);
-	strBuff.Seek(0, AutoBuffer::ESeekStart);
-	strBuff.Read(10, strOut, 6);
-
 	// init xlog
 	std::string logPath = "D://Log";	//use your log path
 	std::string pubKey = "aaa";			//use you pubkey for log encrypt						 
 
-	//xlogger_SetLevel(kLevelAll);
+	xlogger_SetLevel(kLevelAll);
+	//xlogger_SetLevel(kLevelInfo);
 	//xlogger_SetLevel(kLevelWarn);
-	xlogger_SetLevel(kLevelInfo);
 	appender_set_console_log(true);
 	appender_open(kAppednerAsync, logPath.c_str(), "Test", pubKey.c_str());
 
@@ -76,10 +68,10 @@ void CPSIMCallConcrete::MsgLogout()
 	MarsWrapper::GetInstance().MsgLogout();
 }
 
-// 获取群信息;
-void CPSIMCallConcrete::GetGroupInfo(const char* strGroupID)
+// 创建群组
+bool CPSIMCallConcrete::CreateGroup(const PSGroupInfo& groupInfo)
 {
-
+	return MarsWrapper::GetInstance().CreateGroup(groupInfo, CPSIMTaskCallback::GetInstance());
 }
 
 // 获取群成员;
@@ -89,9 +81,9 @@ void CPSIMCallConcrete::GetGroupUsers(const char* strGroupID, const int iPageNum
 }
 
 // 添加群成员;
-void CPSIMCallConcrete::AddGroupUsers(const char* strGroupID)
+bool CPSIMCallConcrete::AddGroupUsers(IN const char* strGroupID, IN const PSUserInfo* pUsers, IN const int iAddCount)
 {
-
+	return MarsWrapper::GetInstance().AddGroupUsers(strGroupID, pUsers, iAddCount, CPSIMTaskCallback::GetInstance());
 }
 
 // 添加群成员;
@@ -143,12 +135,12 @@ bool CPSIMCallConcrete::SendTextMessage(OUT int& iReqID,
 }
 
 // 获取离线消息
-void CPSIMCallConcrete::GetOfflineMsgs(OUT PS_OffMsgDesc_t* pOffMsgDescs, IN const int & iDescCount)
+void CPSIMCallConcrete::GetOfflineMsgs(OUT PSOffMsgDesc* pOffMsgDescs, IN const int & iDescCount)
 {
-	std::vector<PS_OffMsgDesc_t> vecMsgDesc;
+	std::vector<PSOffMsgDesc> vecMsgDesc;
 	for (int i = 0; i < iDescCount; i++)
 	{
-		PS_OffMsgDesc_t OffMsgDesc;
+		PSOffMsgDesc OffMsgDesc;
 		OffMsgDesc.strFrom = pOffMsgDescs[i].strFrom;
 		OffMsgDesc.strTo = pOffMsgDescs[i].strTo;
 		OffMsgDesc.iSendMode = pOffMsgDescs[i].iSendMode;

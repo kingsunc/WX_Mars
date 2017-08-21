@@ -42,22 +42,26 @@ struct STChannelResp;
 class WakeUpLock;
 #endif
 
-namespace mars {
-    namespace stn {
+namespace mars
+{
+namespace stn
+{
 
 struct TaskProfile;
 class DynamicTimeout;
 class LongLinkConnectMonitor;
 
-class LongLinkTaskManager {
-  public:
+// 长连接-任务管理类;
+class LongLinkTaskManager
+{
+public:
     boost::function<int (ErrCmdType _err_type, int _err_code, int _fail_handle, const Task& _task, unsigned int _taskcosttime)> fun_callback_;
 
     boost::function<void (ErrCmdType _err_type, int _err_code, int _fail_handle, uint32_t _src_taskid)> fun_notify_retry_all_tasks;
     boost::function<void (int _line, ErrCmdType _err_type, int _err_code, const std::string& _ip, uint16_t _port)> fun_notify_network_err_;
     boost::function<bool (const Task& _task, const void* _buffer, int _len)> fun_anti_avalanche_check_;
 
-  public:
+public:
     LongLinkTaskManager(mars::stn::NetSource& _netsource, ActiveLogic& _activelogic, DynamicTimeout& _dynamictimeout, MessageQueue::MessageQueue_t  _messagequeueid);
     virtual ~LongLinkTaskManager();
 
@@ -74,7 +78,7 @@ class LongLinkTaskManager {
     unsigned int GetTaskCount();
     unsigned int GetTasksContinuousFailCount();
 
-  private:
+private:
     // from ILongLinkObserver
     void __OnResponse(ErrCmdType _error_type, int _error_code, uint32_t _cmdid, uint32_t _taskid, AutoBuffer& _body, AutoBuffer& _extension, const ConnectProfile& _connect_profile);
     void __OnSend(uint32_t _taskid);
@@ -90,7 +94,7 @@ class LongLinkTaskManager {
 
     std::list<TaskProfile>::iterator __Locate(uint32_t  _taskid);
 
-  private:
+private:
     MessageQueue::ScopeRegister     asyncreg_;
     std::list<TaskProfile>          lst_cmd_;
     uint64_t                        lastbatcherrortime_;   // ms
@@ -105,7 +109,7 @@ class LongLinkTaskManager {
     WakeUpLock*                     wakeup_lock_;
 #endif
 };
-    }
-}
+
+}}
 
 #endif // STN_SRC_LONGLINK_TASK_MANAGER_H_

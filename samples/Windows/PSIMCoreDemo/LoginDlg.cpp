@@ -40,7 +40,7 @@ BOOL CLoginDlg::OnInitDialog()
 
 	m_edtAppName.SetWindowText(_T("xes"));
 	m_edtAppToken.SetWindowText(_T("token"));
-	m_edtUserID.SetWindowText(_T("100001"));
+	m_edtUserID.SetWindowText(_T("3"));
 	m_edtUserName.SetWindowText(_T("zhang"));
 	m_edtDeviceToken.SetWindowText(_T("windowstoken"));
 
@@ -48,7 +48,7 @@ BOOL CLoginDlg::OnInitDialog()
 }
 
 BEGIN_MESSAGE_MAP(CLoginDlg, CDialogEx)
-	ON_BN_CLICKED(ID_LOGIN, &CLoginDlg::OnBnClickedLogin)
+	ON_BN_CLICKED(IDC_BUTTON_LOGIN, &CLoginDlg::OnBnClickedLogin)
 END_MESSAGE_MAP()
 
 // CLoginDlg 消息处理程序

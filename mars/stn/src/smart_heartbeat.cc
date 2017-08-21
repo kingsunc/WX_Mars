@@ -23,20 +23,15 @@
  */
 
 #include "smart_heartbeat.h"
-
 #include <time.h>
 #include <unistd.h>
-
 #include "boost/filesystem.hpp"
-
 #include "mars/comm/time_utils.h"
 #include "mars/comm/xlogger/xlogger.h"
 #include "mars/comm/singleton.h"
 #include "mars/comm/platform_comm.h"
-
 #include "mars/baseevent/active_logic.h"
 #include "mars/app/app.h"
-
 #include "mars/stn/config.h"
 
 #define KV_KEY_SMARTHEART 11249
@@ -50,47 +45,55 @@ static const char* const kKeyFailHeartCount  = "failHeartCount";
 static const char* const kKeyStable          = "stable";
 static const char* const kKeyNetType         = "netType";
 
-SmartHeartbeat::SmartHeartbeat(): is_wait_heart_response_(false), xiaomi_style_count_(0), success_heart_count_(0), last_heart_(MinHeartInterval),
-    ini_(mars::app::GetAppFilePath() + "/" + kFileName, false) {
+SmartHeartbeat::SmartHeartbeat()
+	: is_wait_heart_response_(false), xiaomi_style_count_(0), success_heart_count_(0), last_heart_(MinHeartInterval)
+	, ini_(mars::app::GetAppFilePath() + "/" + kFileName, false)
+{
     xinfo_function();
     ini_.Parse();
 }
 
-SmartHeartbeat::~SmartHeartbeat() {
+SmartHeartbeat::~SmartHeartbeat()
+{
     xinfo_function();
 }
 
-void SmartHeartbeat::OnHeartbeatStart() {
+void SmartHeartbeat::OnHeartbeatStart()
+{
     xverbose_function();
-
-    if (__IsMIUIStyle())
+	if (__IsMIUIStyle())
+	{
         return;
+	}
 
     ScopedLock lock(_mutex_);
     is_wait_heart_response_ = true;
 }
 
-void SmartHeartbeat::OnLongLinkEstablished() {
+void SmartHeartbeat::OnLongLinkEstablished()
+{
     xdebug_function();
     __LoadINI();
     ScopedLock lock(_mutex_);
     success_heart_count_ = 0;
 }
 
-void SmartHeartbeat::OnLongLinkDisconnect() {
+void SmartHeartbeat::OnLongLinkDisconnect()
+{
     xinfo_function();
-
-    if (__IsMIUIStyle())
+	if (__IsMIUIStyle())
+	{
         return;
-
-    if (is_wait_heart_response_)
+	}
+	if (is_wait_heart_response_)
+	{
         OnHeartResult(false, false);
+	}
 
     ScopedLock lock(_mutex_);
-
     is_wait_heart_response_ = false;
-
-    if (!current_net_heart_info_.is_stable_) {
+    if (!current_net_heart_info_.is_stable_)
+	{
 		xinfo2(TSF"%0 not stable last heart:%1", current_net_heart_info_.net_detail_, current_net_heart_info_.cur_heart_);
 		return;
 	}
@@ -102,35 +105,41 @@ void SmartHeartbeat::OnLongLinkDisconnect() {
 
 #define ONE_DAY_SECONEDS (24 * 60 * 60)
 
-void SmartHeartbeat::OnHeartResult(bool _sucess, bool _fail_of_timeout) {
+void SmartHeartbeat::OnHeartResult(bool _sucess, bool _fail_of_timeout)
+{
     xdebug2(TSF"heart result:%0, %1", _sucess, _fail_of_timeout);
-
-    if (__IsMIUIStyle())
+	if (__IsMIUIStyle())
+	{
         return;
+	}
 
     ScopedLock lock(_mutex_);
     xassert2(!current_net_heart_info_.net_detail_.empty(), "something wrong,net_detail_ shoudn't be NULL");
-    
-    if (current_net_heart_info_.net_detail_.empty()) return;
+	if (current_net_heart_info_.net_detail_.empty())
+	{
+		return;
+	}
 
     is_wait_heart_response_ = false;
-    
-    if (_sucess) {
+    if (_sucess)
+	{
         success_heart_count_++;
-        if (current_net_heart_info_.is_stable_) {
-            if (success_heart_count_ >= NetStableTestCount) {
-                
+        if (current_net_heart_info_.is_stable_)
+		{
+            if (success_heart_count_ >= NetStableTestCount)
+			{
                 // has reach the Max value, no need to try bigger.
-                if (current_net_heart_info_.cur_heart_ >= MaxHeartInterval - SuccessStep) {
+                if (current_net_heart_info_.cur_heart_ >= MaxHeartInterval - SuccessStep)
+				{
                     return;
                 }
                 
                 time_t cur_time = time(NULL);
                 struct tm cur_TM = *localtime(&cur_time);
-                
                 // heart info changed recently,Don't need probe
                 // probe bigger heart on Wednesday
-                if ((cur_time - current_net_heart_info_.last_modify_time_) >= ONE_DAY_SECONEDS && cur_TM.tm_wday == 2) {
+                if ((cur_time - current_net_heart_info_.last_modify_time_) >= ONE_DAY_SECONEDS && cur_TM.tm_wday == 2)
+				{
                     xinfo2(TSF"__TryProbeBiggerHeart. curHeart=%0  ", current_net_heart_info_.cur_heart_);
                     current_net_heart_info_.cur_heart_ += SuccessStep;
                     current_net_heart_info_.success_curr_heart_count_ = 0;
@@ -143,23 +152,29 @@ void SmartHeartbeat::OnHeartResult(bool _sucess, bool _fail_of_timeout) {
         }
     }
 
-
-    if (last_heart_ != current_net_heart_info_.cur_heart_) {
+    if (last_heart_ != current_net_heart_info_.cur_heart_)
+	{
         xinfo2(TSF"dynamic heart stop by some reason");
         return;
     }
 
-    if (success_heart_count_ < NetStableTestCount) return;
+	if (success_heart_count_ < NetStableTestCount)
+	{
+		return;
+	}
     
-    if (_sucess) {
+    if (_sucess)
+	{
         current_net_heart_info_.success_curr_heart_count_++;
-        
-        if (current_net_heart_info_.cur_heart_ >= MaxHeartInterval) {
+
+        if (current_net_heart_info_.cur_heart_ >= MaxHeartInterval)
+		{
             current_net_heart_info_.cur_heart_ = MaxHeartInterval - SuccessStep;
             current_net_heart_info_.success_curr_heart_count_ = 0;
             current_net_heart_info_.is_stable_ = true;
             xinfo2(TSF"%0 find the smart heart interval = %1", current_net_heart_info_.net_detail_, current_net_heart_info_.cur_heart_);
-        } else {
+        }
+		else {
             if (current_net_heart_info_.success_curr_heart_count_ >= BaseSuccCount) {
                 unsigned int old_heart = current_net_heart_info_.cur_heart_;
                 current_net_heart_info_.cur_heart_ += HeartStep;

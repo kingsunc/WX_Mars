@@ -87,7 +87,7 @@ __CXX11_CONSTEXPR__ static const char* const HSPA			= "HSPA";
 __CXX11_CONSTEXPR__ static const char* const IDEN			= "IDEN";
 __CXX11_CONSTEXPR__ static const char* const HSPAP			= "HSPA+";
 
-
+// 当前无线接入网络信息;
 struct RadioAccessNetworkInfo
 {
     /***
@@ -180,7 +180,8 @@ struct RadioAccessNetworkInfo
 
     bool Is2G() const
 	{
-		return radio_access_network == GPRS || radio_access_network == CDMA1x || radio_access_network == Edge || radio_access_network == CDMAEVDORev0 || radio_access_network == UMTS || radio_access_network == CDMA;
+		//bool bIs2G = 
+		return  radio_access_network == GPRS || radio_access_network == CDMA1x || radio_access_network == Edge || radio_access_network == CDMAEVDORev0 || radio_access_network == UMTS || radio_access_network == CDMA;
 	}
     bool Is3G() const
 	{
@@ -197,6 +198,7 @@ struct RadioAccessNetworkInfo
 	}
 };
 
+// 获取当前无线接入网络信息;
 bool getCurRadioAccessNetworkInfo(RadioAccessNetworkInfo& _raninfo);
 
 unsigned int getSignal(bool isWifi);
@@ -252,6 +254,7 @@ inline int getCurrNetLabel(std::string& netInfo)
         break;
     }
 
+	printf("getCurrNetLabel: %d,  %s", netId, netInfo.c_str());
     return netId;
 }
 

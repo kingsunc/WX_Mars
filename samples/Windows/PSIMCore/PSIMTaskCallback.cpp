@@ -40,7 +40,7 @@ CPSIMCallBack* CPSIMTaskCallback::GetPSIMCallBack()
 	return pConcrete->GetIMPSCallBack();
 }
 
-void CPSIMTaskCallback::OnRecvMessage(const MessageItem & msgItem)
+void CPSIMTaskCallback::OnRecvMessage(const PSMessageItem & msgItem)
 {
 	CPSIMCallBack*	m_pPSIMCallBack = GetPSIMCallBack();
 	if (!m_pPSIMCallBack)
@@ -70,7 +70,12 @@ void CPSIMTaskCallback::OnResponse(Msg_Task * task, MessageService::SendMsgResp 
 		// 异常处理;
 		return;
 	}
-	m_pPSIMCallBack->OnSendMsgResponse(response.code, response.info.c_str());
+
+	PSMsgResp msgResp;
+	msgResp.iSeqId = task->taskid_;
+	msgResp.iCode = response.code;
+	msgResp.strInfo = (char*)response.info.c_str();
+	m_pPSIMCallBack->OnSendMsgResponse(msgResp);
 }
 
 void CPSIMTaskCallback::OnResponse(OffMsg_Task * task, MessageService::OfflineMsgResp & response)
@@ -82,4 +87,34 @@ void CPSIMTaskCallback::OnResponse(OffMsg_Task * task, MessageService::OfflineMs
 		return;
 	}
 	m_pPSIMCallBack->OnGetOffMsgResponse(response.code, response.info.c_str());
+}
+
+void CPSIMTaskCallback::OnResponse(CreateGroup_Task * task, CreateGroupResp_Json& response)
+{
+	CPSIMCallBack*	m_pPSIMCallBack = GetPSIMCallBack();
+	if (!m_pPSIMCallBack)
+	{
+		// 异常处理;
+		return;
+	}
+
+	CreateGroupResp respCreateGroup;
+	respCreateGroup.iStatus = response.m_iStatus;
+	respCreateGroup.strMessage = (char*)(response.m_strMessage.c_str());
+	m_pPSIMCallBack->OnCreateGroupResponse(respCreateGroup);
+}
+
+void CPSIMTaskCallback::OnResponse(AddGroupUser_Task * task, AddGroupUserResp_Json & response)
+{
+	CPSIMCallBack*	m_pPSIMCallBack = GetPSIMCallBack();
+	if (!m_pPSIMCallBack)
+	{
+		// 异常处理;
+		return;
+	}
+
+	BaseResp respAddGroupUser;
+	respAddGroupUser.iStatus = response.m_iStatus;
+	respAddGroupUser.strMessage = (char*)(response.m_strMessage.c_str());
+	m_pPSIMCallBack->OnAddGroupUserResponse(respAddGroupUser);
 }

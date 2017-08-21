@@ -33,6 +33,8 @@ public:
 public:
 	CStringA	m_strAppID;
 	CStringA	m_strUserID;
+private:
+	CPSIMDemoCallBack* m_pCallBack;
 };
 
 extern CPSIMCoreDemoApp theApp;

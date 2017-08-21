@@ -23,9 +23,10 @@
 //static const char* g_host = "marsopen.cn";
 
 //static const char* g_host = "127.0.0.1";
-static const char* g_host = "172.88.1.192";
+static const char* g_longlink_host = "172.88.1.192";
+static const char* g_shortlink_host = "172.88.1.192";
 
-static const unsigned short g_shortlink_port = 1080;
+static const unsigned short g_shortlink_port = 8081;
 //static const unsigned short g_longlink_port = 1081;
 static const unsigned short g_longlink_port = 20001;
 
@@ -47,7 +48,7 @@ void MarsWrapper::OnPush(uint64_t _channel_id, uint32_t _cmdid, uint32_t _taskid
 	MessageService::Message response;
 	response.readFrom(inStream);
 
-	MessageItem msgItem;
+	PSMessageItem msgItem;
 	msgItem.iMsgId = response.msgId;
 	msgItem.strFrom = (char*)response.from.c_str();
 	msgItem.strTo = (char*)response.to.c_str();
@@ -78,8 +79,8 @@ void MarsWrapper::OnPush(uint64_t _channel_id, uint32_t _cmdid, uint32_t _taskid
 void MarsWrapper::Start()
 {
 	NetworkService::GetInstance().setClientVersion(1);
-	NetworkService::GetInstance().setShortLinkDebugIP(g_host, g_shortlink_port);
-	NetworkService::GetInstance().setLongLinkAddress(g_host, g_longlink_port, "");
+	NetworkService::GetInstance().setShortLinkDebugIP(g_shortlink_host, g_shortlink_port);
+	NetworkService::GetInstance().setLongLinkAddress(g_longlink_host, g_longlink_port, "");
 	NetworkService::GetInstance().Start();	
 
 	NetworkService::GetInstance().SetPushObserver(MSGCMD_S2C_RECV_MESSAGE_REP, this);
@@ -121,7 +122,7 @@ void MarsWrapper::MsgLogin(const char* strAppID, const char* strAppToken, const 
 	pTask->channel_select_ = ChannelType_LongConn;
 	pTask->cmdid_ = MsgCmd::MSGCMD_C2S_LOGIN_REQ;
 	pTask->cgi_ = "/psmsg/login";
-	pTask->host_ = g_host;
+	pTask->host_ = g_shortlink_host;
 	NetworkService::GetInstance().StartTask(pTask);
 }
 
@@ -133,8 +134,77 @@ void MarsWrapper::MsgLogout()
 	pTask->channel_select_ = ChannelType_LongConn;
 	pTask->cmdid_ = MsgCmd::MSGCMD_BOTH_LOGOUT;
 	pTask->cgi_ = "/psmsg/logout";
-	pTask->host_ = g_host;
+	pTask->host_ = g_shortlink_host;
 	NetworkService::GetInstance().StartTask(pTask);
+}
+
+bool MarsWrapper::CreateGroup(IN const PSGroupInfo& groupInfo, IN CreateGroup_Callback* pCallback)
+{
+	if ((!groupInfo.strGroupID) ||
+		(0 == strlen(groupInfo.strGroupID)) )
+	{
+		return false;
+	}
+	char strUrl[256] = { 0 };
+	snprintf(strUrl, sizeof(strUrl), "/group/create?group=%s", groupInfo.strGroupID);
+
+	CreateGroup_Task* pTask = new CreateGroup_Task();
+	/*pTask->strAppID = strAppID;
+	pTask->strAppToken = strToken;
+	pTask->strUserID = strUserID;
+	pTask->strUserName = strUserName;
+	pTask->iDeviceType = iDeviceType;
+	pTask->strDeviceToken = strDeviceToken;*/
+	pTask->pCallback = pCallback;
+
+	pTask->channel_select_ = ChannelType_ShortConn;
+	pTask->cmdid_ = MsgCmd::MSGCMD_C2S_CREATE_GROUP_REQ;
+	pTask->cgi_ = strUrl;
+	pTask->host_ = g_shortlink_host;
+	NetworkService::GetInstance().StartTask(pTask);
+
+	return true;
+}
+
+// 添加群成员;
+bool MarsWrapper::AddGroupUsers(IN const char* strGroupID, IN const PSUserInfo* userInfo, IN const int iAddCount, IN AddGroupUser_Callback* pCallback)
+{
+	if ((!strGroupID) || (0 == strlen(strGroupID)) || 
+		(!userInfo) || (iAddCount <= 0) )
+	{
+		return false;
+	}
+	std::string strMembers;
+	for (int i = 0; i < iAddCount; i++)
+	{
+		strMembers.append(userInfo[i].strUserID).append(",");
+	}
+	strMembers = strMembers.substr(0, strMembers.length() - 1);
+	char strUrl[256] = { 0 };
+	snprintf(strUrl, sizeof(strUrl), "/group/user?op=join&users=%s&group=%s", strMembers.c_str(), strGroupID);
+
+	AddGroupUser_Task* pTask = new AddGroupUser_Task();
+	/*pTask->strAppID = strAppID;
+	pTask->strAppToken = strToken;
+	pTask->strUserID = strUserID;
+	pTask->strUserName = strUserName;
+	pTask->iDeviceType = iDeviceType;
+	pTask->strDeviceToken = strDeviceToken;*/
+	pTask->pCallback = pCallback;
+
+	pTask->channel_select_ = ChannelType_ShortConn;
+	pTask->cmdid_ = MsgCmd::MSGCMD_C2S_ADD_GROUPUSER_REQ;
+	pTask->cgi_ = strUrl;
+	pTask->host_ = g_shortlink_host;
+	NetworkService::GetInstance().StartTask(pTask);
+
+	return true;
+}
+
+// 移除群成员;
+bool MarsWrapper::RemoveGroupUsers(IN const char* strGroupID, IN const PSUserInfo* userInfo, IN const int iRemoveCount)
+{
+	return true;
 }
 
 bool MarsWrapper::SendTextMessage(OUT int& iReqID,
@@ -171,14 +241,14 @@ bool MarsWrapper::SendTextMessage(OUT int& iReqID,
 	pTask->channel_select_ = ChannelType_LongConn;
 	pTask->cmdid_ = MsgCmd::MSGCMD_C2S_SEND_MESSAGE_REP;
 	pTask->cgi_ = "/psmsg/msg";
-	pTask->host_ = g_host;
+	pTask->host_ = g_shortlink_host;
 	NetworkService::GetInstance().StartTask(pTask);
 
 	iReqID = pTask->taskid_;
 	return true;
 }
 
-void MarsWrapper::GetOfflineMsgs(OUT std::vector<PS_OffMsgDesc_t>& vecMsgDesc,
+void MarsWrapper::GetOfflineMsgs(OUT std::vector<PSOffMsgDesc>& vecMsgDesc,
 	IN OffMsg_Callback* pCallback)
 {
 	OffMsg_Task* pTask = new OffMsg_Task();
@@ -188,6 +258,7 @@ void MarsWrapper::GetOfflineMsgs(OUT std::vector<PS_OffMsgDesc_t>& vecMsgDesc,
 	pTask->channel_select_ = ChannelType_LongConn;
 	pTask->cmdid_ = MsgCmd::MSGCMD_C2S_HISTORY_REQ;
 	pTask->cgi_ = "/psmsg/offmsg";
-	pTask->host_ = g_host;
+	pTask->host_ = g_shortlink_host;
 	NetworkService::GetInstance().StartTask(pTask);
 }
+

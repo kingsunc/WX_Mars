@@ -1,5 +1,6 @@
 #pragma once
 #include "PSIMCallBack.h"
+//#include <vector>
 
 // 终端SDK 访问的抽象类;
 class CPSIMCall
@@ -23,8 +24,9 @@ public:
 	// 注销
 	virtual void MsgLogout() = 0;
 
-	//// 添加群;
-	//virtual void CreateGroup() = 0;
+	// 添加群;
+	virtual bool CreateGroup(IN const PSGroupInfo& groupInfo) = 0;
+
 	//// 删除群;
 	//virtual void DeleteGroup() = 0;
 	//// 修改群信息;
@@ -34,10 +36,10 @@ public:
 	//
 	//// 获取群成员;
 	//virtual void GetGroupUsers() = 0;
-	//// 添加群成员;
-	//virtual void AddGroupUsers() = 0;
-	//// 删除群成员;
-	//virtual void DeleteGroupUsers(const char* strGroupID) = 0;
+	// 添加群成员;
+	virtual bool AddGroupUsers(IN const char* strGroupID, IN const PSUserInfo* pUsers, IN const int iAddCount) = 0;
+	// 移除群成员;
+	//virtual bool RemoveGroupUsers(IN const char* strGroupID, IN const PSUserInfo* userInfo, IN const int iRemoveCount);
 
 	//// 管理员同意、拒绝
 	//// 管理员踢人
@@ -66,7 +68,7 @@ public:
 		IN const char* strPushInfo) = 0;
 
 	// 获取离线消息
-	virtual void GetOfflineMsgs(IN PS_OffMsgDesc_t* pOffMsgDescs, IN const int& iDescCount) = 0;
+	virtual void GetOfflineMsgs(IN PSOffMsgDesc* pOffMsgDescs, IN const int& iDescCount) = 0;
 
 	// 消息撤回
 	virtual void RevokeMsg() = 0;
