@@ -21,8 +21,7 @@ enum PS_DeviceType
 	PS_DeviceType_Other				= 6		// 
 };
 
-// 发送模式
-
+// 发送模式;
 enum PS_SendMode
 {
 	PS_SendMode_P2P					= 0,
@@ -33,14 +32,14 @@ enum PS_SendMode
 	PS_SendMode_SystemBroadcast		= 8,
 };
 
-// 发送设置
+// 发送设置;
 enum PS_SendOption
 {
 	PS_SendOption_OfflineSave		= 0x0004,
 	PS_SendOption_IosPush			= 0x0008,
 };
 
-// 消息类型
+// 消息类型;
 enum PS_MessageType
 {
 	PS_MessageType_Text				= 1,
@@ -65,7 +64,7 @@ typedef struct PSOffMsgInfo
 	char*	strContent;
 }PSOffMsgInfo;
 
-// 获取离线消息-描述信息
+// 获取离线消息-描述信息;
 typedef struct PSOffMsgDesc
 {
 	char*			strFrom;
@@ -80,6 +79,67 @@ typedef struct PSBuffer
 	char*	pBuff;
 	int		iLen;
 }PSBuffer;
+
+// 回调响应基类;
+typedef struct PSResp
+{
+	int			iStatus;
+	char*		strMessage;
+}PSResp;
+
+// 登录-回调响应;
+typedef struct PSMsgLoginResp : public PSResp
+{
+
+}PSMsgLoginResp;
+
+// 注销-回调响应;
+typedef struct PSMsgLogoutResp : public PSResp
+{
+
+}PSMsgLogoutResp;
+
+// 被迫退出-回调响应;
+typedef struct PSKickOutResp : public PSResp
+{
+
+}PSKickOutResp;
+
+// 创建群组-回调响应;
+typedef struct PSCreateGroupResp: public PSResp
+{
+
+}PSCreateGroupResp;
+
+// 删除群组-回调响应;
+typedef struct PSDeleteGroupResp : public PSResp
+{
+
+}PSDeleteGroupResp;
+
+// 添加群成员-回调响应;
+typedef struct PSAddGroupUsersResp : public PSResp
+{
+
+}PSAddGroupUsersResp;
+
+// 移除群成员-回调响应;
+typedef struct PSRemoveGroupUsersResp : public PSResp
+{
+
+}PSRemoveGroupUsersResp;
+
+// 添加子群-回调响应;
+typedef struct PSAddGroupChildsResp : public PSResp
+{
+
+}PSAddGroupChildsResp;
+
+// 移除子群-回调响应;
+typedef struct PSRemoveGroupChildsResp : public PSResp
+{
+
+}PSRemoveGroupChildsResp;
 
 typedef struct PSMessageItem
 {
@@ -106,6 +166,7 @@ public:
 	int32_t		iTimestamp;
 }PSMsgResp;
 
+// 用户信息;
 typedef struct PSUserInfo
 {
 	PSUserInfo()
@@ -118,6 +179,7 @@ typedef struct PSUserInfo
 
 }PSUserInfo;
 
+// 群信息;
 typedef struct PSGroupInfo
 {
 	PSGroupInfo()
@@ -138,15 +200,3 @@ typedef struct PSGroupInfo
 	int	iMemberCount;
 
 }PSGroupInfo;
-
-typedef struct BaseResp
-{
-	int			iStatus;
-	char*		strMessage;
-
-}BaseResp;
-
-typedef struct CreateGroupResp: public BaseResp
-{
-
-}CreateGroupResp;

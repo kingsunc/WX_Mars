@@ -74,11 +74,17 @@ bool CPSIMCallConcrete::CreateGroup(const PSGroupInfo& groupInfo)
 	return MarsWrapper::GetInstance().CreateGroup(groupInfo, CPSIMTaskCallback::GetInstance());
 }
 
-// 获取群成员;
-void CPSIMCallConcrete::GetGroupUsers(const char* strGroupID, const int iPageNum, const int iPageSize)
+// 删除群;
+void CPSIMCallConcrete::DeleteGroup(IN const char* strGroupID)
 {
 
 }
+
+// 获取群成员;
+//void CPSIMCallConcrete::GetGroupUsers(const char* strGroupID, const int iPageNum, const int iPageSize)
+//{
+//
+//}
 
 // 添加群成员;
 bool CPSIMCallConcrete::AddGroupUsers(IN const char* strGroupID, IN const PSUserInfo* pUsers, IN const int iAddCount)
@@ -86,10 +92,23 @@ bool CPSIMCallConcrete::AddGroupUsers(IN const char* strGroupID, IN const PSUser
 	return MarsWrapper::GetInstance().AddGroupUsers(strGroupID, pUsers, iAddCount, CPSIMTaskCallback::GetInstance());
 }
 
-// 添加群成员;
-void CPSIMCallConcrete::DeleteGroupUsers(const char* strGroupID)
+// 移除群成员;
+bool CPSIMCallConcrete::RemoveGroupUsers(IN const char* strGroupID, IN const PSUserInfo* pUsers, IN const int iRemoveCount)
 {
+	//return MarsWrapper::GetInstance().RemoveGroupUsers(strGroupID, pUsers, iRemoveCount, CPSIMTaskCallback::GetInstance());
+	return true;
+}
 
+// 添加子群;
+bool CPSIMCallConcrete::AddGroupChilds(IN const char* strGroupID, IN const PSGroupInfo* pGroups, IN const int iAddCount)
+{
+	return true;
+}
+
+// 移除子群;
+bool CPSIMCallConcrete::RemoveGroupUsers(IN const char* strGroupID, IN const PSGroupInfo* pUsers, IN const int iRemoveCount)
+{
+	return true;
 }
 
 // 设置群成员角色

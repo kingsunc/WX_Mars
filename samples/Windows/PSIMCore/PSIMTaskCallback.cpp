@@ -59,7 +59,11 @@ void CPSIMTaskCallback::OnResponse(Login_Task* task, MessageService::LoginResp& 
 		// Òì³£´¦Àí;
 		return;
 	}
-	m_pPSIMCallBack->OnLoginResponse(response.code, response.info.c_str());
+
+	PSMsgLoginResp respMsgLogin;
+	respMsgLogin.iStatus = response.code;
+	respMsgLogin.strMessage = (char*)response.info.c_str();
+	m_pPSIMCallBack->OnMsgLoginResponse(respMsgLogin);
 }
 
 void CPSIMTaskCallback::OnResponse(Msg_Task * task, MessageService::SendMsgResp & response)
@@ -98,7 +102,7 @@ void CPSIMTaskCallback::OnResponse(CreateGroup_Task * task, CreateGroupResp_Json
 		return;
 	}
 
-	CreateGroupResp respCreateGroup;
+	PSCreateGroupResp respCreateGroup;
 	respCreateGroup.iStatus = response.m_iStatus;
 	respCreateGroup.strMessage = (char*)(response.m_strMessage.c_str());
 	m_pPSIMCallBack->OnCreateGroupResponse(respCreateGroup);
@@ -113,8 +117,8 @@ void CPSIMTaskCallback::OnResponse(AddGroupUser_Task * task, AddGroupUserResp_Js
 		return;
 	}
 
-	BaseResp respAddGroupUser;
-	respAddGroupUser.iStatus = response.m_iStatus;
-	respAddGroupUser.strMessage = (char*)(response.m_strMessage.c_str());
-	m_pPSIMCallBack->OnAddGroupUserResponse(respAddGroupUser);
+	PSAddGroupUsersResp respAddGroupUsers;
+	respAddGroupUsers.iStatus = response.m_iStatus;
+	respAddGroupUsers.strMessage = (char*)(response.m_strMessage.c_str());
+	m_pPSIMCallBack->OnAddGroupUsersResponse(respAddGroupUsers);
 }

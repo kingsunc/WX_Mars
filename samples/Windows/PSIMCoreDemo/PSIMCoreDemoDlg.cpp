@@ -172,7 +172,7 @@ LRESULT CPSIMCoreDemoDlg::DefWindowProc(UINT message, WPARAM wParam, LPARAM lPar
 		break;
 	case CREATEGROUP_RESP:
 		{
-			CreateGroupResp* respCreateGroup = (CreateGroupResp*)wParam;
+			PSCreateGroupResp* respCreateGroup = (PSCreateGroupResp*)wParam;
 			assert(respCreateGroup);
 
 			CStringA strInfoA;
@@ -183,11 +183,11 @@ LRESULT CPSIMCoreDemoDlg::DefWindowProc(UINT message, WPARAM wParam, LPARAM lPar
 		break;
 	case ADDGROUPUSER_RESP :
 		{
-			BaseResp* respAddGroupUser = (BaseResp*)wParam;
-			assert(respAddGroupUser);
+			PSAddGroupUsersResp* respAddGroupUsers = (PSAddGroupUsersResp*)wParam;
+			assert(respAddGroupUsers);
 
 			CStringA strInfoA;
-			strInfoA.Format("addgroupuser :  status(%d) message(%s) \n", respAddGroupUser->iStatus, respAddGroupUser->strMessage);
+			strInfoA.Format("addgroupuser :  status(%d) message(%s) \n", respAddGroupUsers->iStatus, respAddGroupUsers->strMessage);
 			CString strInfo = CA2CT(strInfoA);
 			AppendInfo(strInfo);
 		}
@@ -256,7 +256,7 @@ void CPSIMCoreDemoDlg::OnBnClickedButtonSend()
 	m_edtContent.GetWindowText(strContent);
 
 	int iSeqID = 0;
-	//for (int i = 0; i < 1000; i++)
+	for (int i = 0; i < 1000; i++)
 	{
 		bool iRes = AfxGetPSIMCall()->SendTextMessage(iSeqID, PS_SendMode_P2P, CT2CA(strFrom), CT2CA(strTo), CT2CA(strContent), strContent.GetLength(), "");
 		if (iRes && (iSeqID > 0))
@@ -361,6 +361,22 @@ void CPSIMCoreDemoDlg::OnBnClickedButtonGroupSend()
 	}
 }
 
+// 注销-回调处理;
+void CPSIMDemoCallBack::OnMsgLogoutResponse(const PSMsgLoginResp& respMsgLogout)
+{
+	//printf("CPSIMDemoCallBack::OnSendMsgResponse: iSeqID:(%d), iCode(%d), strInfo(%s) \n", msgResp.iSeqId, msgResp.iCode, msgResp.strInfo);
+
+	//SendMessage(g_hwndMain, SENDMESSGAE_RESP, (WPARAM)&msgResp, NULL);
+}
+
+// 被迫踢出-回调处理;
+void CPSIMDemoCallBack::OnKickOutResponse(const PSKickOutResp& respKickOut)
+{
+	//printf("CPSIMDemoCallBack::OnSendMsgResponse: iSeqID:(%d), iCode(%d), strInfo(%s) \n", msgResp.iSeqId, msgResp.iCode, msgResp.strInfo);
+
+	//SendMessage(g_hwndMain, SENDMESSGAE_RESP, (WPARAM)&msgResp, NULL);
+}
+
 // callback
 void CPSIMDemoCallBack::OnSendMsgResponse(const PSMsgResp& msgResp)
 {
@@ -376,16 +392,16 @@ void CPSIMDemoCallBack::OnRecvMessage(const PSMessageItem & msgItem)
 	SendMessage(g_hwndMain, RECVMESSGAE_RESP, (WPARAM)&msgItem, NULL);
 }
 
-void CPSIMDemoCallBack::OnCreateGroupResponse(const CreateGroupResp & respCreateGroup)
+void CPSIMDemoCallBack::OnCreateGroupResponse(const PSCreateGroupResp & respCreateGroup)
 {
 	printf("CPSIMDemoCallBack::OnCreateGroupResponse\n");
 
 	SendMessage(g_hwndMain, CREATEGROUP_RESP, (WPARAM)&respCreateGroup, NULL);
 }
 
-void CPSIMDemoCallBack::OnAddGroupUserResponse(const BaseResp& respAddGroupUser)
+void CPSIMDemoCallBack::OnAddGroupUsersResponse(const PSAddGroupUsersResp& respAddGroupUsers)
 {
 	printf("CPSIMDemoCallBack::OnAddGroupUserResponse\n");
 
-	SendMessage(g_hwndMain, ADDGROUPUSER_RESP, (WPARAM)&respAddGroupUser, NULL);
+	SendMessage(g_hwndMain, ADDGROUPUSER_RESP, (WPARAM)&respAddGroupUsers, NULL);
 }

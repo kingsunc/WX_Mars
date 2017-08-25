@@ -14,21 +14,19 @@ public:
 	// 反初始化;
 	virtual bool UnInit() = 0;
 
-	// 登录
+	// 登录;
 	virtual void MsgLogin(IN const char* strAppID,
 		IN const char* strAppToken,
 		IN const char* strUserID,
 		IN const char* strUserName,
 		IN const char* strDeviceToken) = 0;
-
-	// 注销
+	// 注销;
 	virtual void MsgLogout() = 0;
 
 	// 添加群;
 	virtual bool CreateGroup(IN const PSGroupInfo& groupInfo) = 0;
-
-	//// 删除群;
-	//virtual void DeleteGroup() = 0;
+	// 删除群;
+	virtual void DeleteGroup(IN const char* strGroupID) = 0;
 	//// 修改群信息;
 	//virtual void UpdateGroupInfo() = 0;
 	//// 获取群信息;
@@ -39,13 +37,18 @@ public:
 	// 添加群成员;
 	virtual bool AddGroupUsers(IN const char* strGroupID, IN const PSUserInfo* pUsers, IN const int iAddCount) = 0;
 	// 移除群成员;
-	//virtual bool RemoveGroupUsers(IN const char* strGroupID, IN const PSUserInfo* userInfo, IN const int iRemoveCount);
+	virtual bool RemoveGroupUsers(IN const char* strGroupID, IN const PSUserInfo* pUsers, IN const int iRemoveCount) = 0;
 
-	//// 管理员同意、拒绝
-	//// 管理员踢人
-	//// 群主设置、取消管理员
+	// 添加子群;
+	virtual bool AddGroupChilds(IN const char* strGroupID, IN const PSGroupInfo* pGroups, IN const int iAddCount) = 0;
+	// 移除子群;
+	virtual bool RemoveGroupUsers(IN const char* strGroupID, IN const PSGroupInfo* pUsers, IN const int iRemoveCount) = 0;
 
-	//// 设置群成员角色
+	// 管理员同意、拒绝
+	// 管理员踢人
+	// 群主设置、取消管理员
+
+	// 设置群成员角色
 	//virtual void SetGroupUserRole() = 0;
 
 	//// 禁言

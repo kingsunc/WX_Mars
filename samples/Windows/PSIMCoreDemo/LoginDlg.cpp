@@ -72,15 +72,15 @@ LRESULT CLoginDlg::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	{
 	case LOGIN_RESP:
 		{
-			int* pCode = (int*)wParam;
-			char* pInfo = (char*)lParam;
-			if ( 0 == *pCode)
+			PSMsgLoginResp* pRespMsgLogin = (PSMsgLoginResp*)wParam;
+			assert(pRespMsgLogin);
+			if ( 0 == pRespMsgLogin->iStatus)
 			{
 				EndDialog(IDOK);
 			}
 			else
 			{
-				CString strInfo = CA2CT(pInfo);
+				CString strInfo = CA2CT(pRespMsgLogin->strMessage);
 				MessageBox(strInfo, _T("ÌבÊ¾"), MB_OK);
 			}
 		}
@@ -91,9 +91,9 @@ LRESULT CLoginDlg::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	return CDialogEx::DefWindowProc(message, wParam, lParam);
 }
 
-void CPSIMDemoCallBack::OnLoginResponse(const int& iCode, const char* strInfo)
+void CPSIMDemoCallBack::OnMsgLoginResponse(const PSMsgLoginResp& respMsgLogin)
 {
-	printf("CPSIMDemoCallBack::OnLoginResponse: iCode(%d), strInfo(%s) \n", iCode, strInfo);
+	printf("CPSIMDemoCallBack::OnLoginResponse: iCode(%d), strInfo(%s) \n", respMsgLogin.iStatus, respMsgLogin.strMessage);
 
-	::SendMessage(g_hwndLogin, LOGIN_RESP, (WPARAM)&iCode, (LPARAM)strInfo);
+	::SendMessage(g_hwndLogin, LOGIN_RESP, (WPARAM)&respMsgLogin, NULL);
 }
