@@ -35,98 +35,120 @@
 
 static const char kWellKnownNat64Prefix[] = {'6', '4', ':','f', 'f', '9', 'b', ':', ':', '\0'};
 
-socket_address::socket_address(const char* _url) {
+socket_address::socket_address(const char* _url)
+{
     char ip_s[40] = {0};
     uint16_t port_u = 0;
 
-    if (0 < sscanf(_url, "%15[0-9.]:%8hu", ip_s, &port_u)) {
+    if (0 < sscanf(_url, "%15[0-9.]:%8hu", ip_s, &port_u))
+	{
         sockaddr_in sock_addr = {0};
         sock_addr.sin_family = AF_INET;
         socket_inet_pton(AF_INET, ip_s, &sock_addr.sin_addr);
         sock_addr.sin_port = htons(port_u);
 
         __init((sockaddr*)&sock_addr);
-    } else if (0 < sscanf(_url, "[%40[0-9a-fA-F:.]]:%8hu", ip_s, &port_u) || 0 < sscanf(_url, "%40[0-9a-fA-F:.]", ip_s)) {
+    }
+	else if (0 < sscanf(_url, "[%40[0-9a-fA-F:.]]:%8hu", ip_s, &port_u) || 0 < sscanf(_url, "%40[0-9a-fA-F:.]", ip_s))
+	{
         sockaddr_in6 sock_addr = {0};
         sock_addr.sin6_family = AF_INET6;
         socket_inet_pton(AF_INET6, ip_s, &sock_addr.sin6_addr);
         sock_addr.sin6_port = htons(port_u);
 
         __init((sockaddr*)&sock_addr);
-    } else {
+    }
+	else
+	{
     	sockaddr sock_addr = {0};
     	sock_addr.sa_family = AF_UNSPEC;
     	__init((sockaddr*)&sock_addr);
     }
 }
 
-socket_address::socket_address(const char* _ip, uint16_t _port) {
+socket_address::socket_address(const char* _ip, uint16_t _port)
+{
     in6_addr addr6 = IN6ADDR_ANY_INIT;
     in_addr  addr4 = {0};
-    
-    if (socket_inet_pton(AF_INET, _ip, &addr4)) {
+ 
+    if (socket_inet_pton(AF_INET, _ip, &addr4))
+	{
         sockaddr_in sock_addr = {0};
         sock_addr.sin_family = AF_INET;
         sock_addr.sin_addr = addr4;
         sock_addr.sin_port = htons(_port);
 
         __init((sockaddr*)&sock_addr);
-    } else if (socket_inet_pton(AF_INET6, _ip, &addr6)) {
+    }
+	else if (socket_inet_pton(AF_INET6, _ip, &addr6))
+	{
         sockaddr_in6 sock_addr = {0};
         sock_addr.sin6_family = AF_INET6;
         sock_addr.sin6_addr = addr6;
         sock_addr.sin6_port = htons(_port);
         
         __init((sockaddr*)&sock_addr);
-    } else {
+    }
+	else
+	{
     	sockaddr sock_addr = {0};
     	sock_addr.sa_family = AF_UNSPEC;
     	__init((sockaddr*)&sock_addr);
     }
 }
 
-socket_address::socket_address(const sockaddr_in& _addr) {
+socket_address::socket_address(const sockaddr_in& _addr)
+{
     __init((sockaddr*)&_addr);
 }
 
-socket_address::socket_address(const sockaddr_in6& _addr) {
+socket_address::socket_address(const sockaddr_in6& _addr)
+{
     __init((sockaddr*)&_addr);
 }
 
-socket_address::socket_address(const sockaddr* _addr) {
+socket_address::socket_address(const sockaddr* _addr)
+{
     __init(_addr);
 }
 
-socket_address::socket_address(const struct in_addr& _in_addr) {
+socket_address::socket_address(const struct in_addr& _in_addr)
+{
 	sockaddr_in addr = {0};
 	addr.sin_family = AF_INET;
 	addr.sin_addr = _in_addr;
 	__init((sockaddr*)&addr);
 }
 
-socket_address::socket_address(const struct in6_addr& _in6_addr) {
+socket_address::socket_address(const struct in6_addr& _in6_addr)
+{
 	sockaddr_in6 addr6 = {0};
 	addr6.sin6_family = AF_INET6;
 	addr6.sin6_addr = _in6_addr;
 	__init((sockaddr*)&addr6);
 }
 
-void  socket_address::__init(const sockaddr* _addr) {
+void  socket_address::__init(const sockaddr* _addr)
+{
     memset(&addr_, 0, sizeof(addr_));
     memset(ip_, 0, sizeof(ip_));
     memset(url_, 0, sizeof(url_));
 
-    if (AF_INET == _addr->sa_family) {
+    if (AF_INET == _addr->sa_family)
+	{
         (sockaddr_in&)addr_ = *(sockaddr_in*)_addr;
         sockaddr_in& addr = (sockaddr_in&)addr_;
 
         socket_inet_ntop(addr.sin_family, &(addr.sin_addr), ip_, sizeof(ip_));
         snprintf(url_, sizeof(url_), "%s:%u", ip_, port());
-    } else if (AF_INET6 == _addr->sa_family) {
+    }
+	else if (AF_INET6 == _addr->sa_family)
+	{
         (sockaddr_in6&)addr_ = *(sockaddr_in6*)_addr;
         sockaddr_in6& addr = (sockaddr_in6&)addr_;
 
-		if (IN6_IS_ADDR_NAT64(&addr_.in6.sin6_addr)) {
+		if (IN6_IS_ADDR_NAT64(&addr_.in6.sin6_addr))
+		{
 			strncpy(ip_, kWellKnownNat64Prefix, 9);
 			sockaddr_in addr = { 0 };
 			addr.sin_family = AF_INET;
@@ -136,23 +158,30 @@ void  socket_address::__init(const sockaddr* _addr) {
 			addr.sin_addr.s_addr = addr_.in6.sin6_addr.s6_addr32[3];
 #endif
 			socket_inet_ntop(addr.sin_family, &(addr.sin_addr), ip_+9, sizeof(ip_)-9);
-		} else {
+		}
+		else
+		{
 			socket_inet_ntop(addr.sin6_family, &(addr.sin6_addr), ip_, sizeof(ip_));
 		}
 
 		snprintf(url_, sizeof(url_), "[%s]:%u", ip_, port());
-	} else {
+	}
+	else
+	{
     	addr_.sa.sa_family = AF_UNSPEC;
     }
 }
 
-bool socket_address::fix_current_nat64_addr() {
+bool socket_address::fix_current_nat64_addr()
+{
 	xinfo_function(); //打印耗时
 	bool ret = false;
 	bool is_update = false;
-	if (AF_INET6 == addr_.sa.sa_family && 0!=strncasecmp("::FFFF:", ip_, 7)) {
+	if (AF_INET6 == addr_.sa.sa_family && 0!=strncasecmp("::FFFF:", ip_, 7))
+	{
 		//更新addr_, ip_, url_
-//		if (is_update) {
+//		if (is_update)
+//		{
 			in6_addr nat64_v6_addr;
 #ifdef WIN32
             ret = ConvertV4toNat64V6(*(struct in_addr*)(&(addr_.in6.sin6_addr.u.Byte[12])), nat64_v6_addr);
@@ -161,7 +190,8 @@ bool socket_address::fix_current_nat64_addr() {
 #endif
 			
 			xdebug2(TSF"ret =%_, ip_=%_, nat64_v6_addr = %_", ret, ip_, strutil::Hex2Str((char*)&(nat64_v6_addr.s6_addr16), 16));
-			if (ret) {
+			if (ret)
+			{
 				memcpy ((char*)&(addr_.in6.sin6_addr.s6_addr16), (char*)&(nat64_v6_addr.s6_addr16), 16);
 				socket_inet_ntop(AF_INET6, &(addr_.in6.sin6_addr), ip_, sizeof(ip_));
 				//-----把ip_转为更易读的v6 ip形式---//
@@ -178,10 +208,14 @@ bool socket_address::fix_current_nat64_addr() {
 				//-----------------------------//
 				snprintf(url_, sizeof(url_), "[%s]:%u", ip_, port());
 				xdebug2(TSF"after fix url_=%_", url_);
-			} else {
+			}
+			else
+			{
 				xerror2(TSF"ConvertV4toNat64V6() ret=%_, ipstack=%_", ret, TLocalIPStackStr[local_ipstack_detect()]);
 			}
-//		} else {
+//		}
+//		else
+//		{
 //			xdebug2(TSF"no update nat64_prefix");
 //		}
 
@@ -189,74 +223,102 @@ bool socket_address::fix_current_nat64_addr() {
 	xdebug2(TSF"is_update =%_, ret=%_", is_update, ret);
 	return ret;
 }
-const sockaddr& socket_address::address_fix() {
-	if (AF_INET6 == addr_.sa.sa_family) {
+const sockaddr& socket_address::address_fix()
+{
+	if (AF_INET6 == addr_.sa.sa_family)
+	{
 		xdebug2(TSF"before fix current ipv6 = %_", ipv6());
 		fix_current_nat64_addr();
 		xdebug2(TSF"after fix current ipv6 = %_", ipv6());
 	}
     return (sockaddr&)addr_;
 }
-const sockaddr& socket_address::address() const {
+const sockaddr& socket_address::address() const
+{
 	//if (ELocalIPStack_IPv6==local_ipstack_detect())
 	//	return address_fix();
     return (sockaddr&)addr_;
 }
-socklen_t socket_address::address_length() const {
-    if (AF_INET == addr_.sa.sa_family) {
+
+socklen_t socket_address::address_length() const
+{
+    if (AF_INET == addr_.sa.sa_family)
+	{
         return sizeof(sockaddr_in);
-    } else if (AF_INET6 == addr_.sa.sa_family) {
+    }
+	else if (AF_INET6 == addr_.sa.sa_family)
+	{
         return sizeof(sockaddr_in6);
     }
-
     return 0;
 }
 
-const char* socket_address::url() const {
+const char* socket_address::url() const
+{
     return url_;
 }
 
-const char* socket_address::ip() const {
-    if (AF_INET == addr_.sa.sa_family) {
+const char* socket_address::ip() const
+{
+    if (AF_INET == addr_.sa.sa_family)
+	{
         return ip_;
-    } else if (AF_INET6 == addr_.sa.sa_family) {
-        if (0 == strncasecmp("::FFFF:", ip_, 7))
-            return ip_+7;
-        else if (0 == strncasecmp(kWellKnownNat64Prefix, ip_, 9))
-        	return ip_+9;
-        else
-            return ip_;
     }
-
+	else if (AF_INET6 == addr_.sa.sa_family)
+	{
+		if (0 == strncasecmp("::FFFF:", ip_, 7))
+		{
+			return ip_ + 7;
+		}
+		else if (0 == strncasecmp(kWellKnownNat64Prefix, ip_, 9))
+		{
+			return ip_ + 9;
+		}
+		else
+		{
+			return ip_;
+		}
+    }
     return "";
 }
 
-const char* socket_address::ipv6() const {
+const char* socket_address::ipv6() const
+{
     return ip_;
 }
 
-uint16_t socket_address::port() const {
-    if (AF_INET == addr_.sa.sa_family) {
+uint16_t socket_address::port() const
+{
+    if (AF_INET == addr_.sa.sa_family)
+	{
         return ntohs(addr_.in.sin_port);
-    } else if (AF_INET6 == addr_.sa.sa_family) {
+    }
+	else if (AF_INET6 == addr_.sa.sa_family)
+	{
         return ntohs(addr_.in6.sin6_port);
     }
 
     return 0;
 }
 
-bool socket_address::valid() const {
-    if (AF_INET == addr_.sa.sa_family) {
+bool socket_address::valid() const
+{
+    if (AF_INET == addr_.sa.sa_family)
+	{
     	return true;
-    } else if (AF_INET6 == addr_.sa.sa_family) {
+    }
+	else if (AF_INET6 == addr_.sa.sa_family)
+	{
         return true;
     }
 
     return false;
 }
 
-bool socket_address::valid_server_address(bool _allowloopback) const {
-    if (AF_INET == addr_.sa.sa_family) {
+bool socket_address::valid_server_address(bool _allowloopback) const
+{
+    if (AF_INET == addr_.sa.sa_family)
+	{
         const sockaddr_in& sock_addr = addr_.in;
 
         uint32_t hostip = ntohl(sock_addr.sin_addr.s_addr);
@@ -265,16 +327,21 @@ bool socket_address::valid_server_address(bool _allowloopback) const {
         && hostip != INADDR_BROADCAST
         && hostip != INADDR_NONE
         && (_allowloopback? true : hostip != INADDR_LOOPBACK);
-    } else if (AF_INET6 == addr_.sa.sa_family) {
+    }
+	else if (AF_INET6 == addr_.sa.sa_family)
+	{
         const sockaddr_in6& sock_addr6 = addr_.in6;
-        if (IN6_IS_ADDR_V4MAPPED(&(sock_addr6.sin6_addr))) {
+        if (IN6_IS_ADDR_V4MAPPED(&(sock_addr6.sin6_addr)))
+		{
             uint32_t hostip = ntohl((*(const uint32_t *)(const void *)(&sock_addr6.sin6_addr.s6_addr[12])));
             return  0 != sock_addr6.sin6_port
             && hostip != INADDR_ANY
             && hostip != INADDR_BROADCAST
             && hostip != INADDR_NONE
             && (_allowloopback? true : hostip != INADDR_LOOPBACK);
-        } else {
+        }
+		else
+		{
             //TODO
             return true;
         }
@@ -283,59 +350,81 @@ bool socket_address::valid_server_address(bool _allowloopback) const {
     return false;
 }
 
-bool socket_address::valid_bind_address() const {
-    if (AF_INET == addr_.sa.sa_family) {
+bool socket_address::valid_bind_address() const
+{
+    if (AF_INET == addr_.sa.sa_family)
+	{
         const sockaddr_in& sock_addr = addr_.in;
-
         uint32_t hostip = ntohl(sock_addr.sin_addr.s_addr);
         return  hostip != INADDR_BROADCAST;
-    } else if (AF_INET6 == addr_.sa.sa_family) {
+    }
+	else if (AF_INET6 == addr_.sa.sa_family)
+	{
         return false;
     }
      return false;
 }
 
-bool socket_address::valid_broadcast_address() const {
-    if (AF_INET == addr_.sa.sa_family) {
+bool socket_address::valid_broadcast_address() const
+{
+    if (AF_INET == addr_.sa.sa_family)
+	{
         const sockaddr_in& sock_addr = addr_.in;
         return  0 != sock_addr.sin_port && INADDR_BROADCAST == ntohl(sock_addr.sin_addr.s_addr);
-    } else if (AF_INET6 == addr_.sa.sa_family) {
+    }
+	else if (AF_INET6 == addr_.sa.sa_family)
+	{
         return false;
     }
-    return false;
 
+    return false;
 }
 
-bool socket_address::valid_loopback_ip() const {
-    if (AF_INET == addr_.sa.sa_family) {
+bool socket_address::valid_loopback_ip() const
+{
+    if (AF_INET == addr_.sa.sa_family)
+	{
         const sockaddr_in& sock_addr = addr_.in;
         return INADDR_LOOPBACK == ntohl(sock_addr.sin_addr.s_addr);
-    } else if (AF_INET6 == addr_.sa.sa_family) {
+    }
+	else if (AF_INET6 == addr_.sa.sa_family)
+	{
         return false;
     }
+
     return false;
 }
 
-bool socket_address::valid_broadcast_ip() const {
-    if (AF_INET == addr_.sa.sa_family) {
+bool socket_address::valid_broadcast_ip() const
+{
+    if (AF_INET == addr_.sa.sa_family)
+	{
         const sockaddr_in& sock_addr = addr_.in;
         return INADDR_BROADCAST == ntohl(sock_addr.sin_addr.s_addr);
-    } else if (AF_INET6 == addr_.sa.sa_family) {
+    }
+	else if (AF_INET6 == addr_.sa.sa_family)
+	{
         return false;
     }
+
     return false;
 }
 
-bool socket_address::isv4mapped_address() const {
-    if (AF_INET6 == addr_.sa.sa_family) {
+bool socket_address::isv4mapped_address() const
+{
+    if (AF_INET6 == addr_.sa.sa_family)
+	{
         const sockaddr_in6& sock_addr = addr_.in6;
         return IN6_IS_ADDR_V4MAPPED(&sock_addr.sin6_addr);
     }
+
     return false;
 }
 
-socket_address& socket_address::v4tov4mapped_address() {
-    if (AF_INET == addr_.sa.sa_family) {
+socket_address& socket_address::v4tov4mapped_address()
+{
+    if (AF_INET == addr_.sa.sa_family)
+	{
         sockaddr_in6 sock_addr6 = {0};
         sockaddr_in sock_addr4 = addr_.in;
 
@@ -345,11 +434,14 @@ socket_address& socket_address::v4tov4mapped_address() {
 
         __init((sockaddr*)&sock_addr6);
     }
+
     return *this;
 }
 
-socket_address& socket_address::v4tonat64_address() {
-    if (AF_INET == addr_.sa.sa_family) {
+socket_address& socket_address::v4tonat64_address()
+{
+    if (AF_INET == addr_.sa.sa_family)
+	{
         sockaddr_in6 sock_addr6 = {0};
         sockaddr_in sock_addr4 = addr_.in;
 
@@ -360,12 +452,16 @@ socket_address& socket_address::v4tonat64_address() {
         __init((sockaddr*)&sock_addr6);
     }
     address_fix();
+
     return *this;
 }
 
-socket_address& socket_address::v4tov6_address(bool _nat64) {
+socket_address& socket_address::v4tov6_address(bool _nat64)
+{
 	if (_nat64)
+	{
 		return v4tonat64_address();
+	}
 	else
 	{
 #ifdef WIN32
@@ -374,17 +470,21 @@ socket_address& socket_address::v4tov6_address(bool _nat64) {
 		return v4tov4mapped_address();
 #endif
 	}
-
 }
 
-socket_address socket_address::getsockname(SOCKET _sock) {
+socket_address socket_address::getsockname(SOCKET _sock)
+{
     struct sockaddr_storage addr = {0};
     socklen_t addr_len = sizeof(addr);
     
-    if (0 == ::getsockname(_sock, (sockaddr*)&addr, &addr_len)) {
-        if (AF_INET == addr.ss_family) {
+    if (0 == ::getsockname(_sock, (sockaddr*)&addr, &addr_len))
+	{
+        if (AF_INET == addr.ss_family)
+		{
             return socket_address((const sockaddr_in&)addr);
-        } else if (AF_INET6 == addr.ss_family) {
+        }
+		else if (AF_INET6 == addr.ss_family)
+		{
             return socket_address((const sockaddr_in6&)addr);
         }
     }
@@ -392,14 +492,19 @@ socket_address socket_address::getsockname(SOCKET _sock) {
     return socket_address("0.0.0.0", 0);
 }
 
-socket_address socket_address::getpeername(SOCKET _sock) {
+socket_address socket_address::getpeername(SOCKET _sock)
+{
     struct sockaddr_storage addr = {0};
     socklen_t addr_len = sizeof(addr);
     
-    if (0 == ::getpeername(_sock, (sockaddr*)&addr, &addr_len)) {
-        if (AF_INET == addr.ss_family) {
+    if (0 == ::getpeername(_sock, (sockaddr*)&addr, &addr_len))
+	{
+        if (AF_INET == addr.ss_family)
+		{
             return socket_address((const sockaddr_in&)addr);
-        } else if (AF_INET6 == addr.ss_family) {
+        }
+		else if (AF_INET6 == addr.ss_family)
+		{
             return socket_address((const sockaddr_in6&)addr);
         }
     }

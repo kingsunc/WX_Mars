@@ -25,18 +25,28 @@
 #include "mars/comm/xlogger/xlogger.h"
 #include "mars/stn/stn.h"
 
-#define MAX_RECORD_COUNT (30)
-#define RECORD_INTERCEPT_COUNT (105)
 
-#define NOT_CLEAR_INTERCEPT_COUNT_RETRY (99)
-#define NOT_CLEAR_INTERCEPT_COUNT (75)
-#define NOT_CLEAR_INTERCEPT_INTERVAL_MINUTE (10*60*1000)
-#define RUN_CLEAR_RECORDS_INTERVAL_MINUTE  (60*60*1000)
+
+#define MAX_RECORD_COUNT					(30)				// 记录最近的30条不同请求的记录;				
+#define RECORD_INTERCEPT_COUNT				(105)				// 同一请求超过105次 开始进行拦截;
+
+/********************************************************************************************************************
+
+	当时间间隔超过RUN_CLEAR_RECORDS_INTERVAL_MINUTE(60分钟)后开始清理记录;
+
+	但是当间隔小于NOT_CLEAR_INTERCEPT_INTERVAL_MINUTE(10分钟)且请求次数超过NOT_CLEAR_INTERCEPT_COUNT(75次)不得删除;
+	此时如果请求次数超过NOT_CLEAR_INTERCEPT_COUNT_RETRY(99次)需要修改为NOT_CLEAR_INTERCEPT_COUNT_RETRY(99次).
+
+********************************************************************************************************************/
+#define NOT_CLEAR_INTERCEPT_COUNT_RETRY		(99)				// 
+#define NOT_CLEAR_INTERCEPT_COUNT			(75)				// 
+#define NOT_CLEAR_INTERCEPT_INTERVAL_MINUTE (10*60*1000)		//
+#define RUN_CLEAR_RECORDS_INTERVAL_MINUTE	(60*60*1000)		//
 
 using namespace mars::stn;
 
-FrequencyLimit::FrequencyLimit():
-	itime_record_clear_(::gettickcount())
+FrequencyLimit::FrequencyLimit()
+	: itime_record_clear_(::gettickcount())
 {
 }
 
@@ -78,7 +88,6 @@ bool FrequencyLimit::Check(const mars::stn::Task& _task, const void* _buffer, in
                     &_task, _task.cmdid, _task.need_authed, _task.cgi, _task.channel_select, _task.limit_flow);
             xerror2(TSF"apBuffer Len=%0, Hash=%1, Count=%2, timeLastUpdate=%3",
                     _len, iarr_record_[find_index].hash_, iarr_record_[find_index].count_, iarr_record_[find_index].time_last_update_);
-            xassert2(false);
 
             return false;
         }
@@ -100,21 +109,17 @@ void FrequencyLimit::__ClearRecord()
 
     unsigned long time_cur = ::gettickcount();
     std::vector<STAvalancheRecord>::iterator first = iarr_record_.begin();
-
     while (first != iarr_record_.end())
 	{
         xassert2(time_cur >= first->time_last_update_);
         unsigned long interval = time_cur - first->time_last_update_;
-
         if (interval <= NOT_CLEAR_INTERCEPT_INTERVAL_MINUTE && NOT_CLEAR_INTERCEPT_COUNT <= first->count_)
 		{
             int oldcount = first->count_;
-
 			if (NOT_CLEAR_INTERCEPT_COUNT_RETRY < first->count_)
 			{
 				first->count_ = NOT_CLEAR_INTERCEPT_COUNT_RETRY;
 			}
-
             xwarn2(TSF"timeCur:%_,  first->timeLastUpdate:%_, interval:%_, Hash:%_, oldcount:%_, Count:%_", time_cur, first->time_last_update_, interval, first->hash_, oldcount, first->count_);
             ++first;
         }
@@ -181,6 +186,7 @@ void FrequencyLimit::__UpdateRecord(int _index)
 
 unsigned int FrequencyLimit::__GetLastUpdateTillNow(int _index)
 {
+	// 获取_index请求记录的更新时间到现在的时差;
     xassert2(0 <= _index && (unsigned int)_index < iarr_record_.size());
 
     return (unsigned int)(::gettickcount() - iarr_record_[_index].time_last_update_);

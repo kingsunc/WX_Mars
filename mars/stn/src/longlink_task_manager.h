@@ -72,8 +72,14 @@ public:
     void RedoTasks();
     void RetryTasks(ErrCmdType _err_type, int _err_code, int _fail_handle, uint32_t _src_taskid);
 
-    LongLink& LongLinkChannel() { return *longlink_; }
-    LongLinkConnectMonitor& getLongLinkConnectMonitor() { return *longlinkconnectmon_; }
+    LongLink& LongLinkChannel()
+	{
+		return *longlink_;
+	}
+    LongLinkConnectMonitor& getLongLinkConnectMonitor()
+	{
+		return *longlinkconnectmon_;
+	}
 
     unsigned int GetTaskCount();
     unsigned int GetTasksContinuousFailCount();

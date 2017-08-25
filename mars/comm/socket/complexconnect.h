@@ -35,24 +35,49 @@ class AutoBuffer;
 namespace COMPLEX_CONNECT_NAMESPACE {
 #endif
 
+// 复合连接-callback基类;
 class MComplexConnect
 {
 public:
     virtual ~MComplexConnect(){}
 
-    virtual void OnCreated(unsigned int _index, const socket_address& _addr, SOCKET _socket) {}
-    virtual void OnConnect(unsigned int _index, const socket_address& _addr, SOCKET _socket)  {}
-    virtual void OnConnected(unsigned int _index, const socket_address& _addr, SOCKET _socket, int _error, int _rtt) {}
+    virtual void OnCreated(unsigned int _index, const socket_address& _addr, SOCKET _socket)
+	{
+	}
 
-    virtual bool OnShouldVerify(unsigned int _index, const socket_address& _addr) { return false;}
-    virtual bool OnVerifySend(unsigned int _index, const socket_address& _addr, SOCKET _socket, AutoBuffer& _buffer_send) { return false;}
-    virtual bool OnVerifyRecv(unsigned int _index, const socket_address& _addr, SOCKET _socket, const AutoBuffer& _buffer_recv) { return false;}
-    virtual void OnVerifyTimeout(int _usedtime) {}
+    virtual void OnConnect(unsigned int _index, const socket_address& _addr, SOCKET _socket)
+	{
+	}
 
-    virtual void OnFinished(unsigned int _index, const socket_address& _addr, SOCKET _socket,
-                            int _error, int _conn_rtt, int _conn_totalcost, int _complex_totalcost) {}
+    virtual void OnConnected(unsigned int _index, const socket_address& _addr, SOCKET _socket, int _error, int _rtt)
+	{
+	}
+
+    virtual bool OnShouldVerify(unsigned int _index, const socket_address& _addr)
+	{
+		return false;
+	}
+
+    virtual bool OnVerifySend(unsigned int _index, const socket_address& _addr, SOCKET _socket, AutoBuffer& _buffer_send)
+	{
+		return false;
+	}
+
+    virtual bool OnVerifyRecv(unsigned int _index, const socket_address& _addr, SOCKET _socket, const AutoBuffer& _buffer_recv)
+	{
+		return false;
+	}
+
+    virtual void OnVerifyTimeout(int _usedtime)
+	{
+	}
+
+    virtual void OnFinished(unsigned int _index, const socket_address& _addr, SOCKET _socket, int _error, int _conn_rtt, int _conn_totalcost, int _complex_totalcost)
+	{
+	}
 };
 
+// 复合连接-call;
 class ComplexConnect
 {
 public:
@@ -64,13 +89,31 @@ public:
                             mars::comm::ProxyType _proxy_type = mars::comm::kProxyNone, const socket_address* _proxy_addr = NULL,
                             const std::string& _proxy_username = "", const std::string& _proxy_pwd = "");
 
-    unsigned int TryCount() const { return trycount_;}
-    int Index() const { return index_;}
-    int ErrorCode() const { return errcode_;}
+    unsigned int TryCount() const
+	{
+		return trycount_;
+	}
+    int Index() const
+	{
+		return index_;
+	}
+    int ErrorCode() const
+	{
+		return errcode_;
+	}
 
-    unsigned int IndexRtt() const { return index_conn_rtt_;}
-    unsigned int IndexTotalCost() const { return index_conn_totalcost_;}
-    unsigned int TotalCost() const { return totalcost_;}
+    unsigned int IndexRtt() const
+	{
+		return index_conn_rtt_;
+	}
+    unsigned int IndexTotalCost() const
+	{
+		return index_conn_totalcost_;
+	}
+    unsigned int TotalCost() const
+	{
+		return totalcost_;
+	}
 
 private:
     int __ConnectTime(unsigned int _index) const;
@@ -86,9 +129,9 @@ private:
     const unsigned int error_interval_;
     const unsigned int max_connect_;
 
-    unsigned int trycount_;	// tried ip count
-    int index_;				// used ip index
-    int errcode_;			// errcode
+    unsigned int trycount_;		// tried ip count;
+    int index_;					// used ip index;
+    int errcode_;				// errcode;
 
     int index_conn_rtt_;
     int index_conn_totalcost_;

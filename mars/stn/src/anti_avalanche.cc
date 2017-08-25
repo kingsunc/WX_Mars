@@ -19,21 +19,19 @@
  */
 
 #include "anti_avalanche.h"
-
 #include "mars/baseevent/active_logic.h"
 #include "mars/comm/platform_comm.h"
 #include "mars/comm/singleton.h"
 #include "mars/comm/xlogger/xlogger.h"
 #include "mars/stn/stn.h"
-
 #include "flow_limit.h"
 #include "frequency_limit.h"
 
 using namespace mars::stn;
 
-AntiAvalanche::AntiAvalanche(bool _isactive):
-	frequency_limit_(new FrequencyLimit()),
-	flow_limit_(new FlowLimit((_isactive)))
+AntiAvalanche::AntiAvalanche(bool _isactive)
+	: frequency_limit_(new FrequencyLimit())
+	, flow_limit_(new FlowLimit((_isactive)))
 {
 }
 
@@ -47,13 +45,15 @@ bool AntiAvalanche::Check(const Task& _task, const void* _buffer, int _len)
 {
     xverbose_function();
 
-    unsigned int span = 0;
+    unsigned int span = 0;	// 上一条相同记录到现在的时间;
+	// 发送频率限制;
     if (!frequency_limit_->Check(_task, _buffer, _len, span))
 	{
 		ReportTaskLimited(kFrequencyLimit, _task, span);
     	return false;
     }
 
+	// 移动网络下 流动限制;
     if (kMobile == getNetInfo() && !flow_limit_->Check(_task, _buffer, _len))
 	{
     	ReportTaskLimited(kFlowLimit, _task, (unsigned int&)_len);

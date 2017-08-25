@@ -21,32 +21,37 @@
 #ifndef STN_SRC_ANTI_AVALANCHE_H_
 #define STN_SRC_ANTI_AVALANCHE_H_
 
-namespace mars {
-namespace stn {
+namespace mars
+{
+namespace stn
+{
 
 struct Task;
 
 class FrequencyLimit;
 class FlowLimit;
 
-enum {
+enum
+{
 	kFrequencyLimit = 1,
 	kFlowLimit = 2
 };
 
-class AntiAvalanche {
-  public:
+// ∑¿÷π—©±¿¿‡;
+class AntiAvalanche
+{
+public:
     AntiAvalanche(bool _isactive);
     virtual ~AntiAvalanche();
 
     bool Check(const Task& _task, const void* _buffer, int _len);
     void OnSignalActive(bool _isactive);
 
-  public:
+public:
     AntiAvalanche(const AntiAvalanche&);
     AntiAvalanche& operator=(const AntiAvalanche&);
 
-  private:
+private:
     FrequencyLimit* frequency_limit_;
     FlowLimit* flow_limit_;
 };

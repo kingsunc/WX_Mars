@@ -91,13 +91,21 @@ void TimingSync::OnNetworkChange()
 void TimingSync::OnLongLinkStatuChanged(LongLink::TLongLinkStatus _status)
 {
     xverbose_function();
-	if (_status == LongLink::kConnected)
+
+	switch (_status)
 	{
-        alarm_.Cancel();
-	}
-	else if (_status == LongLink::kDisConnected)
-	{
-		alarm_.Start(GetAlarmTime(active_logic_.IsActive()));
+	case LongLink::kConnected:
+		{
+			alarm_.Cancel();
+		}
+		break;
+	case LongLink::kDisConnected:
+		{
+			alarm_.Start(GetAlarmTime(active_logic_.IsActive()));
+		}
+		break;
+	default:
+		break;
 	}
 }
 

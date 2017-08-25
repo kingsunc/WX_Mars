@@ -75,24 +75,24 @@ public:
 		return messagequeue_creater_.GetMessageQueue();
 	}
 
-    void    CancelAndWait()
+    void CancelAndWait()
 	{
 		messagequeue_creater_.CancelAndWait();
 	}
     
-    void    StartTask(const Task& _task);
-    void    StopTask(uint32_t _taskid);
-    bool    HasTask(uint32_t _taskid) const;
-    void    ClearTasks();
-    void    RedoTasks();
-    void    RetryTasks(ErrCmdType _err_type, int _err_code, int _fail_handle, uint32_t _src_taskid);
+    void StartTask(const Task& _task);
+    void StopTask(uint32_t _taskid);
+    bool HasTask(uint32_t _taskid) const;
+    void ClearTasks();
+    void RedoTasks();
+    void RetryTasks(ErrCmdType _err_type, int _err_code, int _fail_handle, uint32_t _src_taskid);
 
-    void    MakeSureLongLinkConnect();
-    bool    LongLinkIsConnected();
-    void    OnNetworkChange();
+    void MakeSureLongLinkConnect();
+    bool LongLinkIsConnected();
+    void OnNetworkChange();
 
-    void	KeepSignal();
-    void	StopSignal();
+    void KeepSignal();
+    void StopSignal();
 
 #ifdef USE_LONG_LINK
     LongLink& Longlink();

@@ -55,15 +55,16 @@ using namespace mars::app;
 
 namespace
 {
+// 长连接回调;
 class LongLinkConnectObserver : public MComplexConnect
 {
 public:
-    LongLinkConnectObserver(LongLink& _longlink, const std::vector<IPPortItem>& _iplist): 
-		longlink_(_longlink),
-		ip_items_(_iplist)
+    LongLinkConnectObserver(LongLink& _longlink, const std::vector<IPPortItem>& _iplist)
+		: longlink_(_longlink)
+		, ip_items_(_iplist)
 	{
     	memset(connecting_index_, 0, sizeof(connecting_index_));
-    };
+    }
 
     virtual void OnCreated(unsigned int _index, const socket_address& _addr, SOCKET _socket)
 	{
@@ -173,8 +174,10 @@ LongLink::~LongLink()
     testproxybreak_.Break();
     Disconnect(kReset);
     asyncreg_.CancelAndWait();
-    if (NULL != smartheartbeat_) {
-    	delete smartheartbeat_, smartheartbeat_=NULL;
+    if (NULL != smartheartbeat_)
+	{
+		delete smartheartbeat_;
+		smartheartbeat_ = NULL;
     }
 }
 
@@ -243,8 +246,6 @@ bool LongLink::Stop(uint32_t _taskid)
 
     return false;
 }
-
-
 
 bool LongLink::MakeSureConnected(bool* _newone)
 {
@@ -409,6 +410,8 @@ void LongLink::__ConnectStatus(TLongLinkStatus _status)
     xinfo2(TSF"connect status from:%0 to:%1, nettype:%_", connectstatus_, _status, ::getNetInfo());
     connectstatus_ = _status;
     __NotifySmartHeartbeatConnectStatus(connectstatus_);
+
+	// 发送连接状态变更信号;
     STATIC_RETURN_SYNC2ASYNC_FUNC(boost::bind(boost::ref(SignalConnection), connectstatus_));
 }
 

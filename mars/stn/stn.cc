@@ -41,11 +41,11 @@ Task::Task(uint32_t _taskid)
 
     send_only = false;
     need_authed = false;
-    //limit_flow = true;
-    //limit_frequency = true;
 
-	limit_flow = false;
-	limit_frequency = false; // 禁用限制频率
+	limit_flow = true;
+	limit_frequency = true;
+	//limit_flow = false;
+	//limit_frequency = false; // 禁用-限制频率;
 
     channel_strategy = kChannelNormalStrategy;
     network_status_sensitive = false;

@@ -18,8 +18,6 @@
  *      Author: yerungui && jiahong
  */
 
-
-
 #ifndef __TcpClient__
 #define __TcpClient__
 
@@ -31,8 +29,9 @@
 
 class AutoBuffer;
 
-class MTcpEvent {
-  public:
+class MTcpEvent
+{
+public:
     virtual ~MTcpEvent() {}
 
     virtual void OnConnect() = 0;
@@ -45,9 +44,11 @@ class MTcpEvent {
     virtual void OnRead() = 0;
 };
 
-class TcpClient {
-  public:
-    enum TTcpStatus {
+class TcpClient
+{
+public:
+    enum TTcpStatus
+	{
         kTcpInit = 0,
         kTcpInitErr,
         kSocketThreadStart,
@@ -62,11 +63,11 @@ class TcpClient {
         kTcpDisConnected,
     };
 
-  public:
+public:
     TcpClient(const char* _ip, uint16_t _port, MTcpEvent& _event, int _timeout = 6 * 1000);
     ~TcpClient();
 
-  public:
+public:
     bool Connect();
     void Disconnect();
     void DisconnectAndWait();
@@ -83,12 +84,12 @@ class TcpClient {
 
     TTcpStatus GetTcpStatus() const {return status_;}
 
-  private:
+private:
     void __Run();
     void __RunThread();
     void __SendBreak();
 
-  private:
+private:
     char* ip_;
     uint16_t port_;
     MTcpEvent& event_;

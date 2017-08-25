@@ -221,6 +221,4 @@ class Singleton {
 //Mutex Singleton::SingletonInstance<T>::singleton_mutex();
 }
 
-
-
 #endif	// COMM_SINGLETON_H_

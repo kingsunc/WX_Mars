@@ -25,39 +25,46 @@
 #include "longlink.h"
 #include "shortlink.h"
 
-namespace mars {
-namespace stn {
+namespace mars
+{
+namespace stn
+{
 
-namespace ShortLinkChannelFactory {
+namespace ShortLinkChannelFactory
+{
 
-    
-ShortLinkInterface* (*Create)(const mq::MessageQueue_t& _messagequeueid, NetSource& _netsource, const Task& _task, bool _use_proxy)
-= [](const mq::MessageQueue_t& _messagequeueid, NetSource& _netsource, const Task& _task, bool _use_proxy) -> ShortLinkInterface* {
-	xdebug2(TSF"use weak func Create");
-	return new ShortLink(_messagequeueid, _netsource, _task, _use_proxy);
-};
-    
-void (*Destory)(ShortLinkInterface* _short_link_channel)
-= [](ShortLinkInterface* _short_link_channel) {
-    delete _short_link_channel;
-    _short_link_channel = NULL;
-};
-    
-}
+	ShortLinkInterface* (*Create)(const mq::MessageQueue_t& _messagequeueid, NetSource& _netsource, const Task& _task, bool _use_proxy)
+		= [](const mq::MessageQueue_t& _messagequeueid, NetSource& _netsource, const Task& _task, bool _use_proxy) -> ShortLinkInterface*
+	{
+		xdebug2(TSF"use weak func Create");
+		return new ShortLink(_messagequeueid, _netsource, _task, _use_proxy);
+	};
 
-namespace LongLinkChannelFactory {
-
-LongLink* (*Create)(const mq::MessageQueue_t& _messagequeueid, NetSource& _netsource)
-= [](const mq::MessageQueue_t& _messagequeueid, NetSource& _netsource) {
-	return new LongLink(_messagequeueid, _netsource);
-};
-
-void (*Destory)(LongLink* _long_link_channel)
-= [](LongLink* _long_link_channel) {
-	delete _long_link_channel;
-	_long_link_channel = NULL;
-};
+	void(*Destory)(ShortLinkInterface* _short_link_channel)
+		= [](ShortLinkInterface* _short_link_channel)
+	{
+		delete _short_link_channel;
+		_short_link_channel = NULL;
+	};
 
 }
+
+namespace LongLinkChannelFactory
+{
+
+	LongLink* (*Create)(const mq::MessageQueue_t& _messagequeueid, NetSource& _netsource)
+	= [](const mq::MessageQueue_t& _messagequeueid, NetSource& _netsource)
+	{
+		return new LongLink(_messagequeueid, _netsource);
+	};
+
+	void (*Destory)(LongLink* _long_link_channel)
+	= [](LongLink* _long_link_channel)
+	{
+		delete _long_link_channel;
+		_long_link_channel = NULL;
+	};
+
 }
-}
+
+}}

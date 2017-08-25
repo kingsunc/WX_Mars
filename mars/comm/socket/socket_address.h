@@ -22,12 +22,11 @@
 #define SOCKET_ADDRESS_H_
 
 #include "unix_socket.h"
-
 #include <string.h>
 
-class socket_address {
-
-  public:
+class socket_address
+{
+public:
     explicit socket_address(const char* _url);
     explicit socket_address(const char* _ip, uint16_t _port);
     explicit socket_address(const sockaddr_in& _addr);
@@ -64,22 +63,25 @@ class socket_address {
 	bool fix_current_nat64_addr();
 
     static bool update_nat64_prefix();
-  public:
+
+public:
     static socket_address getsockname(SOCKET _sock);
 	static socket_address getpeername(SOCKET _sock);
 
-  private:
+private:
     //    socket_address(const socket_address&);
     //    const socket_address& operator=(const socket_address&);
     void  __init(const sockaddr*  _addr);
 
-  private:
+private:
 
-    union {
+    union
+	{
         struct sockaddr     sa;
         struct sockaddr_in  in;
         struct sockaddr_in6 in6;
     }                   addr_;
+
     char                ip_[96];
     char                url_[128];
 };

@@ -163,13 +163,18 @@ NetCore::NetCore()
     zombie_task_manager_->fun_start_task_ = boost::bind(&NetCore::StartTask, this, _1);
     zombie_task_manager_->fun_callback_ = boost::bind(&NetCore::__CallBack, this, (int)kCallFromZombie, _1, _2, _3, _4, _5);
 
-    // async
+    // async 异步执行回调;
     longlink_task_manager_->fun_callback_ = boost::bind(&NetCore::__CallBack, this, (int)kCallFromLong, _1, _2, _3, _4, _5);
-    // sync
+
+    // sync 同步;
     longlink_task_manager_->fun_notify_retry_all_tasks = boost::bind(&NetCore::RetryTasks, this, _1, _2, _3, _4);
     longlink_task_manager_->fun_notify_network_err_ = boost::bind(&NetCore::__OnLongLinkNetworkError, this, _1, _2, _3, _4, _5);
+	// 雪崩检测;
     longlink_task_manager_->fun_anti_avalanche_check_ = boost::bind(&AntiAvalanche::Check, anti_avalanche_, _1, _2, _3);
+	// 网络出错;
     longlink_task_manager_->LongLinkChannel().fun_network_report_ = boost::bind(&NetCore::__OnLongLinkNetworkError, this, _1, _2, _3, _4, _5);
+
+	// 与SignalConnection信号进行绑定;
     longlink_task_manager_->LongLinkChannel().SignalConnection.connect(boost::bind(&TimingSync::OnLongLinkStatuChanged, timing_sync_, _1));
     longlink_task_manager_->LongLinkChannel().SignalConnection.connect(boost::bind(&NetCore::__OnLongLinkConnStatusChange, this, _1));
 
@@ -719,10 +724,10 @@ void NetCore::__OnLongLinkConnStatusChange(LongLink::TLongLinkStatus _status)
 }
 #endif
 
+// 往上层上报连接状态;
 void NetCore::__ConnStatusCallBack()
 {
     int all_connstatus = kNetworkUnavailable;
-
     if (shortlink_try_flag_)
 	{
 		if (shortlink_error_count_ >= kShortlinkErrTime)

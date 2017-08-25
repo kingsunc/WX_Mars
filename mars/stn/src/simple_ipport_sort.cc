@@ -67,21 +67,21 @@ static inline uint32_t CAL_BIT_COUNT(uint64_t RECORDS)
 ///////////////////////////////////////////////////////////////////////////////////////////
 namespace mars
 {
-namespace stn
-{
-    struct BanItem
+	namespace stn
 	{
-        BanItem(): port(0), records(0)
+		struct BanItem
 		{
-		}
+			BanItem() : port(0), records(0)
+			{
+			}
 
-        std::string ip;
-        uint16_t port;
-        uint8_t records;
-        tickcount_t last_fail_time;
-        tickcount_t last_suc_time;
-    };
-}
+			std::string ip;
+			uint16_t port;
+			uint8_t records;
+			tickcount_t last_fail_time;
+			tickcount_t last_suc_time;
+		};
+	}
 }
 
 using namespace mars::stn;

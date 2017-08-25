@@ -133,7 +133,7 @@ private:
     ActiveLogic&        active_logic_;
     SimpleIPPortSort    ipportstrategy_;
 };
-        
+
 }}
 
 #endif // STN_SRC_NETSOURCE_H_

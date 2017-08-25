@@ -23,23 +23,27 @@
 
 #include <stdint.h>
 
-namespace mars {
-namespace stn {
+namespace mars
+{
+namespace stn
+{
 
 struct Task;
 
-class FlowLimit {
-  public:
+// 流动限制;
+class FlowLimit
+{
+public:
     FlowLimit(bool _isactive);
     virtual ~FlowLimit();
 
     bool Check(const mars::stn::Task& _task, const void* _buffer, int _len);
     void Active(bool _isactive);
 
-  private:
+private:
     void __FlashCurVol();
 
-  private:
+private:
     int funnel_speed_;
     int cur_funnel_vol_;
     uint64_t time_lastflow_computer_;

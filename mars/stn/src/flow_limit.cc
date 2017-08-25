@@ -25,10 +25,10 @@
 #include "mars/stn/stn.h"
 
 #if true
-static const int kInactiveSpeed = (2 * 1024 * 1024 / 3600);
-static const int kActiveSpeed = (8 * 1024 * 1024 / 3600);
-static const int kInactiveMinvol = (6 * 1024 * 1024);
-static const int kMaxVol = (8 * 1024 * 1024);
+static const int kInactiveSpeed		= (2 * 1024 * 1024 / 3600);
+static const int kActiveSpeed		= (8 * 1024 * 1024 / 3600);
+static const int kInactiveMinvol	= (6 * 1024 * 1024);
+static const int kMaxVol			= (8 * 1024 * 1024);
 #else
 static const int kInactiveSpeed = (1);
 static const int kActiveSpeed = (3);
@@ -38,10 +38,10 @@ static const int kMaxVol = (2 * 1024);
 
 using namespace mars::stn;
 
-FlowLimit::FlowLimit(bool _isactive):
-	funnel_speed_(_isactive ? kActiveSpeed : kInactiveSpeed),
-	cur_funnel_vol_(0),
-	time_lastflow_computer_(::gettickcount())
+FlowLimit::FlowLimit(bool _isactive)
+	: funnel_speed_(_isactive ? kActiveSpeed : kInactiveSpeed)
+	, cur_funnel_vol_(0)
+	, time_lastflow_computer_(::gettickcount())
 {
 }
 

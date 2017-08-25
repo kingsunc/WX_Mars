@@ -121,6 +121,7 @@ LongLinkConnectMonitor::LongLinkConnectMonitor(ActiveLogic& _activelogic, LongLi
     xinfo2(TSF"handler:(%_,%_)", asyncreg_.Get().queue,asyncreg_.Get().seq);
     activelogic_.SignalActive.connect(boost::bind(&LongLinkConnectMonitor::__OnSignalActive, this, _1));
     activelogic_.SignalForeground.connect(boost::bind(&LongLinkConnectMonitor::__OnSignalForeground, this, _1));
+	// 与SignalConnection信号进行绑定;
     longlink_.SignalConnection.connect(boost::bind(&LongLinkConnectMonitor::__OnLongLinkStatuChanged, this, _1));
 }
 
@@ -212,21 +213,35 @@ void LongLinkConnectMonitor::__OnSignalActive(bool _isactive) {
     ASYNC_BLOCK_END
 }
 
-void LongLinkConnectMonitor::__OnLongLinkStatuChanged(LongLink::TLongLinkStatus _status) {
+void LongLinkConnectMonitor::__OnLongLinkStatuChanged(LongLink::TLongLinkStatus _status)
+{
     alarm_.Cancel();
 
-    if (LongLink::kConnectFailed == _status || LongLink::kDisConnected == _status) {
-        alarm_.Start(500);
-    } else if (LongLink::kConnected == _status) {
-        xinfo2(TSF"cancel auto connect");
-    }
+	switch (_status)
+	{
+	case LongLink::kConnectFailed:
+	case LongLink::kDisConnected:
+		{
+			// 断开连接;
+			alarm_.Start(500);
+		}
+		break;
+	case LongLink::kConnected:
+		{
+			xinfo2(TSF"cancel auto connect");
+		}
+		break;
+	default:
+		break;
+	}
 
     status_ = _status;
     last_connect_time_ = ::gettickcount();
     last_connect_net_type_ = ::getNetInfo();
 }
 
-void LongLinkConnectMonitor::__OnAlarm() {
+void LongLinkConnectMonitor::__OnAlarm()
+{
     __AutoIntervalConnect();
 }
 

@@ -40,17 +40,17 @@ struct DnsProfile;
 struct Task
 {
 public:
-    // 通道连接类型
-    static const int kChannelShort	= 0x1;		// 短连接，http
-    static const int kChannelLong	= 0x2;		// 长连接，tcp
-    static const int kChannelBoth	= 0x3;		// 全连接
+    // 通道连接类型;
+    static const int kChannelShort	= 0x1;		// 短连接，http;
+    static const int kChannelLong	= 0x2;		// 长连接，tcp;
+    static const int kChannelBoth	= 0x3;		// 全连接;
 
-	// 通道策略(普通、快速、容灾)
+	// 通道策略(普通、快速、容灾);
 	static const int kChannelNormalStrategy				= 0;
 	static const int kChannelFastStrategy				= 1;
 	static const int kChannelDisasterRecoveryStategy	= 2;
 
-	// 任务优先级划分
+	// 任务优先级划分;
     static const int kTaskPriorityHighest = 0;
     static const int kTaskPriority0 = 0;
     static const int kTaskPriority1 = 1;
@@ -71,8 +71,8 @@ private:
 public:
     Task(uint32_t _taskid);
 
-    // 请求
-    uint32_t		taskid;						// 任务ID
+    // 请求;
+    uint32_t		taskid;						// 任务ID;
     uint32_t		cmdid;						// 命令ID;
     uint64_t		channel_id;					// 通道ID;
     int32_t			channel_select;				// 通道类型;
@@ -90,7 +90,7 @@ public:
     
     int32_t			retry_count;				// user - 重试次数;
     int32_t			server_process_cost;		// user - 服务器过程消耗;
-    int32_t			total_timetout;				// user - 总超时(ms)
+    int32_t			total_timetout;				// user - 总超时(ms);
     
     void*			user_context;				// user - 用户自定义内容;
     std::string		report_arg;					// user for cgi report
@@ -230,42 +230,56 @@ struct IPPortItem
     IPSourceType 	source_type;
     std::string 	str_host;
 };
-        
+
+// 需要认证;
 extern bool (*MakesureAuthed)();
-// 流量统计
+
+// 流量统计;
 extern void (*TrafficData)(ssize_t _send, ssize_t _recv);
 
-// 底层询问上层该host对应的ip列表 
+// 底层询问上层该host对应的ip列表;
 extern std::vector<std::string> (*OnNewDns)(const std::string& host);
-// 网络层收到push消息回调 
+
+// 底层告诉上层处理push消息回调;
 extern void (*OnPush)(uint64_t _channel_id, uint32_t _cmdid, uint32_t _taskid, const AutoBuffer& _body, const AutoBuffer& _extend);
-// 底层获取task要发送的数据 
+
+// 底层获取task要发送的数据;
 extern bool (*Req2Buf)(uint32_t taskid, void* const user_context, AutoBuffer& outbuffer, AutoBuffer& extend, int& error_code, const int channel_select);
-// 底层回包返回给上层解析 
+
+// 底层回包返回给上层解析; 
 extern int (*Buf2Resp)(uint32_t taskid, void* const user_context, const AutoBuffer& inbuffer, const AutoBuffer& extend, int& error_code, const int channel_select);
-// 任务执行结束 
+
+// 任务执行结束;
 extern int  (*OnTaskEnd)(uint32_t taskid, void* const user_context, int error_type, int error_code);
 
-// 上报网络连接状态 
+// 上报网络连接状态;
 extern void (*ReportConnectStatus)(int status, int longlink_status);
-        
-extern void (*OnLongLinkNetworkError)(ErrCmdType _err_type, int _err_code, const std::string& _ip, uint16_t _port);        
+
+// 长连接出错;
+extern void (*OnLongLinkNetworkError)(ErrCmdType _err_type, int _err_code, const std::string& _ip, uint16_t _port);
+
+// 短连接出错;
 extern void (*OnShortLinkNetworkError)(ErrCmdType _err_type, int _err_code, const std::string& _ip, const std::string& _host, uint16_t _port);
         
-// 长连信令校验 ECHECK_NOW = 0, ECHECK_NEVER = 1, ECHECK_NEXT = 2
+// 长连信令校验 ECHECK_NOW = 0, ECHECK_NEVER = 1, ECHECK_NEXT = 2;
 extern int  (*GetLonglinkIdentifyCheckBuffer)(AutoBuffer& identify_buffer, AutoBuffer& buffer_hash, int32_t& cmdid);
-// 长连信令校验回包
+
+// 长连信令校验回包;
 extern bool (*OnLonglinkIdentifyResponse)(const AutoBuffer& response_buffer, const AutoBuffer& identify_buffer_hash);
 
+// 
 extern void (*RequestSync)();
 
-//底层询问上层http网络检查的域名列表 
+// 底层询问上层http网络检查的域名列表;
 extern void (*RequestNetCheckShortLinkHosts)(std::vector<std::string>& _hostlist);
-//底层向上层上报cgi执行结果 
+
+// 底层向上层上报cgi执行结果;
 extern void (*ReportTaskProfile)(const TaskProfile& _task_profile);
-//底层通知上层cgi命中限制 
+
+// 底层通知上层cgi命中限制;
 extern void (*ReportTaskLimited)(int _check_type, const Task& _task, unsigned int& _param);
-//底层上报域名dns结果 
+
+// 底层上报域名dns结果;
 extern void (*ReportDnsProfile)(const DnsProfile& _dns_profile);
 
 }}
