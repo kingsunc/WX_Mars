@@ -329,9 +329,9 @@ void ShortLinkTaskManager::__OnResponse(ShortLinkInterface* _worker, ErrCmdType 
     fun_shortlink_response_(_status);
 
     std::list<TaskProfile>::iterator it = __LocateBySeq((intptr_t)_worker);    // must used iter pWorker, not used aSelf. aSelf may be destroy already
-
-    if (lst_cmd_.end() == it) {
-    		xerror2(TSF"task no found task:%0, status:%1, worker:%2", _status, _worker);
+    if (lst_cmd_.end() == it)
+	{
+    	xerror2(TSF"task no found task:%0, status:%1, worker:%2", it->task.taskid, _status, _worker);
 		return;
     }
 

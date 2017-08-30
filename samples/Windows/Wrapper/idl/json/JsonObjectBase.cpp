@@ -1,19 +1,21 @@
-#include "JsonObjectBase.h"
+ï»¿#include "JsonObjectBase.h"
 
 CJsonObjectBase::CJsonObjectBase()
 {
+
 }
 
 CJsonObjectBase::~CJsonObjectBase()
 {
+
 }
 
-std::string CJsonObjectBase::Serialize()
+string CJsonObjectBase::Serialize()
 {
 	Json::Value new_item = DoSerialize();
 	Json::FastWriter writer;
-	std::string strOut = writer.write(new_item);
-	return strOut;
+	std::string out2 = writer.write(new_item);
+	return out2;
 }
 
 bool CJsonObjectBase::DeSerialize(const char* str)
@@ -48,19 +50,23 @@ Json::Value CJsonObjectBase::DoSerialize()
 			break;
 		case asBool:
 			new_item[m_vectorName[i]] = Serialize<bool>(pAddr);
+			break;
 		case asInt:
 			new_item[m_vectorName[i]] = Serialize<INT>(pAddr);
 			break;
 		case asUInt:
 			new_item[m_vectorName[i]] = Serialize<UINT>(pAddr);
 			break;
-		case asDouble:
-			new_item[m_vectorName[i]] = Serialize<double>(pAddr);
+		case asInt64:
+			new_item[m_vectorName[i]] = Serialize<LONGLONG>(pAddr);
+			break;
+		case asUInt64:
+			new_item[m_vectorName[i]] = Serialize<ULONGLONG>(pAddr);
 			break;
 		case asString:
-			new_item[m_vectorName[i]] = Serialize<std::string>(pAddr);
+			new_item[m_vectorName[i]] = Serialize<string>(pAddr);
 		default:
-			// ÎÒÔİÊ±Ö»Ö§³ÖÕâ¼¸ÖÖÀàĞÍ£¬ĞèÒªµÄ¿ÉÒÔ×ÔĞĞÌí¼Ó  
+			//æˆ‘æš‚æ—¶åªæ”¯æŒè¿™å‡ ç§ç±»å‹ï¼Œéœ€è¦çš„å¯ä»¥è‡ªè¡Œæ·»åŠ   
 			break;
 		}
 	}
@@ -73,59 +79,51 @@ bool CJsonObjectBase::DoDeSerialize(Json::Value& root)
 	for (int i = 0; i < nSize; ++i)
 	{
 		void* pAddr = m_vectorPropertyAddr[i];
+
 		switch (m_vectorType[i])
 		{
 		case asListArray:
 		case asVectorArray:
+		{
+			if (root.isNull() || root[m_vectorName[i]].isNull())
 			{
-				if (root.isNull() || root[m_vectorName[i]].isNull())
-				{
-					break;
-				}
-				DoArrayDeSerialize(m_vectorName[i], pAddr, root[m_vectorName[i]], m_vectorType[i], m_vectorListParamType[i]);
+				break;
 			}
-			break;
+			DoArrayDeSerialize(m_vectorName[i], pAddr, root[m_vectorName[i]], m_vectorType[i], m_vectorListParamType[i]);
+		}
+		break;
 		case asJsonObj:
-			{
-				if (!root[m_vectorName[i]].isNull())
-				{
-					((CJsonObjectBase*)pAddr)->DoDeSerialize(root[m_vectorName[i]]);
-				}
-			}
-			break;
+		{
+			if (!root[m_vectorName[i]].isNull())
+				((CJsonObjectBase*)pAddr)->DoDeSerialize(root[m_vectorName[i]]);
+		}
+		break;
 		case asBool:
-			{
-				(*(bool*)pAddr) = root.get(m_vectorName[i], 0).asBool();
-			}
+			(*(bool*)pAddr) = root.get(m_vectorName[i], 0).asBool();
 			break;
 		case asInt:
-			{
-				(*(INT*)pAddr) = root.get(m_vectorName[i], 0).asInt();
-			}
+			(*(INT*)pAddr) = root.get(m_vectorName[i], 0).asInt();
 			break;
 		case asUInt:
-			{
-				(*(UINT*)pAddr) = root.get(m_vectorName[i], 0).asUInt();
-			}
+			(*(UINT*)pAddr) = root.get(m_vectorName[i], 0).asUInt();
 			break;
-		case asDouble:
-			{
-				(*(double*)pAddr) = root.get(m_vectorName[i], 0).asDouble();
-			}
+		case asInt64:
+			(*(LONGLONG*)pAddr) = root.get(m_vectorName[i], 0).asInt64();
+			break;
+		case asUInt64:
+			(*(ULONGLONG*)pAddr) = root.get(m_vectorName[i], 0).asUInt64();
 			break;
 		case asString:
-			{
-				(*(std::string*)pAddr) = root.get(m_vectorName[i], "").asString();
-			}
+			(*(string*)pAddr) = root.get(m_vectorName[i], "").asString();
 		default:
-			//ÎÒÔİÊ±Ö»Ö§³ÖÕâ¼¸ÖÖÀàĞÍ£¬ĞèÒªµÄ¿ÉÒÔ×ÔĞĞÌí¼Ó     
+			// æˆ‘æš‚æ—¶åªæ”¯æŒè¿™å‡ ç§ç±»å‹ï¼Œéœ€è¦çš„å¯ä»¥è‡ªè¡Œæ·»åŠ ;
 			break;
 		}
 	}
 	return true;
 }
 
-void CJsonObjectBase::SetProperty(std::string name, CEnumJsonTypeMap type, void* addr, CEnumJsonTypeMap listParamType )
+void CJsonObjectBase::SetProperty(string name, CEnumJsonTypeMap type, void* addr, CEnumJsonTypeMap listParamType /*= asInt*/)
 {
 	m_vectorName.push_back(name);
 	m_vectorPropertyAddr.push_back(addr);
@@ -133,19 +131,17 @@ void CJsonObjectBase::SetProperty(std::string name, CEnumJsonTypeMap type, void*
 	m_vectorListParamType.push_back(listParamType);
 }
 
-// ÓĞÌØÊâ¶ÔÏóĞèÒªĞòÁĞ»¯Ê±£¬ÇëÖØÔØ´Ëº¯Êı   
-Json::Value CJsonObjectBase::DoSpecialArraySerialize(const std::string& propertyName)
+Json::Value CJsonObjectBase::DoSpecialArraySerialize(const string& propertyName)
 {
 	return "";
 }
 
-//ÔÚ·´ĞòÁĞ»¯Ê±£¬Èç¹û¶ÔÏóÖĞÇ¶Ì×ÁËÁĞ±í£¬²¢ÇÒÁĞ±íÖĞÈİÄÉµÄÄÚÈİÊÇÆäËûÌØÊâ¶ÔÏóÊ±£¬ĞèÒªÖØÔØ´Ëº¯Êı£¬new³öÕæÕıµÄ¶ÔÏó  
-CJsonObjectBase* CJsonObjectBase::GenerateJsonObjForDeSerialize(const std::string& propertyName)
+CJsonObjectBase* CJsonObjectBase::GenerateJsonObjForDeSerialize(const string& propertyName)
 {
 	return NULL;
 }
 
-bool CJsonObjectBase::DoArrayDeSerialize(const std::string& propertyName, void* addr, Json::Value& root, CEnumJsonTypeMap listType, CEnumJsonTypeMap paramType)
+bool CJsonObjectBase::DoArrayDeSerialize(const string& propertyName, void* addr, Json::Value& root, CEnumJsonTypeMap listType, CEnumJsonTypeMap paramType)
 {
 	if (listType == asVectorArray)
 	{
@@ -153,20 +149,22 @@ bool CJsonObjectBase::DoArrayDeSerialize(const std::string& propertyName, void* 
 		{
 		case asJsonObj:
 		{
-			return DoObjArrayDeSerialize_Wrapper(std::vector, CJsonObjectBase*)(propertyName, addr, root);
+			return DoObjArrayDeSerialize_Wrapper(vector, CJsonObjectBase*)(propertyName, addr, root);
 		}
 		break;
 		case asBool:
-			//ÎŞ   
+			//æ—    
 			break;
 		case asInt:
-			return DoArrayDeSerialize_Wrapper(std::vector, INT)(addr, root);
+			return DoArrayDeSerialize_Wrapper(vector, INT)(addr, root);
 		case asUInt:
-			return DoArrayDeSerialize_Wrapper(std::vector, UINT)(addr, root);
-		case asDouble:
-			return DoArrayDeSerialize_Wrapper(std::vector, double)(addr, root);
+			return DoArrayDeSerialize_Wrapper(vector, UINT)(addr, root);
+		case asInt64:
+			return DoArrayDeSerialize_Wrapper(vector, LONGLONG)(addr, root);
+		case asUInt64:
+			return DoArrayDeSerialize_Wrapper(vector, ULONGLONG)(addr, root);
 		case asString:
-			return DoArrayDeSerialize_Wrapper(std::vector, std::string)(addr, root);
+			return DoArrayDeSerialize_Wrapper(vector, string)(addr, root);
 		default:
 			break;
 		}
@@ -177,23 +175,70 @@ bool CJsonObjectBase::DoArrayDeSerialize(const std::string& propertyName, void* 
 		{
 		case asJsonObj:
 		{
-			return DoObjArrayDeSerialize_Wrapper(std::list, CJsonObjectBase*)(propertyName, addr, root);
+			return DoObjArrayDeSerialize_Wrapper(list, CJsonObjectBase*)(propertyName, addr, root);
 		}
 		break;
 		case asBool:
-			return DoArrayDeSerialize_Wrapper(std::list, bool)(addr, root);
+			return DoArrayDeSerialize_Wrapper(list, bool)(addr, root);
 		case asInt:
-			return DoArrayDeSerialize_Wrapper(std::list, INT)(addr, root);
+			return DoArrayDeSerialize_Wrapper(list, INT)(addr, root);
 		case asUInt:
-			return DoArrayDeSerialize_Wrapper(std::list, UINT)(addr, root);
-		case asDouble:
-			return DoArrayDeSerialize_Wrapper(std::list, double)(addr, root);
+			return DoArrayDeSerialize_Wrapper(list, UINT)(addr, root);
+		case asInt64:
+			return DoArrayDeSerialize_Wrapper(list, LONGLONG)(addr, root);
+		case asUInt64:
+			return DoArrayDeSerialize_Wrapper(list, ULONGLONG)(addr, root);
 		case asString:
-			return DoArrayDeSerialize_Wrapper(std::list, std::string)(addr, root);
+			return DoArrayDeSerialize_Wrapper(list, string)(addr, root);
 		default:
 			break;
 		}
 	}
 
 	return true;
+}
+
+Json::Value CJsonObjectBase::DoArraySerialize(void * addr, CEnumJsonTypeMap listType, CEnumJsonTypeMap paramType)
+{
+	if (listType == asVectorArray)
+	{
+		switch (paramType)
+		{
+		case asBool:
+			return "";
+		case asJsonObj:
+			return DoArraySerialize_Wrapper(vector, CJsonObjectBase*);
+		case asInt:
+			return DoArraySerialize_Wrapper(vector, INT);
+		case asUInt:
+			return DoArraySerialize_Wrapper(vector, UINT);
+		case asInt64:
+			return DoArraySerialize_Wrapper(vector, LONGLONG);
+		case asUInt64:
+			return DoArraySerialize_Wrapper(vector, ULONGLONG);
+		case asString:
+			return DoArraySerialize_Wrapper(vector, string);
+		}
+	}
+	else
+	{
+		switch (paramType)
+		{
+		case asBool:
+			return DoArraySerialize_Wrapper(list, bool);
+		case asJsonObj:
+			return DoArraySerialize_Wrapper(list, CJsonObjectBase*);
+		case asInt:
+			return DoArraySerialize_Wrapper(list, INT);
+		case asUInt:
+			return DoArraySerialize_Wrapper(list, UINT);
+		case asInt64:
+			return DoArraySerialize_Wrapper(list, LONGLONG);
+		case asUInt64:
+			return DoArraySerialize_Wrapper(list, ULONGLONG);
+		case asString:
+			return DoArraySerialize_Wrapper(list, string);
+		}
+	}
+	return "";
 }

@@ -29,23 +29,26 @@
 
 #include "special_ini.h"
 
-enum HeartbeatReportType {
-    kReportTypeCompute            = 1,        // report info of compute smart heartbeat
-    kReportTypeSuccRate           = 2,    // report succuss rate when smart heartbeat is stabled
+enum HeartbeatReportType
+{
+    kReportTypeCompute		= 1,	// 计算智能心跳的报告信息 (report info of compute smart heartbeat);
+    kReportTypeSuccRate		= 2,	// 当智能心跳稳定时报告成功率 (report succuss rate when smart heartbeat is stabled);
 };
 
 class SmartHeartbeat;
 
-class NetHeartbeatInfo {
-  public:
+// 网络心跳信息;
+class NetHeartbeatInfo
+{
+public:
     NetHeartbeatInfo();
     void Clear();
 
-  public:
+public:
 //    NetHeartbeatInfo(const NetHeartbeatInfo&);
 //    NetHeartbeatInfo& operator=(const NetHeartbeatInfo&);
     
-  private:
+private:
     std::string net_detail_;
     int net_type_;
 
@@ -59,8 +62,10 @@ class NetHeartbeatInfo {
     friend class SmartHeartbeat;
 };
 
-class SmartHeartbeat {
-  public:
+// 智能心跳类;
+class SmartHeartbeat
+{
+public:
 	SmartHeartbeat();
 	~SmartHeartbeat();
     void OnHeartbeatStart();
@@ -73,7 +78,7 @@ class SmartHeartbeat {
     // MIUI align alarm response at Times of five minutes, We should  handle this case specailly.
     void JudgeMIUIStyle();
 
-  private:
+private:
     void __DumpHeartInfo();
 
     bool __IsMIUIStyle();
@@ -82,7 +87,7 @@ class SmartHeartbeat {
     void __LoadINI();
     void __SaveINI();
 
-  private:
+private:
     bool is_wait_heart_response_;
     unsigned int xiaomi_style_count_;
 

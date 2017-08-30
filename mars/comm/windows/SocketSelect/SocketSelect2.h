@@ -10,8 +10,6 @@
 // either express or implied. See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-
 #ifndef _SOCKSTSELECT_
 #define _SOCKSTSELECT_
 
@@ -20,10 +18,12 @@
 #include "socket/unix_socket.h"
 
 class SocketSelect;
-class SocketBreaker {
-    friend SocketSelect;
-  public:
-	  SocketBreaker();
+class SocketBreaker
+{
+	friend SocketSelect;
+
+public:
+	SocketBreaker();
     ~SocketBreaker();
 
     bool IsCreateSuc() const;
@@ -37,11 +37,11 @@ class SocketBreaker {
 
     WSAEVENT BreakerFD() const;
 
-  private:
+private:
 	  SocketBreaker(const SocketBreaker&);
 	  SocketBreaker& operator=(const SocketBreaker&);
 
-  private:
+private:
     Mutex m_mutex;
     WSAEVENT m_event;
     bool m_create_success;
@@ -49,8 +49,9 @@ class SocketBreaker {
     int m_exception;
 };
 
-class SocketSelect {
-  public:
+class SocketSelect
+{
+public:
     SocketSelect(SocketBreaker& _breaker, bool _autoclear = false);
     ~SocketSelect();
 
@@ -73,11 +74,11 @@ class SocketSelect {
 
 	SocketBreaker& Breaker();
 
-  private:
+private:
     SocketSelect(const SocketSelect&);
     SocketSelect& operator=(const SocketSelect&);
 
-  private:
+private:
     const bool autoclear_;
 	SocketBreaker& breaker_;
     bool m_broken;

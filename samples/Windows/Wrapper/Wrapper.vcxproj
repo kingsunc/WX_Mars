@@ -142,8 +142,10 @@
     <ClInclude Include="component\stn_callback.h" />
     <ClInclude Include="idl\json\AddGroupUserResp_Json.h" />
     <ClInclude Include="idl\json\CreateGroupResp_Json.h" />
+    <ClInclude Include="idl\json\DeleteGroupResp_Json.h" />
     <ClInclude Include="idl\json\JsonObjectBase.h" />
     <ClInclude Include="idl\json\HttpRespBase.h" />
+    <ClInclude Include="idl\json\reqData.h" />
     <ClInclude Include="idl\tars\access_tars.h" />
     <ClInclude Include="idl\tars\msg_resp_tars.h" />
     <ClInclude Include="idl\tars\msg_result_tars.h" />
@@ -173,6 +175,7 @@
     <ClCompile Include="component\stn_callback.cpp" />
     <ClCompile Include="idl\json\AddGroupUserResp_Json.cpp" />
     <ClCompile Include="idl\json\CreateGroupResp_Json.cpp" />
+    <ClCompile Include="idl\json\DeleteGroupResp_Json.cpp" />
     <ClCompile Include="idl\json\JsonObjectBase.cpp" />
     <ClCompile Include="idl\json\json\json_reader.cpp" />
     <ClCompile Include="idl\json\json\json_value.cpp" />

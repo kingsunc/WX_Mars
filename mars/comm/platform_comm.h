@@ -253,7 +253,7 @@ inline int getCurrNetLabel(std::string& netInfo)
         break;
     }
 
-	printf("getCurrNetLabel: %d,  %s \n", netId, netInfo.c_str());
+	//printf("getCurrNetLabel: %d,  %s \n", netId, netInfo.c_str());
     return netId;
 }
 

@@ -6,12 +6,6 @@ using namespace std;
 
 bool Msg_Task::Req2Buf(uint32_t _taskid, void* const _user_context, AutoBuffer& _outbuffer, AutoBuffer& _extend, int& _error_code, const int _channel_select)
 {
-	//printf("send seqid: %d\n", _taskid);
-	if (_taskid > 106)
-	{
-		int i = 0;
-	}
-
 	MessageService::Message req;
 	req.msgId = msgId;
 	req.from = from;
@@ -36,8 +30,6 @@ bool Msg_Task::Req2Buf(uint32_t _taskid, void* const _user_context, AutoBuffer& 
 
 int Msg_Task::Buf2Resp(uint32_t _taskid, void* const _user_context, const AutoBuffer& _inbuffer, const AutoBuffer& _extend, int& _error_code, const int _channel_select)
 {
-	printf("recv seqid: %d\n", _taskid);
-
 	tars::TarsInputStream<tars::BufferReader> inStream;
 	inStream.setBuffer((const char*)(_inbuffer.Ptr()), _inbuffer.Length());
 

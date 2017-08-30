@@ -1,5 +1,5 @@
-#ifndef _AddGroupUserIN_CGI_TASK_H_
-#define _AddGroupUserIN_CGI_TASK_H_
+#ifndef _ADDGROUPUSERIN_CGI_TASK_H_
+#define _ADDGROUPUSERIN_CGI_TASK_H_
 
 #include "task/CGITask.h"
 #include "mars/boost/weak_ptr.hpp"

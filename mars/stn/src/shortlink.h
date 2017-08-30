@@ -39,19 +39,22 @@
 #include "net_source.h"
 #include "shortlink_interface.h"
 
-namespace mars {
-namespace stn {
-    
+namespace mars
+{
+namespace stn
+{
+
 class shortlink_tracker;
-    
-class ShortLink : public ShortLinkInterface {
-  public:
+
+class ShortLink : public ShortLinkInterface
+{
+public:
     ShortLink(MessageQueue::MessageQueue_t _messagequeueid, NetSource& _netsource, const Task& _task, bool _use_proxy);
     virtual ~ShortLink();
 
     ConnectProfile   Profile() const { return conn_profile_;}
 
-  protected:
+protected:
     virtual void 	 SendRequest(AutoBuffer& _buffer_req, AutoBuffer& _task_extend);
 
     virtual void     __Run();
@@ -63,8 +66,8 @@ class ShortLink : public ShortLinkInterface {
 
     void 			 __RunResponseError(ErrCmdType _type, int _errcode, ConnectProfile& _conn_profile, bool _report = true);
     void 			 __OnResponse(ErrCmdType _err_type, int _status, AutoBuffer& _body, AutoBuffer& _extension, ConnectProfile& _conn_profile, bool _report = true);
-    
-  protected:
+
+protected:
     MessageQueue::ScopeRegister     asyncreg_;
     NetSource&                      net_source_;
     Task                            task_;
@@ -76,10 +79,10 @@ class ShortLink : public ShortLinkInterface {
     const bool                      use_proxy_;
     AutoBuffer                      send_body_;
     AutoBuffer                      send_extend_;
-    
+
     boost::scoped_ptr<shortlink_tracker> tracker_;
 };
-        
+
 }}
 
 #endif // STN_SRC_MMSHORTLINK_H_

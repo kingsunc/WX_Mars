@@ -1,28 +1,29 @@
-#pragma once
+ï»¿#ifndef CJSONOBJECTBASE_H  
+#define CJSONOBJECTBASE_H  
 #include <string>
 #include <vector>
 #include <list>
-#include "json/json/json.h"
+#include <wtypes.h>
+#include "json/json.h"
+using namespace std;
 
 #pragma warning(disable:4267)  
-typedef int				INT;
-typedef unsigned int	UINT;
 
-#define DoArrayDeSerialize_Wrapper(listType, type)	\
+#define DoArrayDeSerialize_Wrapper(listType, type) \
 DoArrayDeSerialize<##listType<##type>, ##type>
 
-#define Type_Wrapper(listType, type)	\
+#define Type_Wrapper(listType, type) \
 (##listType<##type>*)
 
-#define DoArraySerialize_Wrapper(listType, type)	\
+#define DoArraySerialize_Wrapper(listType, type) \
 DoArraySerialize(Type_Wrapper(listType, type)addr);
 
-#define DoObjArrayDeSerialize_Wrapper(listType, type)	\
+#define DoObjArrayDeSerialize_Wrapper(listType, type) \
 DoObjArrayDeSerialize<##listType<type>>
 
-typedef void* (*GenerateJsonObjForDeSerializeFromOutSide)(const std::string& propertyName);
+typedef void* (*GenerateJsonObjForDeSerializeFromOutSide)(const string& propertyName);
 
-class CJsonObjectBase
+struct CJsonObjectBase
 {
 protected:
 	enum CEnumJsonTypeMap
@@ -31,6 +32,8 @@ protected:
 		asInt,
 		asUInt,
 		asString,
+		asInt64,
+		asUInt64,
 		asDouble,
 		asJsonObj,
 		asSpecialArray,
@@ -42,35 +45,35 @@ public:
 	CJsonObjectBase();
 	virtual ~CJsonObjectBase();
 
-	// ĞòÁĞ»¯
-	std::string Serialize();
-	// ·´ĞòÁĞ»¯;
+	// åºåˆ—åŒ– struct->buff;
+	string Serialize();
+	// ååºåˆ—åŒ– buff->struct;
 	bool DeSerialize(const char* str);
 
 protected:
+
 	Json::Value DoSerialize();
 	bool DoDeSerialize(Json::Value& root);
 
-	void SetProperty(std::string name, CEnumJsonTypeMap type, void* addr, CEnumJsonTypeMap listParamType = asInt);
-
+	void SetProperty(string name, CEnumJsonTypeMap type, void* addr, CEnumJsonTypeMap listParamType = asInt);
 	virtual void SetPropertys() = 0;
-	//ÓĞÌØÊâ¶ÔÏóĞèÒªĞòÁĞ»¯Ê±£¬ÇëÖØÔØ´Ëº¯Êı
-	virtual Json::Value DoSpecialArraySerialize(const std::string& propertyName);
 
-	//ÔÚ·´ĞòÁĞ»¯Ê±£¬Èç¹û¶ÔÏóÖĞÇ¶Ì×ÁËÁĞ±í£¬²¢ÇÒÁĞ±íÖĞÈİÄÉµÄÄÚÈİÊÇÆäËûÌØÊâ¶ÔÏóÊ±£¬ĞèÒªÖØÔØ´Ëº¯Êı£¬new³öÕæÕıµÄ¶ÔÏó  
-	virtual CJsonObjectBase* GenerateJsonObjForDeSerialize(const std::string& propertyName);
+	// æœ‰ç‰¹æ®Šå¯¹è±¡éœ€è¦åºåˆ—åŒ–æ—¶ï¼Œè¯·é‡è½½æ­¤å‡½æ•°;
+	virtual Json::Value DoSpecialArraySerialize(const string& propertyName);
+	//åœ¨ååºåˆ—åŒ–æ—¶ï¼Œå¦‚æœå¯¹è±¡ä¸­åµŒå¥—äº†åˆ—è¡¨ï¼Œå¹¶ä¸”åˆ—è¡¨ä¸­å®¹çº³çš„å†…å®¹æ˜¯å…¶ä»–ç‰¹æ®Šå¯¹è±¡æ—¶ï¼Œéœ€è¦é‡è½½æ­¤å‡½æ•°ï¼Œnewå‡ºçœŸæ­£çš„å¯¹è±¡;
+	virtual CJsonObjectBase* GenerateJsonObjForDeSerialize(const string& propertyName);
 
-	bool DoArrayDeSerialize(const std::string& propertyName, void* addr, Json::Value& root, CEnumJsonTypeMap listType, CEnumJsonTypeMap paramType);
+	bool DoArrayDeSerialize(const string& propertyName, void* addr, Json::Value& root, CEnumJsonTypeMap listType, CEnumJsonTypeMap paramType);
 
-	//ÌØÊâ¶ÔÏóÁĞ±íµÄ·´ĞòÁĞ»¯  
-	template<typename T1>
-	bool DoObjArrayDeSerialize(const std::string& propertyName, void* addr, Json::Value& node)
+	// ç‰¹æ®Šå¯¹è±¡åˆ—è¡¨çš„ååºåˆ—åŒ–;
+	template<typename T>
+	bool DoObjArrayDeSerialize(const string& propertyName, void* addr, Json::Value& node)
 	{
 		if (!node.isArray())
 		{
 			return false;
 		}
-		T1* pList = (T1*)addr;
+		T* pList = (T*)addr;
 		int size = node.size();
 		for (int i = 0; i < size; ++i)
 		{
@@ -81,8 +84,7 @@ protected:
 		return true;
 	}
 
-public:
-	//³£¼ûÀàĞÍÁĞ±íµÄ·´ĞòÁĞ»¯   
+	// å¸¸è§ç±»å‹åˆ—è¡¨çš„ååºåˆ—åŒ–;
 	template <typename T1, typename T2>
 	static bool DoArrayDeSerialize(void* addr, Json::Value& node)
 	{
@@ -97,9 +99,9 @@ public:
 		return true;
 	}
 
-	//ÌØÊâ¶ÔÏóÁĞ±íµÄ·´ĞòÁĞ»¯  
+	// ç‰¹æ®Šå¯¹è±¡åˆ—è¡¨çš„ååºåˆ—åŒ–;
 	template<typename T1>
-	static bool DoObjArrayDeSerialize(const std::string& propertyName, void* addr, Json::Value& node, GenerateJsonObjForDeSerializeFromOutSide funGenerate)
+	static bool DoObjArrayDeSerialize(const string& propertyName, void* addr, Json::Value& node, GenerateJsonObjForDeSerializeFromOutSide funGenerate)
 	{
 		if (!node.isArray())
 		{
@@ -115,49 +117,9 @@ public:
 		}
 		return true;
 	}
-protected:
-	Json::Value DoArraySerialize(void* addr, CEnumJsonTypeMap listType, CEnumJsonTypeMap paramType)
-	{
-		if (listType == asVectorArray)
-		{
-			switch (paramType)
-			{
-			case asBool:
-				return "";
-			case asJsonObj:
-				return DoArraySerialize_Wrapper(std::vector, CJsonObjectBase*);
-			case asInt:
-				return DoArraySerialize_Wrapper(std::vector, INT);
-			case asUInt:
-				return DoArraySerialize_Wrapper(std::vector, UINT);
-			case asDouble:
-				return DoArraySerialize_Wrapper(std::vector, double);
-			case asString:
-				return DoArraySerialize_Wrapper(std::vector, std::string);
-			}
-		}
-		else
-		{
-			switch (paramType)
-			{
-			case asBool:
-				return DoArraySerialize_Wrapper(std::list, bool);
-			case asJsonObj:
-				return DoArraySerialize_Wrapper(std::list, CJsonObjectBase*);
-			case asInt:
-				return DoArraySerialize_Wrapper(std::list, INT);
-			case asUInt:
-				return DoArraySerialize_Wrapper(std::list, UINT);
-			case asDouble:
-				return DoArraySerialize_Wrapper(std::list, double);
-			case asString:
-				return DoArraySerialize_Wrapper(std::list, std::string);
-			}
-		}
-		return "";
-	}
 
-public:
+	Json::Value DoArraySerialize(void* addr, CEnumJsonTypeMap listType, CEnumJsonTypeMap paramType);
+
 	template <typename T1>
 	static Json::Value DoArraySerialize(T1* pList)
 	{
@@ -170,10 +132,10 @@ public:
 	}
 
 	template <>
-	static Json::Value DoArraySerialize(std::vector<CJsonObjectBase*>* pList)
+	static Json::Value DoArraySerialize(vector<CJsonObjectBase*>* pList)
 	{
 		Json::Value arrayValue;
-		for (std::vector<CJsonObjectBase*>::iterator it = pList->begin(); it != pList->end(); ++it)
+		for (vector<CJsonObjectBase*>::iterator it = pList->begin(); it != pList->end(); ++it)
 		{
 			arrayValue.append((*it)->DoSerialize());
 		}
@@ -181,16 +143,16 @@ public:
 	}
 
 	template <>
-	static Json::Value DoArraySerialize(std::list<CJsonObjectBase*>* pList)
+	static Json::Value DoArraySerialize(list<CJsonObjectBase*>* pList)
 	{
 		Json::Value arrayValue;
-		for (std::list<CJsonObjectBase*>::iterator it = pList->begin(); it != pList->end(); ++it)
+		for (list<CJsonObjectBase*>::iterator it = pList->begin(); it != pList->end(); ++it)
 		{
 			arrayValue.append((*it)->DoSerialize());
 		}
 		return arrayValue;
 	}
-	static std::string JsonValueToString(Json::Value& tvalue)
+	static string JsonValueToString(Json::Value& tvalue)
 	{
 		Json::FastWriter writer;
 		return writer.write(tvalue);
@@ -233,22 +195,26 @@ private:
 	{
 		return root.asUInt();
 	}
-
 	template <>
-	static double GetData(Json::Value& root)
+	static LONGLONG GetData(Json::Value& root)
 	{
-		return root.asDouble();
+		return root.asInt64();
 	}
-
 	template <>
-	static std::string GetData(Json::Value& root)
+	static ULONGLONG GetData(Json::Value& root)
+	{
+		return root.asUInt64();
+	}
+	template <>
+	static string GetData(Json::Value& root)
 	{
 		return root.asString();
 	}
 
 private:
-	std::vector<std::string>			m_vectorName;
-	std::vector<void*>					m_vectorPropertyAddr;
-	std::vector<CEnumJsonTypeMap>		m_vectorType;
-	std::vector<CEnumJsonTypeMap>		m_vectorListParamType;
+	vector<string> m_vectorName;
+	vector<void*>  m_vectorPropertyAddr;
+	vector<CEnumJsonTypeMap>     m_vectorType;
+	vector<CEnumJsonTypeMap>     m_vectorListParamType;
 };
+#endif

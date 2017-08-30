@@ -7,4 +7,3 @@ public:
 	CreateGroupResp_Json();
 	~CreateGroupResp_Json();
 };
-

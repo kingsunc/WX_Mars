@@ -27,12 +27,28 @@
 #include "task/Msg_Task.h"
 #include "task/OffMsg_Task.h"
 #include "task/CreateGroup_Task.h"
+#include "task/DeleteGroup_Task.h"
 #include "task/AddGroupUser_Task.h"
+
+class AppInfo
+{
+public:
+	std::string strAppID;
+	std::string strToken;
+	std::string strUserID;
+};
 
 class MessagePush
 {
 public:
-	virtual void OnRecvMessage(const PSMessageItem& msgItem) = 0;
+	// 被迫下线;
+	virtual void OnKickOut(const PSKickOutResp& response) = 0;
+
+	// 接收消息;
+	virtual void OnRecvMessage(const PSMessageItem& response) = 0;
+
+	// 接收离线消息概述;
+	virtual void OnRecvOffMsgNotice(const PSOffMsgInfoNotice& response) = 0;
 };
 
 // 业务包装类;
@@ -43,6 +59,8 @@ public:
 	static MarsWrapper& GetInstance();
 	// 启动;
 	void Start();
+	// 启动;
+	void Exit();
 
 	// 设置接收消息的回调类;
 	void SetMsgPushObserver(MessagePush* pMsgPush);
@@ -60,7 +78,8 @@ public:
 	// 注销
 	void MsgLogout();
 
-	bool CreateGroup(IN const PSGroupInfo& groupInfo, IN CreateGroup_Callback* pCallback);
+	void CreateGroup(IN const PSGroupInfo& groupInfo, IN CreateGroup_Callback* pCallback);
+	void DeleteGroup(IN const char* strGroupID, IN DeleteGroup_Callback* pCallback);
 
 	//// 获取群信息;
 	//virtual void GetGroupInfo(const char* strGroupID);
@@ -68,9 +87,9 @@ public:
 	//// 获取群成员;
 	//virtual void GetGroupUsers(const char* strGroupID, const int iPageNum, const int iPageSize);
 	// 添加群成员;
-	virtual bool AddGroupUsers(IN const char* strGroupID, IN const PSUserInfo* userInfo, IN const int iAddCount, IN AddGroupUser_Callback* pCallback);
+	virtual void AddGroupUsers(IN const char* strGroupID, IN const PSUserInfo* userInfo, IN const int iAddCount, IN AddGroupUser_Callback* pCallback);
 	// 移除群成员;
-	virtual bool RemoveGroupUsers(IN const char* strGroupID, IN const PSUserInfo* userInfo, IN const int iRemoveCount);
+	virtual void RemoveGroupUsers(IN const char* strGroupID, IN const PSUserInfo* userInfo, IN const int iRemoveCount);
 
 	//// 设置群成员角色
 	//virtual void SetGroupUserRole(const char* strGroupID);
@@ -86,7 +105,7 @@ public:
 	//virtual void InviteGroupUsers(const char* strGroupID);
 
 	// 发送文本消息
-	bool SendTextMessage(OUT int& iReqID,
+	void SendTextMessage(OUT int& iReqID,
 		IN const PS_SendMode& eSendMode,
 		IN const char* strFrom,
 		IN const char* strTo,
@@ -105,10 +124,18 @@ public:
 protected:
 	virtual void OnPush(uint64_t _channel_id, uint32_t _cmdid, uint32_t _taskid, const AutoBuffer& _body, const AutoBuffer& _extend);
 
+	// 被迫下线;
+	virtual void OnKickOut(const AutoBuffer& _body);
+	// 接收消息;
+	virtual void OnRecvMessage(const AutoBuffer& _body);
+	// 接收离线消息通知;
+	virtual void OnGetOffMsgInfoNotice(const AutoBuffer& _body);
+
 private:
 	MarsWrapper();
 
 	MessagePush*	m_pMsgPush;
+	AppInfo			m_appInfo;
 };
 
 #endif

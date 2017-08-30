@@ -289,19 +289,25 @@ SOCKET ShortLink::__RunConnect(ConnectProfile& _conn_profile) {
     return sock;
 }
 
-void ShortLink::__RunReadWrite(SOCKET _socket, int& _err_type, int& _err_code, ConnectProfile& _conn_profile) {
+void ShortLink::__RunReadWrite(SOCKET _socket, int& _err_type, int& _err_code, ConnectProfile& _conn_profile)
+{
 	xmessage2_define(message)(TSF"taskid:%_, cgi:%_, @%_", task_.taskid, task_.cgi, this);
 
     std::string url;
-    if (kIPSourceProxy==_conn_profile.ip_type) {
+    if (kIPSourceProxy==_conn_profile.ip_type)
+	{
         url +="http://";
         url += _conn_profile.host;
     }
 	url += task_.cgi;
 
-
-	std::map<std::string, std::string> headers;
+	HttpHeaderMap headers;
 	headers[http::HeaderFields::KStringHost] = _conn_profile.host;
+
+	for (HttpHeaderMap::iterator it = task_.http_header.begin(); it != task_.http_header.end(); it++)
+	{
+		headers[it->first] = it->second;
+	}
 
 	if (_conn_profile.proxy_info.IsValid() && mars::comm::kProxyHttp == _conn_profile.proxy_info.type
 		&& !_conn_profile.proxy_info.username.empty() && !_conn_profile.proxy_info.password.empty()) {

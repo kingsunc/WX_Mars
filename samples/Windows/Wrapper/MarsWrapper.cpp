@@ -42,6 +42,86 @@ MarsWrapper::MarsWrapper(): m_pMsgPush(nullptr)
 
 void MarsWrapper::OnPush(uint64_t _channel_id, uint32_t _cmdid, uint32_t _taskid, const AutoBuffer& _body, const AutoBuffer& _extend)
 {
+	switch (_cmdid)
+	{
+	case MSGCMD_S2C_KICKOUT:
+		{
+			// 被迫下线;
+			OnKickOut(_body);
+		}
+		break;
+	case MSGCMD_S2C_RECV_MESSAGE_REP:
+		{
+			// 接收在线消息;
+			OnRecvMessage(_body);
+		}
+		break;
+	case MSGCMD_S2C_HISTORY_INFO:
+		{
+			// 接收离线消息描述;
+			OnGetOffMsgInfoNotice(_body);
+		}
+		break;
+	default:
+		{
+			printf("cmid: %d OnPush is not handle.", _cmdid);
+		}
+		break;
+	}
+}
+
+// 被迫下线;
+void MarsWrapper::OnKickOut(const AutoBuffer& _body)
+{
+	tars::TarsInputStream<tars::BufferReader> inStream;
+	inStream.setBuffer((const char*)(_body.Ptr()), _body.Length());
+
+	MessageService::Kickout response;
+	response.readFrom(inStream);
+
+	PSKickOutResp resp;
+	memset(&resp, 0, sizeof(resp));
+	resp.iStatus = response.code;
+	switch (resp.iStatus)
+	{
+	case MessageService::KICKOUT_REASON_REPEAT:
+		{
+			resp.strMessage = "login_repeat";
+		}
+		break;
+	case MessageService::KICKOUT_REASON_TOKEN_TIMEOUT:
+		{
+			resp.strMessage = "token_timeout";
+		}
+		break;
+	case MessageService::KICKOUT_REASON_CLIENT_UNNORMAL:
+		{
+			resp.strMessage = "client_unnormal";
+		}
+		break;
+	case MessageService::KICKOUT_REASON_OUTSIDE:
+		{
+			resp.strMessage = "outside";
+		}
+		break;
+	default:
+		{
+			resp.strMessage = "other_error";
+		}
+		break;
+	}
+
+	Exit();
+
+	if (m_pMsgPush)
+	{
+		m_pMsgPush->OnKickOut(resp);
+	}
+}
+
+// 接收消息;
+void MarsWrapper::OnRecvMessage(const AutoBuffer& _body)
+{
 	tars::TarsInputStream<tars::BufferReader> inStream;
 	inStream.setBuffer((const char*)(_body.Ptr()), _body.Length());
 
@@ -59,20 +139,73 @@ void MarsWrapper::OnPush(uint64_t _channel_id, uint32_t _cmdid, uint32_t _taskid
 	msgItem.strPushInfo = (char*)response.pushInfo.c_str();
 	msgItem.iTimestamp = response.timestamp;
 	msgItem.iExpireTime = response.expireTime;
-
+	// 内容拷贝;
 	const int iLen = response.content.size();
-	msgItem.psBuff.pBuff = new char[iLen + 1];
-	memset(msgItem.psBuff.pBuff, 0, (iLen + 1) * sizeof(char));
 	for (int i = 0; i < iLen; i++)
 	{
-		msgItem.psBuff.pBuff[i] = response.content[i];
+		msgItem.strContent += response.content[i];
 	}
-	msgItem.psBuff.iLen = iLen;
 
 	if (m_pMsgPush)
 	{
 		m_pMsgPush->OnRecvMessage(msgItem);
-		delete []msgItem.psBuff.pBuff;
+	}
+}
+
+// 接收离线消息通知;
+void MarsWrapper::OnGetOffMsgInfoNotice(const AutoBuffer& _body)
+{
+	tars::TarsInputStream<tars::BufferReader> inStream;
+	inStream.setBuffer((const char*)(_body.Ptr()), _body.Length());
+
+	MessageService::OffMsgInfoNotice response;
+	response.readFrom(inStream);
+	vector<MessageService::OffMsgInfo>& msgInfos = response.msgInfos;
+
+	PSOffMsgInfoNotice offmsgNotice;
+	offmsgNotice.iStatus = PSResult_Success;
+	offmsgNotice.strMessage = "";
+	for (int i = 0; i < msgInfos.size(); i++)
+	{
+		PSOffMsgInfoNoticeItem offmsgNoticeItem;
+
+		MessageService::MessageQueue& queue = msgInfos[i].queue;
+		offmsgNoticeItem.offmsgDesc.strFrom = (char*)queue.from.c_str();
+		offmsgNoticeItem.offmsgDesc.strTo = (char*)queue.to.c_str();
+		offmsgNoticeItem.offmsgDesc.iSendMode = (PS_SendMode)queue.sendMode;
+		offmsgNoticeItem.offmsgDesc.iStartMsgID = msgInfos[i].lastUserMsgId;
+		offmsgNoticeItem.offmsgDesc.iEndMsgID = msgInfos[i].lastMsgId;
+
+		vector<MessageService::Message>& messsages = msgInfos[i].messsages;
+		for (int j = 0; j < messsages.size(); j++)
+		{
+			PSMessageItem msgItem;
+			msgItem.iMsgId = messsages[j].msgId;
+			msgItem.strFrom = (char*)messsages[j].from.c_str();
+			msgItem.strTo = (char*)messsages[j].to.c_str();
+			msgItem.iSendMode = messsages[j].sendMode;
+			msgItem.iType = messsages[j].type;
+			msgItem.iPriority = messsages[j].priority;
+			msgItem.iHandleOption = messsages[j].handleOption;
+			msgItem.strPushInfo = (char*)messsages[j].pushInfo.c_str();
+			msgItem.iTimestamp = messsages[j].timestamp;
+			msgItem.iExpireTime = messsages[j].expireTime;
+			// 内容拷贝;
+			const int iLen = messsages[j].content.size();
+			for (int iIndex = 0; iIndex < iLen; iIndex++)
+			{
+				msgItem.strContent += messsages[j].content[iIndex];
+			}
+
+			offmsgNoticeItem.vecMessage.push_back(msgItem);
+		}
+		
+		offmsgNotice.vecOffMsgNotice.push_back(offmsgNoticeItem);
+	}
+
+	if (m_pMsgPush)
+	{
+		m_pMsgPush->OnRecvOffMsgNotice(offmsgNotice);
 	}
 }
 
@@ -84,6 +217,13 @@ void MarsWrapper::Start()
 	NetworkService::GetInstance().Start();	
 
 	NetworkService::GetInstance().SetPushObserver(MSGCMD_S2C_RECV_MESSAGE_REP, this);
+	NetworkService::GetInstance().SetPushObserver(MSGCMD_S2C_HISTORY_INFO, this);
+	NetworkService::GetInstance().SetPushObserver(MSGCMD_S2C_KICKOUT, this);
+}
+
+void MarsWrapper::Exit()
+{
+	NetworkService::GetInstance().Exit();
 }
 
 void MarsWrapper::SetMsgPushObserver(MessagePush* pMsgPush)
@@ -93,11 +233,15 @@ void MarsWrapper::SetMsgPushObserver(MessagePush* pMsgPush)
 
 void MarsWrapper::MsgLogin(const char* strAppID, const char* strAppToken, const char* strUserID, const char* strUserName, const int iDeviceType, const char* strDeviceToken, Login_Callback* pCallback)
 {
+	m_appInfo.strAppID = strAppID;
+	m_appInfo.strToken = strAppToken;
+	m_appInfo.strUserID = strUserID;
+
 	std::string strToken;
 #ifdef NO_APP_SERVER
-	string strNowTime = std::to_string(time(NULL) + 3600);
+	string strEffectTime = std::to_string(time(NULL) + 3600);	 // 有效截至时间
 	string strPwd = "mypassword";	// psm password
-	std::string strInput = strPwd + strAppID + strUserID + strNowTime;
+	std::string strInput = strPwd + strAppID + strUserID + strEffectTime;
 
 	unsigned char sig[16] = { 0 };
 	MD5_buffer(strInput.c_str(), (unsigned int)strInput.length(), sig);
@@ -105,18 +249,18 @@ void MarsWrapper::MsgLogin(const char* strAppID, const char* strAppToken, const 
 	MD5_sig_to_string((const char*)sig, strDest);
 
 	strToken.append(strDest);
-	strToken.append(strNowTime);
+	strToken.append(strEffectTime);
 #else
 	strToken.append(strAppToken);
 #endif
 
 	Login_Task* pTask = new Login_Task();
-	pTask->strAppID = strAppID;
+	pTask->strAppID = (strAppID ? strAppID : "");
 	pTask->strAppToken = strToken;
-	pTask->strUserID = strUserID;
-	pTask->strUserName = strUserName;
+	pTask->strUserID = (strUserID ? strUserID : "");
+	pTask->strUserName = (strUserName ? strUserName : "");
 	pTask->iDeviceType = iDeviceType;
-	pTask->strDeviceToken = strDeviceToken;
+	pTask->strDeviceToken = (strDeviceToken ? strDeviceToken : "");
 	pTask->pCallback = pCallback;
 
 	pTask->channel_select_ = ChannelType_LongConn;
@@ -138,46 +282,97 @@ void MarsWrapper::MsgLogout()
 	NetworkService::GetInstance().StartTask(pTask);
 }
 
-bool MarsWrapper::CreateGroup(IN const PSGroupInfo& groupInfo, IN CreateGroup_Callback* pCallback)
+void MarsWrapper::CreateGroup(IN const PSGroupInfo& groupInfo, IN CreateGroup_Callback* pCallback)
 {
-	if ((!groupInfo.strGroupID) ||
+	/*if ((!groupInfo.strGroupID) ||
 		(0 == strlen(groupInfo.strGroupID)) )
 	{
 		return false;
-	}
+	}*/
 	char strUrl[256] = { 0 };
-	snprintf(strUrl, sizeof(strUrl), "/group/create?group=%s", groupInfo.strGroupID);
+	snprintf(strUrl, sizeof(strUrl), "/group/create");
 
 	CreateGroup_Task* pTask = new CreateGroup_Task();
-	/*pTask->strAppID = strAppID;
-	pTask->strAppToken = strToken;
-	pTask->strUserID = strUserID;
-	pTask->strUserName = strUserName;
-	pTask->iDeviceType = iDeviceType;
-	pTask->strDeviceToken = strDeviceToken;*/
+	if (!groupInfo.strGroupID.IsEmpty())
+	{
+		pTask->m_strGroupID = groupInfo.strGroupID.GetString();
+	}
+	if (!groupInfo.strGroupName.IsEmpty())
+	{
+		pTask->m_strGroupName = groupInfo.strGroupName.GetString();
+	}
+	if (!groupInfo.strGroupDesc.IsEmpty())
+	{
+		pTask->m_strGroupDesc = groupInfo.strGroupDesc.GetString();
+	}
+	pTask->m_bPublic = groupInfo.bPublic;
+	pTask->m_iMaxUsers = groupInfo.iMaxUsers;
+	if (!groupInfo.strGroupOwner.IsEmpty())
+	{
+		pTask->m_strOwner = groupInfo.strGroupOwner.GetString();
+	}
+	for (int i = 0; i < groupInfo.vecAdmin.size(); i++)
+	{
+		pTask->m_vecAdmins.push_back(groupInfo.vecAdmin[i].strUserID.GetString());
+	}
+	for (int i = 0; i < groupInfo.vecMember.size(); i++)
+	{
+		pTask->m_vecMembers.push_back(groupInfo.vecMember[i].strUserID.GetString());
+	}
 	pTask->pCallback = pCallback;
 
+	pTask->headers_[HEADER_APPID] = m_appInfo.strAppID;
+	pTask->headers_[HEADER_TOKEN] = m_appInfo.strToken;
+	char strSeqID[256] = { 0 };
+	snprintf(strSeqID, sizeof(strSeqID), "%d", pTask->taskid_);
+	pTask->headers_[HEADER_SEQID] = strSeqID;
+
 	pTask->channel_select_ = ChannelType_ShortConn;
-	pTask->cmdid_ = MsgCmd::MSGCMD_C2S_CREATE_GROUP_REQ;
+	//pTask->cmdid_ = MsgCmd::MSGCMD_C2S_CREATE_GROUP_REQ;
 	pTask->cgi_ = strUrl;
 	pTask->host_ = g_shortlink_host;
 	NetworkService::GetInstance().StartTask(pTask);
+}
 
-	return true;
+void MarsWrapper::DeleteGroup(IN const char* strGroupID, IN DeleteGroup_Callback* pCallback)
+{
+	/*if ((!strGroupID) ||
+		(0 == strlen(strGroupID)))
+	{
+		return false;
+	}*/
+	char strUrl[256] = { 0 };
+	snprintf(strUrl, sizeof(strUrl), "group/del?group=%s", strGroupID);
+
+	DeleteGroup_Task* pTask = new DeleteGroup_Task();
+	pTask->strGroupID = strGroupID;
+	pTask->pCallback = pCallback;
+
+	pTask->headers_[HEADER_APPID] = m_appInfo.strAppID;
+	pTask->headers_[HEADER_TOKEN] = m_appInfo.strToken;
+	char strSeqID[256] = { 0 };
+	snprintf(strSeqID, sizeof(strSeqID), "%d", pTask->taskid_);
+	pTask->headers_[HEADER_SEQID] = strSeqID;
+
+	pTask->channel_select_ = ChannelType_ShortConn;
+	//pTask->cmdid_ = MsgCmd::MSGCMD_C2S_DELETE_GROUP_REQ;
+	pTask->cgi_ = strUrl;
+	pTask->host_ = g_shortlink_host;
+	NetworkService::GetInstance().StartTask(pTask);
 }
 
 // 添加群成员;
-bool MarsWrapper::AddGroupUsers(IN const char* strGroupID, IN const PSUserInfo* userInfo, IN const int iAddCount, IN AddGroupUser_Callback* pCallback)
+void MarsWrapper::AddGroupUsers(IN const char* strGroupID, IN const PSUserInfo* userInfo, IN const int iAddCount, IN AddGroupUser_Callback* pCallback)
 {
-	if ((!strGroupID) || (0 == strlen(strGroupID)) || 
-		(!userInfo) || (iAddCount <= 0) )
-	{
-		return false;
-	}
+	//if ((!strGroupID) || (0 == strlen(strGroupID)) || 
+	//	(!userInfo) || (iAddCount <= 0) )
+	//{
+	//	return false;
+	//}
 	std::string strMembers;
 	for (int i = 0; i < iAddCount; i++)
 	{
-		strMembers.append(userInfo[i].strUserID).append(",");
+		strMembers.append(userInfo[i].strUserID.GetString()).append(",");
 	}
 	strMembers = strMembers.substr(0, strMembers.length() - 1);
 	char strUrl[256] = { 0 };
@@ -197,17 +392,14 @@ bool MarsWrapper::AddGroupUsers(IN const char* strGroupID, IN const PSUserInfo* 
 	pTask->cgi_ = strUrl;
 	pTask->host_ = g_shortlink_host;
 	NetworkService::GetInstance().StartTask(pTask);
-
-	return true;
 }
 
 // 移除群成员;
-bool MarsWrapper::RemoveGroupUsers(IN const char* strGroupID, IN const PSUserInfo* userInfo, IN const int iRemoveCount)
+void MarsWrapper::RemoveGroupUsers(IN const char* strGroupID, IN const PSUserInfo* userInfo, IN const int iRemoveCount)
 {
-	return true;
 }
 
-bool MarsWrapper::SendTextMessage(OUT int& iReqID,
+void MarsWrapper::SendTextMessage(OUT int& iReqID,
 	IN const PS_SendMode& eSendMode,
 	IN const char* strFrom,
 	IN const char* strTo,
@@ -216,14 +408,6 @@ bool MarsWrapper::SendTextMessage(OUT int& iReqID,
 	IN const char* strPushInfo,
 	IN Msg_Callback* pCallback)
 {
-	if ((!strFrom) || (!strTo) || (!strContent) ||
-		(0 == strlen(strFrom)) || 
-		(0 == strlen(strTo)) ||
-		(0 == strlen(strContent)) )
-	{
-		return false;
-	}
-
 	Msg_Task* pTask = new Msg_Task();
 	pTask->from = strFrom;
 	pTask->to = strTo;
@@ -245,13 +429,16 @@ bool MarsWrapper::SendTextMessage(OUT int& iReqID,
 	NetworkService::GetInstance().StartTask(pTask);
 
 	iReqID = pTask->taskid_;
-	return true;
 }
 
 void MarsWrapper::GetOfflineMsgs(OUT std::vector<PSOffMsgDesc>& vecMsgDesc,
 	IN OffMsg_Callback* pCallback)
 {
 	OffMsg_Task* pTask = new OffMsg_Task();
+	/*for (int i = 0; i < vecMsgDesc.size(); i++)
+	{
+		pTask->vecMsgDesc.push_back(vecMsgDesc[i]);
+	}*/
 	pTask->vecMsgDesc = vecMsgDesc;
 	pTask->pCallback = pCallback;
 

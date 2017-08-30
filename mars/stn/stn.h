@@ -26,8 +26,10 @@
 
 #include <string>
 #include <vector>
-
+#include <map>
 #include "mars/comm/autobuffer.h"
+
+typedef std::map<std::string, std::string> HttpHeaderMap;
 
 namespace mars
 {
@@ -77,6 +79,7 @@ public:
     uint64_t		channel_id;					// 通道ID;
     int32_t			channel_select;				// 通道类型;
     std::string		cgi;						// user
+	HttpHeaderMap	http_header;				// header
 
     //optional
     bool			send_only;					// user - 只发送，不需要响应;

@@ -13,7 +13,6 @@
 using namespace std;
 #include "tars/msg_tars.h"
 
-
 namespace MessageService
 {
 	enum CONNECT_RESULT
@@ -53,24 +52,30 @@ namespace MessageService
 		return -1;
 	}
 
-	enum KICKOUT_RESULT
+	enum KICKOUT_REASON
 	{
-		KICKOUT_RESULT_REPEAT = 80,
-		KICKOUT_RESULT_TOKEN_TIMEOUT = 81,
+		KICKOUT_REASON_REPEAT = 80,
+		KICKOUT_REASON_TOKEN_TIMEOUT = 81,
+		KICKOUT_REASON_CLIENT_UNNORMAL = 82,
+		KICKOUT_REASON_OUTSIDE = 83,
 	};
-	inline string etos(const KICKOUT_RESULT & e)
+	inline string etos(const KICKOUT_REASON & e)
 	{
 		switch (e)
 		{
-		case KICKOUT_RESULT_REPEAT: return "KICKOUT_RESULT_REPEAT";
-		case KICKOUT_RESULT_TOKEN_TIMEOUT: return "KICKOUT_RESULT_TOKEN_TIMEOUT";
+		case KICKOUT_REASON_REPEAT: return "KICKOUT_REASON_REPEAT";
+		case KICKOUT_REASON_TOKEN_TIMEOUT: return "KICKOUT_REASON_TOKEN_TIMEOUT";
+		case KICKOUT_REASON_CLIENT_UNNORMAL: return "KICKOUT_REASON_CLIENT_UNNORMAL";
+		case KICKOUT_REASON_OUTSIDE: return "KICKOUT_REASON_OUTSIDE";
 		default: return "";
 		}
 	}
-	inline int stoe(const string & s, KICKOUT_RESULT & e)
+	inline int stoe(const string & s, KICKOUT_REASON & e)
 	{
-		if (s == "KICKOUT_RESULT_REPEAT") { e = KICKOUT_RESULT_REPEAT; return 0; }
-		if (s == "KICKOUT_RESULT_TOKEN_TIMEOUT") { e = KICKOUT_RESULT_TOKEN_TIMEOUT; return 0; }
+		if (s == "KICKOUT_REASON_REPEAT") { e = KICKOUT_REASON_REPEAT; return 0; }
+		if (s == "KICKOUT_REASON_TOKEN_TIMEOUT") { e = KICKOUT_REASON_TOKEN_TIMEOUT; return 0; }
+		if (s == "KICKOUT_REASON_CLIENT_UNNORMAL") { e = KICKOUT_REASON_CLIENT_UNNORMAL; return 0; }
+		if (s == "KICKOUT_REASON_OUTSIDE") { e = KICKOUT_REASON_OUTSIDE; return 0; }
 
 		return -1;
 	}
@@ -244,10 +249,10 @@ namespace MessageService
 		}
 		static string MD5()
 		{
-			return "83f3e4405d6cc63fbbdd7c84a5aaaf8b";
+			return "13fdd0f71acc627ee08e3e9b60670244";
 		}
 		Kickout()
-			:code(MessageService::KICKOUT_RESULT_REPEAT)
+			:code(MessageService::KICKOUT_REASON_REPEAT)
 		{
 		}
 		void resetDefautlt()
@@ -262,9 +267,9 @@ namespace MessageService
 		void readFrom(tars::TarsInputStream<ReaderT>& _is)
 		{
 			resetDefautlt();
-			tars::Int32 eTemp0 = MessageService::KICKOUT_RESULT_REPEAT;
+			tars::Int32 eTemp0 = MessageService::KICKOUT_REASON_REPEAT;
 			_is.read(eTemp0, 0, true);
-			code = (MessageService::KICKOUT_RESULT)eTemp0;
+			code = (MessageService::KICKOUT_REASON)eTemp0;
 		}
 		ostream& display(ostream& _os, int _level = 0) const
 		{
@@ -279,7 +284,7 @@ namespace MessageService
 			return _os;
 		}
 	public:
-		MessageService::KICKOUT_RESULT code;
+		MessageService::KICKOUT_REASON code;
 	};
 	inline bool operator==(const Kickout&l, const Kickout&r)
 	{
@@ -498,7 +503,5 @@ namespace MessageService
 
 
 }
-
-
 
 #endif

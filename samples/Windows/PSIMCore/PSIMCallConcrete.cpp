@@ -48,6 +48,8 @@ bool CPSIMCallConcrete::UnInit()
 	// uninit xlog
 	appender_close();
 
+	MarsWrapper::GetInstance().Exit();
+
 	return true;
 }
 
@@ -56,10 +58,82 @@ void CPSIMCallConcrete::MsgLogin(IN const char* strAppID,
 	IN const char* strAppToken,
 	IN const char* strUserID,
 	IN const char* strUserName,
+	IN const int iDeviceType,
 	IN const char* strDeviceToken)
 {
-	int iDeviceType = PS_DeviceType_Windows;
-	MarsWrapper::GetInstance().MsgLogin(strAppID, strAppToken, strUserID, strUserName, iDeviceType, strDeviceToken, CPSIMTaskCallback::GetInstance());
+	try
+	{
+		PSMsgLoginResp resp;
+		resp.iStatus = PSResult_ParaError;
+		if (!strAppID)
+		{
+			resp.strMessage = "appid is null";
+			throw resp;
+		}
+		if (0 == strlen(strAppID))
+		{
+			resp.strMessage = "appid is empty";
+			throw resp;
+		}
+
+		if (!strAppToken)
+		{
+			resp.strMessage = "apptoken is null";
+			throw resp;
+		}
+		if (0 == strlen(strAppToken))
+		{
+			resp.strMessage = "apptoken is empty";
+			throw resp;
+		}
+
+		if (!strUserID)
+		{
+			resp.strMessage = "userid is null";
+			throw resp;
+		}
+		if (0 == strlen(strUserID))
+		{
+			resp.strMessage = "userid is empty";
+			throw resp;
+		}
+
+		switch (iDeviceType)
+		{
+		case PS_DeviceType_Android:
+		case PS_DeviceType_Ios:
+			{
+				if (!strDeviceToken)
+				{
+					resp.strMessage = "devicetoken is null";
+					throw resp;
+				}
+				if (0 == strlen(strDeviceToken))
+				{
+					resp.strMessage = "devicetoken is empty";
+					throw resp;
+				}
+			}
+			break;
+		case PS_DeviceType_Windows:
+			break;
+		default:
+			{
+				resp.strMessage = "device type is not support";
+				throw resp;
+			}
+			break;
+		}
+
+		MarsWrapper::GetInstance().MsgLogin(strAppID, strAppToken, strUserID, strUserName, iDeviceType, strDeviceToken, CPSIMTaskCallback::GetInstance());
+	}
+	catch (PSMsgLoginResp& resp)
+	{
+		if (m_pPSIMCallBack)
+		{
+			m_pPSIMCallBack->OnMsgLoginResponse(resp);
+		}
+	}
 }
 
 // 注销
@@ -68,17 +142,22 @@ void CPSIMCallConcrete::MsgLogout()
 	MarsWrapper::GetInstance().MsgLogout();
 }
 
-// 创建群组
-bool CPSIMCallConcrete::CreateGroup(const PSGroupInfo& groupInfo)
+// 创建群组;
+void CPSIMCallConcrete::CreateGroup(const PSGroupInfo& groupInfo)
 {
-	return MarsWrapper::GetInstance().CreateGroup(groupInfo, CPSIMTaskCallback::GetInstance());
+	MarsWrapper::GetInstance().CreateGroup(groupInfo, CPSIMTaskCallback::GetInstance());
 }
 
 // 删除群;
 void CPSIMCallConcrete::DeleteGroup(IN const char* strGroupID)
 {
-
+	MarsWrapper::GetInstance().DeleteGroup(strGroupID, CPSIMTaskCallback::GetInstance());
 }
+
+//void CPSIMCallConcrete::GetGroupUsers(IN const PSGroupInfo& groupUsers)
+//{
+//
+//}
 
 // 获取群成员;
 //void CPSIMCallConcrete::GetGroupUsers(const char* strGroupID, const int iPageNum, const int iPageSize)
@@ -87,34 +166,30 @@ void CPSIMCallConcrete::DeleteGroup(IN const char* strGroupID)
 //}
 
 // 添加群成员;
-bool CPSIMCallConcrete::AddGroupUsers(IN const char* strGroupID, IN const PSUserInfo* pUsers, IN const int iAddCount)
+void CPSIMCallConcrete::AddGroupUsers(IN const char* strGroupID, IN const PSUserInfo* pUsers, IN const int iAddCount)
 {
-	return MarsWrapper::GetInstance().AddGroupUsers(strGroupID, pUsers, iAddCount, CPSIMTaskCallback::GetInstance());
+	MarsWrapper::GetInstance().AddGroupUsers(strGroupID, pUsers, iAddCount, CPSIMTaskCallback::GetInstance());
 }
 
 // 移除群成员;
-bool CPSIMCallConcrete::RemoveGroupUsers(IN const char* strGroupID, IN const PSUserInfo* pUsers, IN const int iRemoveCount)
+void CPSIMCallConcrete::RemoveGroupUsers(IN const char* strGroupID, IN const PSUserInfo* pUsers, IN const int iRemoveCount)
 {
 	//return MarsWrapper::GetInstance().RemoveGroupUsers(strGroupID, pUsers, iRemoveCount, CPSIMTaskCallback::GetInstance());
-	return true;
 }
 
 // 添加子群;
-bool CPSIMCallConcrete::AddGroupChilds(IN const char* strGroupID, IN const PSGroupInfo* pGroups, IN const int iAddCount)
+void CPSIMCallConcrete::AddGroupChilds(IN const char* strGroupID, IN const PSGroupInfo* pGroups, IN const int iAddCount)
 {
-	return true;
 }
 
 // 移除子群;
-bool CPSIMCallConcrete::RemoveGroupUsers(IN const char* strGroupID, IN const PSGroupInfo* pUsers, IN const int iRemoveCount)
+void CPSIMCallConcrete::RemoveGroupUsers(IN const char* strGroupID, IN const PSGroupInfo* pUsers, IN const int iRemoveCount)
 {
-	return true;
 }
 
 // 设置群成员角色
 void CPSIMCallConcrete::SetGroupUserRole(const char* strGroupID)
 {
-
 }
 
 // 禁言
@@ -142,36 +217,46 @@ void CPSIMCallConcrete::InviteGroupUsers(const char* strGroupID)
 }
 
 // 发送文本消息
-bool CPSIMCallConcrete::SendTextMessage(OUT int& iReqID,
+void CPSIMCallConcrete::SendTextMessage(OUT int& iReqID,
 	IN const PS_SendMode& eSendMode,
 	IN const char* strFrom,
 	IN const char* strTo,
-	IN const char* strContent,
-	IN const int& iContentLen,
+	IN const PSString& strContent,
 	IN const char* strPushInfo)
 {
-	return MarsWrapper::GetInstance().SendTextMessage(iReqID, eSendMode, strFrom, strTo, strContent, iContentLen, strPushInfo, CPSIMTaskCallback::GetInstance());
+	MarsWrapper::GetInstance().SendTextMessage(iReqID, eSendMode, strFrom, strTo, strContent.GetString(), strContent.GetLength(), strPushInfo, CPSIMTaskCallback::GetInstance());
 }
 
-// 获取离线消息
-void CPSIMCallConcrete::GetOfflineMsgs(OUT PSOffMsgDesc* pOffMsgDescs, IN const int & iDescCount)
+// 获取离线消息;
+void CPSIMCallConcrete::GetOfflineMsgs(IN const PSVector<PSOffMsgDesc>& vecOffMsgDescs)
 {
-	std::vector<PSOffMsgDesc> vecMsgDesc;
-	for (int i = 0; i < iDescCount; i++)
+	try
 	{
-		PSOffMsgDesc OffMsgDesc;
-		OffMsgDesc.strFrom = pOffMsgDescs[i].strFrom;
-		OffMsgDesc.strTo = pOffMsgDescs[i].strTo;
-		OffMsgDesc.iSendMode = pOffMsgDescs[i].iSendMode;
-		OffMsgDesc.iStartMsgID = pOffMsgDescs[i].iStartMsgID;
-		OffMsgDesc.iMsgCount = pOffMsgDescs[i].iMsgCount;
-		vecMsgDesc.push_back(OffMsgDesc);
+		PSOffMsgResp resp;
+		resp.iStatus = PSResult_ParaError;
+		if (vecOffMsgDescs.size() <= 0)
+		{
+			resp.strMessage = "vecor size is 0";
+			throw resp;
+		}
+
+		std::vector<PSOffMsgDesc> vecMsgDesc;
+		for (int i = 0; i < vecOffMsgDescs.size(); i++)
+		{
+			vecMsgDesc.push_back(vecOffMsgDescs[i]);
+		}
+		MarsWrapper::GetInstance().GetOfflineMsgs(vecMsgDesc, CPSIMTaskCallback::GetInstance());
 	}
-	MarsWrapper::GetInstance().GetOfflineMsgs(vecMsgDesc, CPSIMTaskCallback::GetInstance());
+	catch (PSMsgLoginResp& resp)
+	{
+		if (m_pPSIMCallBack)
+		{
+			m_pPSIMCallBack->OnMsgLoginResponse(resp);
+		}
+	}
 }
 
 // 消息撤回
 void CPSIMCallConcrete::RevokeMsg()
 {
-
 }

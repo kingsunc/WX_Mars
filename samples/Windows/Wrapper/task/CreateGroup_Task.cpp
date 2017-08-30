@@ -1,24 +1,26 @@
 #include <mars/comm/windows/projdef.h>
 #include "CreateGroup_Task.h"
 #include "mars/stn/stn_logic.h"
+#include "idl/json/reqData.h"
 
 using namespace std;
 
 bool CreateGroup_Task::Req2Buf(uint32_t _taskid, void* const _user_context, AutoBuffer& _outbuffer, AutoBuffer& _extend, int& _error_code, const int _channel_select)
 {
-	/*MessageService::CreateGroupReq req;
-	req.appId = strAppID;
-	req.userId = strUserID;
-	req.userName = strUserName;
-	req.token = strAppToken;
-	req.deviceType = iDeviceType;
-	req.deviceToken = strDeviceToken;*/
+	MessageService::GroupData req;
+	req.id = m_strGroupID;
+	req.name = m_strGroupName;
+	req.desc = m_strGroupDesc;
+	req.isPublic = m_bPublic;
+	req.maxUsers = m_iMaxUsers;
+	req.owner = m_strOwner;
+	req.admins = m_vecAdmins;
+	req.members = m_vecMembers;
 
-	//tars::TarsOutputStream<tars::BufferWriter> outStream;
-	//req.writeTo(outStream);
-	//int iLen = outStream.getLength();
-	//_outbuffer.AllocWrite(iLen);
-	//_outbuffer.Write(outStream.getBuffer(), iLen);
+	string strReq = req.Serialize();
+	int iLen = strReq.length();
+	_outbuffer.AllocWrite(iLen);
+	_outbuffer.Write(strReq.c_str(), iLen);
 
 	return true;
 }

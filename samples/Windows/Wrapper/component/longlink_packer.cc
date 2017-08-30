@@ -34,7 +34,9 @@
 #include "mars/comm/thread/lock.h"
 
 // 通信协议版本号;
-static uint32_t sg_client_version = 0;
+static uint32_t sg_client_version = 1;
+// 心跳间隔 (ms);
+static uint32_t sg_heart_interval = 0;
 
 #pragma pack(push, 1)
 #pragma pack(pop)
@@ -52,6 +54,11 @@ longlink_tracker* (*longlink_tracker::Create)()
 void SetClientVersion(uint32_t _client_version) 
 {
     sg_client_version = _client_version;
+}
+
+void SetHeartInterval(uint32_t _heart_interval)
+{
+	sg_heart_interval = _heart_interval;
 }
 
 static int __unpack_header(const void* _packed, size_t _packed_len, uint32_t& _cmdid, uint32_t& _seq, size_t& _package_len, size_t& _body_len)
@@ -188,8 +195,7 @@ void (*longlink_noop_resp_body)(const AutoBuffer& _body, const AutoBuffer& _exte
 uint32_t (*longlink_noop_interval)()
 = []()
 {
-	uint32_t interval = 0;
-	return interval;
+	return sg_heart_interval;
 };
 
 bool (*longlink_complexconnect_need_verify)()
@@ -198,13 +204,12 @@ bool (*longlink_complexconnect_need_verify)()
     return false;
 };
 
-const int sg_iRecvMessageCmdID = 20;
-
 bool (*longlink_ispush)(uint32_t _cmdid, uint32_t _taskid, const AutoBuffer& _body, const AutoBuffer& _extend)
 = [](uint32_t _cmdid, uint32_t _taskid, const AutoBuffer& _body, const AutoBuffer& _extend)
 {
-	// 确认是否推送消息 与消息类型协议一致 此处为20;
-    return sg_iRecvMessageCmdID == _cmdid;
+	// 确认是否推送消息;
+	// PS消息类型协议规定 类型为20, 23的为推送消息;
+    return (4 == _cmdid) || (20 == _cmdid) || (23 == _cmdid);
 };
     
 bool (*longlink_identify_isresp)(uint32_t _sent_seq, uint32_t _cmdid, uint32_t _recv_seq, const AutoBuffer& _body, const AutoBuffer& _extend)

@@ -1,6 +1,7 @@
 #include <mars/comm/windows/projdef.h>
 #include "Login_Task.h"
 #include "mars/stn/stn_logic.h"
+#include "NetworkService.h"
 
 using namespace std;
 
@@ -35,6 +36,9 @@ int Login_Task::Buf2Resp(uint32_t _taskid, void* const _user_context, const Auto
 	{
 		pCallback->OnResponse(this, response);
 	}
+
+	// 根据服务器返回得时间设置心跳间隔;
+	// NetworkService::GetInstance().SetHeartInterval(response.server_timeout * 1000);
 
 	return mars::stn::kTaskFailHandleNoError;
 }

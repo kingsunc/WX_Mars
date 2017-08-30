@@ -23,26 +23,28 @@ public:
 		IN const char* strAppToken,
 		IN const char* strUserID,
 		IN const char* strUserName,
+		IN const int iDeviceType,
 		IN const char* strDeviceToken);
 	// 注销;
 	virtual void MsgLogout();
 
 	// 创建群组;
-	virtual bool CreateGroup(IN const PSGroupInfo& groupInfo);
+	virtual void CreateGroup(IN const PSGroupInfo& groupInfo);
 	// 删除群;
 	virtual void DeleteGroup(IN const char* strGroupID);
 
 	// 获取群成员;
+	//virtual void GetGroupUsers(IN const PSGroupInfo& groupUsers);
 	//virtual void GetGroupUsers(const char* strGroupID, const int iPageNum, const int iPageSize);
 	// 添加群成员;
-	virtual bool AddGroupUsers(IN const char* strGroupID, IN const PSUserInfo* pUsers, IN const int iAddCount);
+	virtual void AddGroupUsers(IN const char* strGroupID, IN const PSUserInfo* pUsers, IN const int iAddCount);
 	// 移除群成员;
-	virtual bool RemoveGroupUsers(IN const char* strGroupID, IN const PSUserInfo* pUsers, IN const int iRemoveCount);
+	virtual void RemoveGroupUsers(IN const char* strGroupID, IN const PSUserInfo* pUsers, IN const int iRemoveCount);
 
 	// 添加子群;
-	virtual bool AddGroupChilds(IN const char* strGroupID, IN const PSGroupInfo* pGroups, IN const int iAddCount);
+	virtual void AddGroupChilds(IN const char* strGroupID, IN const PSGroupInfo* pGroups, IN const int iAddCount);
 	// 移除子群;
-	virtual bool RemoveGroupUsers(IN const char* strGroupID, IN const PSGroupInfo* pUsers, IN const int iRemoveCount);
+	virtual void RemoveGroupUsers(IN const char* strGroupID, IN const PSGroupInfo* pUsers, IN const int iRemoveCount);
 
 	// 设置群成员角色
 	virtual void SetGroupUserRole(const char* strGroupID);
@@ -58,17 +60,15 @@ public:
 	virtual void InviteGroupUsers(const char* strGroupID);
 
 	// 发送文本消息
-	virtual bool SendTextMessage(OUT int& iReqID,
+	virtual void SendTextMessage(OUT int& iReqID,
 		IN const PS_SendMode& eSendMode,
 		IN const char* strFrom,
 		IN const char* strTo,
-		IN const char* strContent,
-		IN const int& iContentLen,
+		IN const PSString& strContent,
 		IN const char* strPushInfo);
 
-	// 获取离线消息
-	virtual void GetOfflineMsgs(OUT PSOffMsgDesc* pOffMsgDescs,
-		IN const int& iDescCount);
+	// 获取离线消息;
+	virtual void GetOfflineMsgs(IN const PSVector<PSOffMsgDesc>& vecOffMsgDescs);
 
 	// 消息撤回
 	virtual void RevokeMsg();

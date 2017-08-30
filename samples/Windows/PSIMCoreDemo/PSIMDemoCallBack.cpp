@@ -10,34 +10,26 @@ CPSIMDemoCallBack::~CPSIMDemoCallBack()
 {
 }
 
-void CPSIMDemoCallBack::OnGetOffMsgResponse(const int & iCode, const char * strInfo)
-{
-	printf("CPSIMDemoCallBack::OnGetOffMsgResponse: iCode(%d), strInfo(%s) \n", iCode, strInfo);
-
-	// todo
-	return;
-}
-
 // 删除群-回调处理;
-void CPSIMDemoCallBack::OnDeleteGroupResponse(const PSDeleteGroupResp& respDeleteeGroup)
+void CPSIMDemoCallBack::OnDeleteGroupResponse(const PSDeleteGroupResp& resp)
 {
-	printf("CPSIMDemoCallBack::OnDeleteGroupResponse: iCode(%d), strInfo(%s) \n", respDeleteeGroup.iStatus, respDeleteeGroup.strMessage);
+	printf("CPSIMDemoCallBack::OnDeleteGroupResponse: iCode(%d), strInfo(%s) \n", resp.iStatus, resp.strMessage.GetString());
 }
 
 // 移除群成员-回调处理;
-void CPSIMDemoCallBack::OnRemoveGroupUsersResponse(const PSRemoveGroupUsersResp& respRemoveGroupUsers)
+void CPSIMDemoCallBack::OnRemoveGroupUsersResponse(const PSRemoveGroupUsersResp& resp)
 {
-	printf("CPSIMDemoCallBack::OnRemoveGroupUsersResponse: iCode(%d), strInfo(%s) \n", respRemoveGroupUsers.iStatus, respRemoveGroupUsers.strMessage);
+	printf("CPSIMDemoCallBack::OnRemoveGroupUsersResponse: iCode(%d), strInfo(%s) \n", resp.iStatus, resp.strMessage.GetString());
 }
 
 // 添加子群-回调处理;
-void CPSIMDemoCallBack::OnAddGroupChildsResponse(const PSAddGroupChildsResp& respAddGroupChilds)
+void CPSIMDemoCallBack::OnAddGroupChildsResponse(const PSAddGroupChildsResp& resp)
 {
-	printf("CPSIMDemoCallBack::OnAddGroupChildsResponse: iCode(%d), strInfo(%s) \n", respAddGroupChilds.iStatus, respAddGroupChilds.strMessage);
+	printf("CPSIMDemoCallBack::OnAddGroupChildsResponse: iCode(%d), strInfo(%s) \n", resp.iStatus, resp.strMessage.GetString());
 }
 
 // 移除子群-回调处理;
-void CPSIMDemoCallBack::OnRemoveGroupChildsResponse(const PSRemoveGroupChildsResp& respRemoveGroupChilds)
+void CPSIMDemoCallBack::OnRemoveGroupChildsResponse(const PSRemoveGroupChildsResp& resp)
 {
-	printf("CPSIMDemoCallBack::OnRemoveGroupChildsResponse: iCode(%d), strInfo(%s) \n", respRemoveGroupChilds.iStatus, respRemoveGroupChilds.strMessage);
+	printf("CPSIMDemoCallBack::OnRemoveGroupChildsResponse: iCode(%d), strInfo(%s) \n", resp.iStatus, resp.strMessage.GetString());
 }

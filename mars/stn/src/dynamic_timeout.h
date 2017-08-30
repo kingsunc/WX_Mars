@@ -24,31 +24,34 @@
 #include <bitset>
 #include <string>
 
-enum DynamicTimeoutStatus {
+enum DynamicTimeoutStatus
+{
     kEValuating = 1,
     kExcellent,
     kBad
 };
 
-namespace mars {
-    namespace stn {
+namespace mars
+{
+namespace stn
+{
 
-class DynamicTimeout {
-    
-  public:
+class DynamicTimeout
+{
+public:
     DynamicTimeout();
     virtual ~DynamicTimeout();
-    
+
     void ResetStatus();
-    
+
     void CgiTaskStatistic(std::string _cgi_uri, unsigned int _total_size, uint64_t _cost_time);
     
     int GetStatus();
-    
-  private:
+
+private:
     void __StatusSwitch(std::string _cgi_uri, int _task_status);
-    
-  private:
+
+private:
     int                     dyntime_status_;
     unsigned int            dyntime_continuous_good_count_;
     unsigned long           dyntime_latest_bigpkg_goodtime_;  //ms
@@ -56,8 +59,7 @@ class DynamicTimeout {
     unsigned long           dyntime_fncount_latstmodify_time_;    //ms
     size_t                  dyntime_fncount_pos_;
 };
-        
-    }
-}
+
+}}
 
 #endif // STN_SRC_DYNAMIC_TIMEOUT_H_

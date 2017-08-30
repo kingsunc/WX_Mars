@@ -29,9 +29,9 @@ ext {
     WRAPPER_VERSION_NAME_SUFFIX = '' // '-SNAPSHOT'
 
     minSdkVersion = 16
-    compileSdkVersion = 25
+    compileSdkVersion = 26
     targetSdkVersion = compileSdkVersion
-    buildToolsVersion = '23.0.3'
+    buildToolsVersion = '26.0.3'
     javaVersion = JavaVersion.VERSION_1_7
 
     VERSION_NAME = "${VERSION_NAME_PREFIX}${VERSION_NAME_SUFFIX}"

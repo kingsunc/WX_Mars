@@ -13,6 +13,6 @@ void CHttpRespBase::SetPropertys()
 
 void CHttpRespBase::DisplayPropertys()
 {
-	printf("status : %d \n", m_iStatus);
-	printf("message : %s \n", m_strMessage.c_str());
+	//printf("status : %d \n", m_iStatus);
+	//printf("message : %s \n", m_strMessage.c_str());
 }

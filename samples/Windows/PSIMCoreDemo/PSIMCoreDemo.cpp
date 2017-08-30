@@ -56,9 +56,9 @@ BOOL CPSIMCoreDemoApp::InitInstance()
 	AllocConsole();
 	freopen("CONOUT$", "w", stdout);
 
-	m_pCallBack = new CPSIMDemoCallBack();
-	CPSIMCallFactory::CreateInstance(m_pCallBack);
-	AfxGetPSIMCall()->Init();
+	m_pCallBack = new CPSIMDemoCallBack(); // 继承CPSIMCallBack 进行回调处理;
+	CPSIMCallFactory::CreateInstance(m_pCallBack); // 创建IMCall的实体对象;
+	AfxGetPSIMCall()->Init();	// 获取IMCall的实体对象，进行初始化操作;
 
 	CLoginDlg dlgLogin;
 	INT_PTR iRes = dlgLogin.DoModal();

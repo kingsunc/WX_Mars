@@ -38,6 +38,8 @@ public:
 	static NetworkService& GetInstance();
 	// 启动;
 	void Start();
+	// 结束;
+	void Exit();
 
 	// 任务处理: 开始->发送->接收->结束
 	// 任务开始;
@@ -51,6 +53,7 @@ public:
 	
 	// 设置相关信息;
 	void setClientVersion(uint32_t _client_version);
+	void SetHeartInterval(uint32_t _heart_interval);
 	void setShortLinkDebugIP(const std::string& _ip, unsigned short _port);
 	void setShortLinkPort(unsigned short _port);
 	void setLongLinkAddress(const std::string& _ip, unsigned short _port, const std::string& _debug_ip = "");

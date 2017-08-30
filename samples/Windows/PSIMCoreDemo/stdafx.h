@@ -34,7 +34,7 @@
 #include <afxcontrolbars.h>     // 功能区和控件条的 MFC 支持
 
 
-
+#define NO_UNIT_TEST		0		// 没有单元测试;
 
 
 

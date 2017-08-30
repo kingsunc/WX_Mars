@@ -63,7 +63,29 @@ void CLoginDlg::OnBnClickedLogin()
 
 	theApp.m_strAppID = CT2CA(strAppName);
 	theApp.m_strUserID = CT2CA(strUserID);
-	AfxGetPSIMCall()->MsgLogin(CT2CA(strAppName), CT2CA(strAppToken), CT2CA(strUserID), CT2CA(strUserName), CT2CA(strDeviceToken));
+
+#if NO_UNIT_TEST
+	AfxGetPSIMCall()->MsgLogin(CT2CA(strAppName), CT2CA(strAppToken), CT2CA(strUserID), CT2CA(strUserName), PS_DeviceType_Windows, CT2CA(strDeviceToken));
+#else
+	//AfxGetPSIMCall()->MsgLogin(NULL, NULL, NULL, NULL, PS_DeviceType_Other, NULL);
+	//AfxGetPSIMCall()->MsgLogin("", NULL, NULL, NULL, PS_DeviceType_Other, NULL);
+	//AfxGetPSIMCall()->MsgLogin(CT2CA(strAppName), NULL, NULL, NULL, PS_DeviceType_Other, NULL);
+	//AfxGetPSIMCall()->MsgLogin(CT2CA(strAppName), "", NULL, NULL, PS_DeviceType_Other, NULL);
+	//AfxGetPSIMCall()->MsgLogin(CT2CA(strAppName), CT2CA(strAppToken), NULL, NULL, PS_DeviceType_Other, NULL);
+	//AfxGetPSIMCall()->MsgLogin(CT2CA(strAppName), CT2CA(strAppToken), "", NULL, PS_DeviceType_Other, NULL);
+	//AfxGetPSIMCall()->MsgLogin(CT2CA(strAppName), CT2CA(strAppToken), CT2CA(strUserID), NULL, PS_DeviceType_Other, NULL);
+	//AfxGetPSIMCall()->MsgLogin(CT2CA(strAppName), CT2CA(strAppToken), CT2CA(strUserID), NULL, PS_DeviceType_Windows, NULL);	// successed
+
+	//AfxGetPSIMCall()->MsgLogin(CT2CA(strAppName), CT2CA(strAppToken), CT2CA(strUserID), NULL, PS_DeviceType_Ios, NULL);
+	//AfxGetPSIMCall()->MsgLogin(CT2CA(strAppName), CT2CA(strAppToken), CT2CA(strUserID), NULL, PS_DeviceType_Ios, "");
+	//AfxGetPSIMCall()->MsgLogin(CT2CA(strAppName), CT2CA(strAppToken), CT2CA(strUserID), NULL, PS_DeviceType_Ios, CT2CA(strDeviceToken));	// successed
+	
+	//AfxGetPSIMCall()->MsgLogin(CT2CA(strAppName), CT2CA(strAppToken), CT2CA(strUserID), NULL, PS_DeviceType_Android, NULL);
+	//AfxGetPSIMCall()->MsgLogin(CT2CA(strAppName), CT2CA(strAppToken), CT2CA(strUserID), NULL, PS_DeviceType_Android, "");
+	//AfxGetPSIMCall()->MsgLogin(CT2CA(strAppName), CT2CA(strAppToken), CT2CA(strUserID), NULL, PS_DeviceType_Android, CT2CA(strDeviceToken));	// successed
+
+	AfxGetPSIMCall()->MsgLogin(CT2CA(strAppName), CT2CA(strAppToken), CT2CA(strUserID), CT2CA(strUserName), PS_DeviceType_Windows, CT2CA(strDeviceToken));
+#endif
 }
 
 LRESULT CLoginDlg::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
@@ -80,7 +102,7 @@ LRESULT CLoginDlg::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 			}
 			else
 			{
-				CString strInfo = CA2CT(pRespMsgLogin->strMessage);
+				CString strInfo = CA2CT(pRespMsgLogin->strMessage.GetString());
 				MessageBox(strInfo, _T("ÌבÊ¾"), MB_OK);
 			}
 		}
@@ -91,9 +113,9 @@ LRESULT CLoginDlg::DefWindowProc(UINT message, WPARAM wParam, LPARAM lParam)
 	return CDialogEx::DefWindowProc(message, wParam, lParam);
 }
 
-void CPSIMDemoCallBack::OnMsgLoginResponse(const PSMsgLoginResp& respMsgLogin)
+void CPSIMDemoCallBack::OnMsgLoginResponse(const PSMsgLoginResp& resp)
 {
-	printf("CPSIMDemoCallBack::OnLoginResponse: iCode(%d), strInfo(%s) \n", respMsgLogin.iStatus, respMsgLogin.strMessage);
+	printf("CPSIMDemoCallBack::OnLoginResponse: iCode(%d), strInfo(%s) \n", resp.iStatus, resp.strMessage.GetString());
 
-	::SendMessage(g_hwndLogin, LOGIN_RESP, (WPARAM)&respMsgLogin, NULL);
+	::SendMessage(g_hwndLogin, LOGIN_RESP, (WPARAM)&resp, NULL);
 }

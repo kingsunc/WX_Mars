@@ -33,7 +33,8 @@ int socket_set_nobio(SOCKET fd) {
     return ret;
 }
 #else
-int socket_set_nobio(SOCKET fd) {
+int socket_set_nobio(SOCKET fd)
+{
     static const int noblock = 1;
     return ioctlsocket(fd, FIONBIO, (u_long*)&noblock);
 }

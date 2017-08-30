@@ -22,11 +22,16 @@
 
 #include <map>
 #include <string>
+#include <vector>
 #include "mars/comm/autobuffer.h"
 #include "mars/comm/thread/atomic_oper.h"
 #include "PSDefs.h"
 
 #define NO_APP_SERVER		// 暂时没有业务服务器;
+
+#define HEADER_TOKEN		"token"
+#define HEADER_APPID		"appId"
+#define HEADER_SEQID		"seqId"
 
 // 通道类型;
 enum ChannelType 
@@ -88,6 +93,8 @@ enum MsgCmd
 
 static uint32_t gs_taskid = 1;
 
+typedef std::map<std::string, std::string> HttpHeaderMap;
+
 // 任务基类;
 class CGITask
 {
@@ -106,8 +113,9 @@ public:
 	uint32_t		taskid_;
 	ChannelType		channel_select_;
 	uint32_t		cmdid_;
-	std::string		cgi_;
-	std::string		host_;
+	std::string		cgi_;	// url
+	std::string		host_;	// host
+	HttpHeaderMap	headers_;	// http header
 };
 
 #endif

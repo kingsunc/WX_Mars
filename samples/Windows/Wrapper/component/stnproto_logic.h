@@ -27,7 +27,9 @@ namespace mars
 namespace stn
 {
 
-void SetClientVersion(uint32_t _client_version);
+	void SetClientVersion(uint32_t _client_version);
+
+	void SetHeartInterval(uint32_t _heart_interval);	// ĞÄÌø¼ä¸ô;
 
 }}
 

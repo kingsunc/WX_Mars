@@ -45,6 +45,11 @@ void NetworkService::setClientVersion(uint32_t _client_version)
 	mars::stn::SetClientVersion(_client_version);
 }
 
+void NetworkService::SetHeartInterval(uint32_t _heart_interval)
+{
+	mars::stn::SetHeartInterval(_heart_interval);
+}
+
 void NetworkService::setShortLinkDebugIP(const std::string& _ip, unsigned short _port)
 {
 	mars::stn::SetShortlinkSvrAddr(_port, _ip);
@@ -68,6 +73,11 @@ void NetworkService::Start()
 	mars::stn::MakesureLonglinkConnected();
 }
 
+void NetworkService::Exit()
+{
+	mars::baseevent::OnDestroy();
+}
+
 void NetworkService::Init()
 {
 	mars::stn::SetCallback(mars::stn::StnCallBack::Instance());
@@ -83,6 +93,7 @@ int NetworkService::StartTask(CGITask* task)
 	stnTask.shortlink_host_list.push_back(task->host_);
 	stnTask.cgi = task->cgi_;
 	stnTask.user_context = (void*)task;
+	stnTask.http_header = task->headers_;
 	mars::stn::StartTask(stnTask);
 	m_mapTasks[stnTask.taskid] = task;
 	return stnTask.taskid;

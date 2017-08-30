@@ -138,6 +138,12 @@
     <ClInclude Include="task\AddGroupUser_Task.h">
       <Filter>task</Filter>
     </ClInclude>
+    <ClInclude Include="idl\json\reqData.h">
+      <Filter>idl\json</Filter>
+    </ClInclude>
+    <ClInclude Include="idl\json\DeleteGroupResp_Json.h">
+      <Filter>idl\json</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="component\app_callback.cpp">
@@ -202,6 +208,9 @@
     </ClCompile>
     <ClCompile Include="task\AddGroupUser_Task.cpp">
       <Filter>task</Filter>
+    </ClCompile>
+    <ClCompile Include="idl\json\DeleteGroupResp_Json.cpp">
+      <Filter>idl\json</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

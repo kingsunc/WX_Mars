@@ -10,11 +10,11 @@ bool OffMsg_Task::Req2Buf(uint32_t _taskid, void* const _user_context, AutoBuffe
 	for (int i = 0; i < vecMsgDesc.size(); i++)
 	{
 		MessageService::OffMsgDesc desc;
-		desc.queue.from = vecMsgDesc[i].strFrom;
-		desc.queue.to = vecMsgDesc[i].strTo;
+		desc.queue.from = vecMsgDesc[i].strFrom.GetString();
+		desc.queue.to = vecMsgDesc[i].strTo.GetString();
 		desc.queue.sendMode = vecMsgDesc[i].iSendMode;
 		desc.startMsgId = vecMsgDesc[i].iStartMsgID;
-		desc.count = vecMsgDesc[i].iMsgCount;
+		desc.count = vecMsgDesc[i].iEndMsgID - vecMsgDesc[i].iStartMsgID + 1;
 		req.reqs.push_back(desc);
 	}
 

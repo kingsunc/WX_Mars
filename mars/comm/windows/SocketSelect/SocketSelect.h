@@ -18,7 +18,8 @@
 #include <winsock2.h>
 #include "thread/lock.h"
 
-class SocketSelectBreaker {
+class SocketSelectBreaker
+{
   public:
     SocketSelectBreaker();
     ~SocketSelectBreaker();
@@ -47,7 +48,8 @@ class SocketSelectBreaker {
     Mutex m_mutex;
 };
 
-class SocketSelect {
+class SocketSelect
+{
   public:
     SocketSelect(SocketSelectBreaker& _breaker, bool _autoclear = false);
     ~SocketSelect();
