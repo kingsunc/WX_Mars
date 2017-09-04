@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<Window size="320,150" roundcorner="3,3" caption="0,0,0,150" showshadow="true" shadowimage="image/wnd_shadow.png" shadowsize="30" shadowcorner="40,40,40,40" >
+	<Font id="0" name="微软雅黑" size="12" bold="false" italic="false" />
+    <Font id="1" name="微软雅黑" size="12" bold="true"  italic="false" />
+
+    <VerticalLayout name="root" width="320" height="150" bkimage="file='main\0.png' corner='320,25,0,40'" >
+		<HorizontalLayout height="25" >
+			<Text  padding="5,4,0,0" name="txt_caption" width="150" height="24" font="1" align="left" textcolor="#FFFFFF" />
+			<HorizontalLayout />
+			<Button name="btn_close" width="25" height="25" normalimage="file='image/titlebutton.png' source='1,1,26,26'"  hotimage="file='image/titlebutton.png' source='27,1,52,26'"  pushedimage="file='image/titlebutton.png' source='53,1,78,26'"  disabledimage="file='image/titlebutton.png' source='79,1,104,26'"  tooltip="关闭"	 keyboard="false" />
+        </HorizontalLayout>
+		<VerticalLayout bkcolor="#D8FFFFFF" >
+			<HorizontalLayout >
+				<Label padding="20,25,0,0"  name="lab_icon" width="32" height="32" />
+				<Text  padding="20,25,0,20" name="txt_text" wordbreak="true" width="230" height="60" font="0" textcolor="#FF353535" />
+			</HorizontalLayout>	
+		</VerticalLayout>
+		<VerticalLayout height="40" >
+			<HorizontalLayout height="8" />
+			<HorizontalLayout>
+				<HorizontalLayout />
+				<Button name="btn_box1" width="65" height="24" font="0" textcolor="#FFFFFFFF" style="btn_style" />
+				<HorizontalLayout width="15" />
+				<Button name="btn_box2" width="65" height="24" font="0" textcolor="#FFFFFFFF" style="btn_style" />
+				<HorizontalLayout width="15" />
+				<Button name="btn_box3" width="65" height="24" font="0" textcolor="#FFFFFFFF" style="btn_style" />
+				<HorizontalLayout width="15" />
+			</HorizontalLayout>
+			<HorizontalLayout height="8" />
+		</VerticalLayout>
+	</VerticalLayout>
+</Window>

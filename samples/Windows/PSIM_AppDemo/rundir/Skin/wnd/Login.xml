@@ -1,0 +1,100 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<Window size="440,350" roundcorner="3,3" caption="0,0,0,350" showshadow="true" shadowimage="image/wnd_shadow.png" shadowsize="30" shadowcorner="40,40,40,40" >
+	<Font shared="true" id="0" name="微软雅黑" size="12" bold="false" />
+	<Font shared="true" id="1" name="微软雅黑" size="12" bold="true" />
+	<Font shared="true" id="2" name="微软雅黑" size="14"  />
+	<Font shared="true" id="3" name="微软雅黑" size="14" bold="true" />
+	<Font shared="true" id="4" name="微软雅黑" size="16"  />
+	<Font shared="true" id="5" name="微软雅黑" size="16" bold="true" />
+	<Font shared="true" id="101" name="宋体" size="10" />
+	<Font shared="true" id="102" name="宋体" size="10" bold="true" />
+	<Font shared="true" id="103" name="宋体" size="12" />
+	<Font shared="true" id="104" name="宋体" size="12" bold="true" />
+	<Font shared="true" id="105" name="宋体" size="14" />
+	<Font shared="true" id="106" name="宋体" size="14" bold="true" />
+	<Font shared="true" id="107" name="宋体" size="16" />
+	<Font shared="true" id="108" name="宋体" size="16" bold="true" />
+
+	<!-- <Style name="btn_style"   shared="true" value="normalimage=&quot;res='image/button.png' source='0,1,50,35' corner='3,3,3,3' &quot; hotimage=&quot;res='image/button.png' source='51,1,101,35' corner='3,3,3,3' &quot; pushedimage=&quot; res='image/button.png' source='102,1,152,35' corner='3,3,3,3' &quot; disabledimage=&quot;res='image/button.png' source='153,1,203,35' corner='3,3,3,3' &quot;" /> -->
+	<Style name="btn_style"   shared="true" value="normalimage=&quot;res='image/button1.png' source='1,1,49,25' corner='15,0,15,0' &quot; hotimage=&quot;res='image/button1.png' source='50,1,98,25' corner='15,0,15,0' &quot; pushedimage=&quot; res='image/button1.png' source='99,1,147,25' corner='15,0,15,0'' &quot; disabledimage=&quot;res='image/button1.png' source='148,1,196,25' corner='15,0,15,0'' &quot;" />
+	<Style name="btn2_style"   shared="true" value="normalimage=&quot;res='image/button2.png' source='1,1,49,25' corner='15,0,15,0' &quot; hotimage=&quot;res='image/button2.png' source='50,1,98,25' corner='15,0,15,0' &quot; pushedimage=&quot; res='image/button2.png' source='99,1,147,25' corner='15,0,15,0'' &quot; disabledimage=&quot;res='image/button2.png' source='148,1,196,25' corner='15,0,15,0'' &quot;" />
+	
+	<Style name="loginbtn_style"   shared="true" value="normalimage=&quot;res='image/button.png' source='0,1,50,35' corner='3,3,3,3' &quot; hotimage=&quot;res='image/button.png' source='51,1,101,35' corner='3,3,3,3' &quot; pushedimage=&quot; res='image/button.png' source='102,1,152,35' corner='3,3,3,3' &quot; disabledimage=&quot;res='image/button.png' source='102,1,152,35' corner='3,3,3,3' &quot;" />
+    <Style name="edit_style"  shared="true" value="normalimage=&quot;res='image/edit.png'   source='1,1,51,25' corner='5,5,5,5' &quot; hotimage=&quot;res='image/edit.png'   source='1,26,51,50'  corner='5,5,5,5' &quot; focusedimage=&quot;res='image/edit.png'   source='1,51,51,75'   corner='5,5,5,5' &quot; disabledimage=&quot;res='image/edit.png'   source='1,76,51,100'  corner='5,5,5,5' &quot; textpadding=&quot;6,1,1,1&quot; " />
+	<Style name="edit2_style"  shared="true" value="normalimage=&quot;res='image/edit2.png'   source='1,1,51,25' corner='5,5,5,5' &quot; hotimage=&quot;res='image/edit2.png'   source='1,26,51,50'  corner='5,5,5,5' &quot; focusedimage=&quot;res='image/edit2.png'   source='1,51,51,75'   corner='5,5,5,5' &quot; disabledimage=&quot;res='image/edit2.png'   source='1,76,51,100'  corner='5,5,5,5' &quot; textpadding=&quot;10,1,1,1&quot; " />
+	<Style name="check_style" shared="true" value="normalimage=&quot;res='image/check.png' source='1,1,17,17' dest='0,4,13,17' corner='2,2,2,2' &quot; hotimage=&quot;res='image/check.png'  source='18,1,34,17'  dest='0,4,13,17' corner='2,2,2,2' &quot; pushedimage=&quot; res='image/check.png'  source='35,1,51,17' dest='0,4,13,17' corner='2,2,2,2' &quot; disabledimage=&quot;res='image/check.png'  source='52,1,68,17'  dest='0,4,13,17' corner='2,2,2,2' &quot; selectedimage=&quot;res='image/check.png'  source='1,18,17,34' dest='0,4,13,17' corner='2,2,2,2' &quot; selectedhotimage=&quot;res='image/check.png'  source='18,18,34,34' dest='0,4,13,17' corner='2,2,2,2' &quot; selectedpushedimage=&quot; res='image/check.png'  source='35,18,51,34' dest='0,4,13,17' corner='2,2,2,2' &quot; selecteddisabledimage=&quot;res='image/check.png'  source='52,18,68,34' dest='0,4,13,17' corner='2,2,2,2' &quot; textpadding=&quot;16,2,0,0&quot; font=&quot;0&quot; textcolor=&quot;#FF353535&quot; align=&quot;left&quot; " />
+	<!-- <Style name="combo_style" shared="true" value="normalimage=&quot;res='image/combo.png'   source='1,1,267,31' corner='10,0,35,0' &quot; hotimage=&quot;res='image/combo.png'   source='1,32,267,62'  corner='10,0,35,0' &quot; focusedimage=&quot;res='image/combo.png'   source='1,32,267,62'   corner='10,0,35,0' &quot; pushedimage=&quot; res='image/combo.png' source='1,63,267,93' corner='10,0,35,0' &quot; disabledimage=&quot;res='image/combo.png'   source='1,94,267,124'  corner='10,0,35,0' &quot; itembkcolor=&quot;#FFFFFFFF&quot; itemhotbkcolor=&quot;#FFFFFFFF&quot; itemselectedbkcolor=&quot;#FFFFFFFF&quot; itemselectedtextcolor=&quot;#FFFB6655&quot; font=&quot;0&quot; textpadding=&quot;10,1,35,1&quot; endellipsis=&quot;true&quot; itemfont=&quot;0&quot; itemtextpadding=&quot;10,1,5,1&quot; itemendellipsis=&quot;true&quot;" /> -->
+	<Style name="combo_style" shared="true" value="normalimage=&quot;res='image/combo.png'   source='1,1,65,25' corner='10,0,30,0' &quot; hotimage=&quot;res='image/combo.png'   source='1,26,65,50'  corner='10,0,30,0' &quot; focusedimage=&quot;res='image/combo.png'   source='1,26,65,50'   corner='10,0,30,0' &quot; pushedimage=&quot; res='image/combo.png' source='1,51,65,75' corner='10,0,30,0' &quot; disabledimage=&quot;res='image/combo.png'   source='1,76,65,100'  corner='10,0,30,0' &quot; itembkcolor=&quot;#FFFFFFFF&quot; itemhotbkcolor=&quot;#FFFFFFFF&quot; itemselectedbkcolor=&quot;#FFFFFFFF&quot; itemselectedtextcolor=&quot;#FFFB6655&quot; font=&quot;0&quot; textpadding=&quot;10,1,35,1&quot; endellipsis=&quot;true&quot; itemfont=&quot;0&quot; itemtextpadding=&quot;10,1,5,1&quot; itemendellipsis=&quot;true&quot;" />
+	<!-- <Style name="combo_style" shared="true" value="normalimage=&quot;res='image/combo2.png'   source='1,1,267,37' corner='10,0,35,0' &quot; hotimage=&quot;res='image/combo2.png'   source='1,38,267,74'  corner='10,0,35,0' &quot; focusedimage=&quot;res='image/combo2.png'   source='1,38,267,74'   corner='10,0,35,0' &quot; pushedimage=&quot; res='image/combo2.png' source='1,75,267,111' corner='10,0,35,0' &quot; disabledimage=&quot;res='image/combo2.png'   source='1,112,267,148'  corner='10,0,35,0' &quot; itembkcolor=&quot;#FFFFFFFF&quot; itemhotbkcolor=&quot;#FFFFFFFF&quot; itemselectedbkcolor=&quot;#FFFFFFFF&quot; itemselectedtextcolor=&quot;#FFFB6655&quot; font=&quot;0&quot; textpadding=&quot;10,1,35,1&quot; endellipsis=&quot;true&quot; itemfont=&quot;0&quot; itemtextpadding=&quot;10,1,5,1&quot; itemendellipsis=&quot;true&quot;" />
+	 -->
+	<Default name="VScrollBar" shared="true" value="width=&quot;8&quot; showbutton1=&quot;false&quot; showbutton2=&quot;false&quot; button1normalimage=&quot;file='image/scroll.png' source='0,0,8,8'&quot; button1hotimage=&quot;file='image/scroll.png' source='0,0,8,8'&quot; button1pushedimage=&quot;file='image/scroll.png' source='0,0,8,8'&quot; button2normalimage=&quot;file='image/scroll.png' source='0,42,8,50'&quot; button2hotimage=&quot;file='image/scroll.png' source='0,42,8,50'&quot; button2pushedimage=&quot;file='image/scroll.png' source='0,42,8,50'&quot; thumbnormalimage=&quot;file='image/scroll.png' source='0,8,8,25' corner='5,5,5,5' &quot; thumbhotimage=&quot;file='image/scroll.png' source='0,8,8,25' corner='5,5,5,5' &quot; thumbpushedimage=&quot;file='image/scroll.png' source='0,8,8,25' corner='5,5,5,5'&quot; bknormalimage=&quot;file='image/scroll.png' source='0,25,8,42' corner='5,5,5,5' &quot; bkhotimage=&quot;file='image/scroll.png' source='0,25,8,42' corner='5,5,5,5'&quot; bkpushedimage=&quot;file='image/scroll.png' source='0,25,8,42' corner='5,5,5,5'&quot;" />
+	<Default name="HScrollBar" shared="true" value="height=&quot;8&quot; showbutton1=&quot;false&quot; showbutton2=&quot;false&quot; button1normalimage=&quot;file='image/scroll_hor.png' source='0,0,8,8'&quot; button1hotimage=&quot;file='image/scroll_hor.png' source='0,0,8,8'&quot; button1pushedimage=&quot;file='image/scroll_hor.png' source='0,0,8,8'&quot; button2normalimage=&quot;file='image/scroll_hor.png' source='42,0,50,8'&quot; button2hotimage=&quot;file='image/scroll_hor.png' source='42,0,50,8'&quot; button2pushedimage=&quot;file='image/scroll_hor.png' source='42,0,50,8'&quot; thumbnormalimage=&quot;file='image/scroll_hor.png' source='8,0,25,8' corner='5,5,5,5' &quot; thumbhotimage=&quot;file='image/scroll_hor.png' source='8,0,25,8' corner='5,5,5,5' &quot; thumbpushedimage=&quot;file='image/scroll_hor.png' source='8,0,25,8' corner='5,5,5,5'&quot; bknormalimage=&quot;file='image/scroll_hor.png' source='25,0,42,8' corner='5,5,5,5' &quot; bkhotimage=&quot;file='image/scroll_hor.png' source='25,0,42,8' corner='5,5,5,5'&quot; bkpushedimage=&quot;file='image/scroll_hor.png' source='25,0,42,8' corner='5,5,5,5'&quot;" />
+
+	<VerticalLayout width="440" height="350" bkcolor="0xFFF7FBFF" >
+		<!-- <HorizontalLayout float="true" pos="0,0,0,0" height="180" width="440">
+			<GifAnim width="440" bkimage="bkg_login.gif" autoplay="true" />
+		</HorizontalLayout > -->
+		<HorizontalLayout height="180" bkimage="image/login/bkg_top.png" >
+			<HorizontalLayout />
+			<Button name="btn_min"	 width="25" height="25" normalimage="file='image/titlebutton.png' source='1,27,26,52'" hotimage="file='image/titlebutton.png' source='27,27,52,52'" pushedimage="file='image/titlebutton.png' source='53,27,78,52'" disabledimage="file='image/titlebutton.png' source='79,27,104,52'" tooltip="最小化" keyboard="false" />
+			<Button name="btn_close" width="25" height="25" normalimage="file='image/titlebutton.png' source='1,1,26,26'"  hotimage="file='image/titlebutton.png' source='27,1,52,26'"  pushedimage="file='image/titlebutton.png' source='53,1,78,26'"  disabledimage="file='image/titlebutton.png' source='79,1,104,26'"  tooltip="关闭"	 keyboard="false" />
+        </HorizontalLayout>
+		<HorizontalLayout height="20" />
+		<TabLayout name="tab_login_area" height="150" >
+			<VerticalLayout  >
+				<HorizontalLayout height="110" >
+					<HorizontalLayout width="135" >
+						<HorizontalLayout width="30">
+						</HorizontalLayout>
+						<HorizontalLayout >
+							<Button name="btn_header" width="85" height="85" bkimage="image/login/bkg_header.png" normalimage="file='image/login/header.png' source='1,1,71,71' corner='8,8,8,8'"  hotimage="file='image/login/header.png' source='72,1,142,71' corner='8,8,8,8'" pushedimage="file='image/login/header.png' source='143,1,213,71' corner='8,8,8,8'" disabledimage="file='image/login/header.png' source='214,1,284,71' corner='8,8,8,8'" keyboard="false" />
+						</HorizontalLayout>
+					</HorizontalLayout>
+					<VerticalLayout >
+						<HorizontalLayout height="5" />
+						<HorizontalLayout height="27" >
+							<Edit name="edt_name" tipvalue="用户名" width="200" font="0" style="edit_style" />
+							<Button name="btn_register_name"  width="70" font="0" align="vcenter" textcolor="#FFEB6454" hottextcolor="#FFEB8075" text="注册账号" keyboard="false" />
+						</HorizontalLayout >
+						<HorizontalLayout height="2">
+						</HorizontalLayout>
+						<HorizontalLayout height="27" >
+							<Edit name="edt_pwd" tipvalue="用户密码" width="200" font="0" style="edit_style" />
+							<Button name="btn_recover_pwd"  width="70" font="0" align="vcenter" textcolor="#FFEB6454" hottextcolor="#FFEB8075" text="找回密码" keyboard="false" />
+						</HorizontalLayout>
+						<HorizontalLayout width="200" height="20" padding="0,5,0,0" >
+							<HorizontalLayout width="66" >
+								<Option name="btn_remember_pwd" selected="false" style="check_style"  text="记住密码" />
+							</HorizontalLayout>
+							<HorizontalLayout />
+							<HorizontalLayout width="66" >
+								<Option name="btn_auto_login" selected="false" style="check_style" text="自动登录" />
+							</HorizontalLayout>
+						</HorizontalLayout>
+					</VerticalLayout>	
+				</HorizontalLayout>
+				<HorizontalLayout height="40">
+					<HorizontalLayout width="135">
+					</HorizontalLayout>
+					<HorizontalLayout >
+						<Button name="btn_login" width="200" height="30" style="loginbtn_style" keyboard="false" text="登 录" font="1" textcolor="#FFFFFFFF" disabledtextcolor="#FFFFFFFF" />
+					</HorizontalLayout>
+				</HorizontalLayout>
+			</VerticalLayout>
+			<VerticalLayout>  
+				<HorizontalLayout height="110" >
+					<HorizontalLayout />
+					<Button name="btn_header1" width="85" height="85" bkimage="image/bkg_image/login/header.png" normalimage="file='image/login/header.png' source='1,1,71,71' corner='8,8,8,8'"  hotimage="file='image/login/header.png' source='72,1,142,71' corner='8,8,8,8'" pushedimage="file='image/login/header.png' source='143,1,213,71' corner='8,8,8,8'" disabledimage="file='image/login/header.png' source='214,1,284,71' corner='8,8,8,8'" keyboard="false" />
+					<HorizontalLayout />
+				</HorizontalLayout>
+				<HorizontalLayout height="40">
+					<HorizontalLayout />
+					<HorizontalLayout width="200" >
+						<Button width="200" height="30" style="loginbtn_style" keyboard="false" text="正在登录中..." font="1" textcolor="#FFFFFFFF" disabledtextcolor="#FFFFFFFF" />
+					</HorizontalLayout>
+					<HorizontalLayout />
+				</HorizontalLayout>
+			</VerticalLayout>
+		</TabLayout>
+	</VerticalLayout>
+</Window>

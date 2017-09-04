@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Windows>
+<!-- 完成 -->
+ <VerticalLayout width="600" height="420" >
+    <VerticalLayout height="350" bkimage="update_finish.png" />
+	<HorizontalLayout height="70" bkimage="file='bgbottom.png' corner='10,0,10,10'" >
+		<HorizontalLayout />
+		<Button name="btnRun" padding="0,20,0,0" width="85" height="30" font="1" textcolor="#FFFFFFFF" text="立即启动" normalimage="file='button.png' source='0,1,50,35' corner='3,3,3,3'" hotimage="file='button.png' source='51,1,101,35' corner='3,3,3,3'" pushedimage="file='button.png' source='102,1,152,35' corner='3,3,3,3' "  />
+		<HorizontalLayout />
+	</HorizontalLayout>
+ </VerticalLayout>
+</Windows>

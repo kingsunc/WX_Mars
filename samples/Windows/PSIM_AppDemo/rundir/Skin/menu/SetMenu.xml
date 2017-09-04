@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window roundcorner="3,3" caption="0,0,0,320" showshadow="true" shadowimage="menuwnd_shadow.png" shadowsize="7" shadowcorner="20,20,20,20" >
+	<!-- Menu样式 -->
+	<Default name="Menu" value="itemfont=&quot;0&quot; itemtextcolor=&quot;#FF353535&quot; bordersize=&quot;1&quot; borderround=&quot;2,2&quot;  inset=&quot;2,2,2,2&quot; itemtextpadding=&quot;30,0,0,0&quot; bkimage=&quot;file='menu/menu_bkg.png' &quot; itemselectedbkcolor=&quot;0xFFE6E6E6&quot;" />
+	<Default name="ExplandIcon" value="menu/menu_expand.png" />
+	<Menu >
+		<MenuElement name="item_myinfo" text="我的资料" />
+		<MenuElement linetype="true" linepadding="3,0,5,0" />
+		<MenuElement name="item_update" text="检查更新" />
+		<MenuElement linetype="true" linepadding="3,0,5,0" />
+		<MenuElement text="帮助" expland="true" >
+			<MenuElement name="item_instructions" text="使用说明" />
+			<MenuElement name="item_feedback" text="用户反馈" />
+			<MenuElement linetype="true" linepadding="3,0,5,0" />
+			<MenuElement name="item_home" text="开会宝官网" />
+			<MenuElement name="item_about" text="关于开会宝" />
+		</MenuElement>
+		<MenuElement name="item_changed" text="更换账号" />
+		<MenuElement name="item_logout" text="注销" />
+		<MenuElement name="item_exit" text="退出" />
+	</Menu>
+</Window>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window >
+	<VerticalLayout height="300" bkcolor="#30FFFFFF" padding="10,0,10,0" >
+		<HorizontalLayout height="1" >
+		</HorizontalLayout>
+		<VerticalLayout padding="5,0,0,0">
+			<Label height="24" font="1" align="left" valign="vcenter" textcolor="#FFFB6655" text="活动标题" />
+			<Text  height="24" font="0" textcolor="#FFEAEAEA" />
+			<Label height="24" font="1" align="left" valign="vcenter" textcolor="#FFFB6655" text="活动详情" />
+			<Text  wordbreak="true" font="0" textcolor="#FFFFFFFF" />
+			<Label height="24" font="1" align="left" valign="vcenter" textcolor="#FFFB6655" text="活动奖励" />
+			<Text  wordbreak="true" font="0" textcolor="#FFFFFFFF" />
+			<Label height="24" font="1" align="left" valign="vcenter" textcolor="#FFFB6655" text="参与方式" />
+			<Text  wordbreak="true" font="0" textcolor="#FFFFFFFF" />
+			<Label height="24" font="1" align="left" valign="vcenter" textcolor="#FFFB6655" text="活动时间" />
+			<Text  height="24" font="0" textcolor="#FFFFFFFF" />
+			<VerticalLayout height="5" />
+		</VerticalLayout>
+	</VerticalLayout>
+</Window>

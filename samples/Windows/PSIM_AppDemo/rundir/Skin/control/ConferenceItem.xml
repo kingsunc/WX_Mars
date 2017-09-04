@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Window >
+	<Font id="501" name="微软雅黑" size="12" />
+	<ConferenceItem height="100" bkcolor="#11FFFFFF" padding="10,10,10,0" >
+		<Text height="24"  font="501" textcolor="#FFFFFFFF" padding="5,0,0,0" />
+		<Text height="24"  font="501" textcolor="#FFFFFFFF" padding="5,0,0,0" />
+		<Text height="24"  font="501" textcolor="#FFFFFFFF" padding="5,0,0,0" />
+		<HorizontalLayout  />
+		<HorizontalLayout height="24" >
+			<Button width="65" style="loginbtn_style" keyboard="false" text="开会" font="1" textcolor="#FFFFFFFF" disabledtextcolor="#FFFFFFFF" />
+			<HorizontalLayout width="10" />
+			<Button width="65" style="loginbtn_style" keyboard="false" text="编辑" font="1" textcolor="#FFFFFFFF" disabledtextcolor="#FFFFFFFF" />
+		</HorizontalLayout >
+		<HorizontalLayout height="5" />
+	</ConferenceItem>
+</Window>

@@ -1,0 +1,113 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<Window size="360, 680" roundcorner="3,3" caption="0,0,0,680" maxinfo="440,900" mininfo="360,680" showshadow="true" shadowimage="image/wnd_shadow.png" shadowsize="30" shadowcorner="40,40,40,40" sizebox="4,4,4,4" >
+
+	<Style name="tab1_style" value="bkimage=&quot;res='main_tab1.png' source='1,1,30,30' corner='5,5,5,5' &quot; normalimage=&quot;res='main_tab1.png' source='1,1,30,30' corner='5,5,5,5' &quot; hotimage=&quot;res='main_tab1.png' source='31,1,60,30' corner='5,5,5,5' &quot; pushedimage=&quot;res='main_tab1.png' source='61,1,90,30' corner='5,5,5,5' &quot; selectedimage=&quot;res='main_tab1.png' source='61,1,90,30' corner='5,5,5,5' &quot; textcolor=&quot;#FF373737&quot; hottextcolor=&quot;#FF373737&quot; pushedtextcolor=&quot;#FF373737&quot; selectedtextcolor=&quot;#FF373737&quot; font=&quot;3&quot; textpadding=&quot;0,0,0,2&quot; group=&quot;tab1&quot; "  />
+	<Style name="tab2_style" value="bkimage=&quot;res='main_tab2.png' source='1,1,30,30' corner='5,5,5,5' &quot; normalimage=&quot;res='main_tab2.png' source='1,1,30,30' corner='5,5,5,5' &quot; hotimage=&quot;res='main_tab2.png' source='31,1,60,30' corner='5,5,5,5' &quot; pushedimage=&quot;res='main_tab2.png' source='61,1,90,30' corner='5,5,5,5' &quot; selectedimage=&quot;res='main_tab2.png' source='61,1,90,30' corner='5,5,5,5' &quot; textcolor=&quot;#FF878787&quot; hottextcolor=&quot;#FFFEBDB6&quot; pushedtextcolor=&quot;#FFFB6655&quot; selectedtextcolor=&quot;#FFFB6655&quot; font=&quot;0&quot; textpadding=&quot;0,0,0,2&quot; group=&quot;tab2&quot; " />
+
+	<VerticalLayout name="root" width="360" height="680" bkimage="file='main\0.png' corner='0,60,0,70'" >
+		<HorizontalLayout height="25" bkcolor="#55000000" >
+			<HorizontalLayout  />
+			<VerticalLayout width="100" >
+				<HorizontalLayout height="25">
+					<Button name="btn_set"     width="25" height="25" normalimage="file='image/main/titlebutton_set.png' source='1,1,26,26'"   hotimage="file='image/main/titlebutton_set.png' source='27,1,52,26'"   pushedimage="file='image/main/titlebutton_set.png' source='53,1,78,26'"   disabledimage="file='image/main/titlebutton_set.png' source='79,1,104,26'"   tooltip="菜单"	  keyboard="false" />
+					<Button name="btn_skin"    width="25" height="25" normalimage="file='image/main/titlebutton_skin.png' source='1,1,26,26'"   hotimage="file='image/main/titlebutton_skin.png' source='27,1,52,26'"   pushedimage="file='image/main/titlebutton_skin.png' source='53,1,78,26'"   disabledimage="file='image/main/titlebutton_skin.png' source='79,1,104,26'"   tooltip="皮肤"	  keyboard="false" />
+					<Button name="btn_min"	   width="25" height="25" normalimage="file='image/titlebutton.png' source='1,27,26,52'"  hotimage="file='image/titlebutton.png' source='27,27,52,52'"  pushedimage="file='image/titlebutton.png' source='53,27,78,52'"  disabledimage="file='image/titlebutton.png' source='79,27,104,52'"  tooltip="最小化" keyboard="false" />
+					<!-- <Button name="btn_max"     width="25" height="25" normalimage="file='image/titlebutton.png' source='1,53,26,78'"  hotimage="file='image/titlebutton.png' source='27,53,52,78'"  pushedimage="file='image/titlebutton.png' source='53,53,78,78'"  disabledimage="file='image/titlebutton.png' source='79,53,104,78'"  tooltip="最大化" keyboard="false" />
+					<Button name="btn_restore" width="25" height="25" normalimage="file='image/titlebutton.png' source='1,79,26,104'" hotimage="file='image/titlebutton.png' source='27,79,52,104'" pushedimage="file='image/titlebutton.png' source='53,79,78,104'" disabledimage="file='image/titlebutton.png' source='79,79,104,104'" tooltip="还原"   keyboard="false" visible="false" /> -->
+					<Button name="btn_close"   width="25" height="25" normalimage="file='image/titlebutton.png' source='1,1,26,26'"   hotimage="file='image/titlebutton.png' source='27,1,52,26'"   pushedimage="file='image/titlebutton.png' source='53,1,78,26'"   disabledimage="file='image/titlebutton.png' source='79,1,104,26'"   tooltip="关闭"	  keyboard="false" />
+				</HorizontalLayout>
+				<VerticalLayout height="4" />
+			</VerticalLayout >
+		</HorizontalLayout>
+		<TabLayout name="tab_view_area" >
+			<VerticalLayout >
+				<HorizontalLayout height="60" bkcolor="#11FFFFFF" >
+					<HorizontalLayout width="10" />
+					<VerticalLayout >
+						<HorizontalLayout height="10" />
+						<HorizontalLayout height="40" >
+							<Button name="btn_header" width="40" height="40" bkimage="image/login/bkg_header.png" normalimage="file='image/login/header.png' source='1,1,71,71' corner='8,8,8,8'"  hotimage="file='image/login/header.png' source='72,1,142,71' corner='8,8,8,8'" pushedimage="file='image/login/header.png' source='143,1,213,71' corner='8,8,8,8'" disabledimage="file='image/login/header.png' source='214,1,284,71' corner='8,8,8,8'" keyboard="false" >
+							</Button>
+							<VerticalLayout width="200" inset="10,10,0,0" >
+								<Label name="lab_nickname" height="16" font="2" align="left" valign="vcenter" textcolor="#FFFFFFFF" />
+							</VerticalLayout>
+						</HorizontalLayout>
+					</VerticalLayout>
+					<VerticalLayout width="70" >
+						<HorizontalLayout/>
+						<Button name="btn_conference_set"    height="24" normalimage="file='image/main/btn_conference_set.png' "   hotimage="file='image/main/btn_conference_set.png' "   pushedimage="file='image/main/btn_conference_set.png' "   disabledimage="file='image/main/btn_conference_set.png' "  keyboard="false" />
+						<HorizontalLayout/>
+					</VerticalLayout >
+					<HorizontalLayout width="10" />			
+				</HorizontalLayout>
+				<VerticalLayout >
+					<HorizontalLayout height="50" />
+					<HorizontalLayout height="80" >
+						<HorizontalLayout />
+						<Button name="btn_video_conference_create"     width="80" height="80" normalimage="file='image/main/btn_video_conference_create.png' "   hotimage="file='image/main/btn_video_conference_create.png' "   pushedimage="file='image/main/btn_video_conference_create.png' "   disabledimage="file='image/main/btn_video_conference_create.png' "  keyboard="false" />
+						<HorizontalLayout width="30" />
+						<Button name="btn_audio_conference_create"     width="80" height="80" normalimage="file='image/main/btn_audio_conference_create.png' "   hotimage="file='image/main/btn_audio_conference_create.png' "   pushedimage="file='image/main/btn_audio_conference_create.png' "   disabledimage="file='image/main/btn_audio_conference_create.png' "  keyboard="false" />
+						<HorizontalLayout />
+					</HorizontalLayout >
+					<HorizontalLayout height="30" />
+					<HorizontalLayout height="80" >
+						<HorizontalLayout />
+						<Button name="btn_conference_join"     width="80" height="80" normalimage="file='image/main/btn_conference_join.png' "   hotimage="file='image/main/btn_conference_join.png' "   pushedimage="file='image/main/btn_conference_join.png' "   disabledimage="file='image/main/btn_conference_join.png' "  keyboard="false" />
+						<HorizontalLayout width="30" />
+						<Button name="btn_conference_plan"     width="80" height="80" normalimage="file='image/main/btn_conference_plan.png' "   hotimage="file='image/main/btn_conference_plan.png' "   pushedimage="file='image/main/btn_conference_plan.png' "   disabledimage="file='image/main/btn_conference_plan.png' "  keyboard="false" />
+						<HorizontalLayout />
+					</HorizontalLayout >
+					<HorizontalLayout  />
+				</VerticalLayout >
+			</VerticalLayout>
+			<VerticalLayout >
+				<VerticalLayout height="60" bkcolor="#11FFFFFF" >
+					<HorizontalLayout />
+					<HorizontalLayout height="24" >
+						<HorizontalLayout width="60" />
+						<Button width="65" style="loginbtn_style" keyboard="false" text="我的会议" font="1" textcolor="#FFFFFFFF" disabledtextcolor="#FFFFFFFF" />
+						<HorizontalLayout width="20" />
+						<Button width="65" style="loginbtn_style" keyboard="false" text="录像文件" font="1" textcolor="#FFFFFFFF" disabledtextcolor="#FFFFFFFF" enabled="false" />
+						<HorizontalLayout width="20" />
+						<Button width="40" style="loginbtn_style" keyboard="false" text="刷新" font="1" textcolor="#FFFFFFFF" disabledtextcolor="#FFFFFFFF" enabled="false" />					
+					</HorizontalLayout>
+					<HorizontalLayout />
+				</VerticalLayout >
+				<VerticalLayout name="lay_conf_list" vscrollbar="true"  >
+				</VerticalLayout >
+			</VerticalLayout>
+			<VerticalLayout >
+				<Label font="0" align="center" valign="vcenter" textcolor="#FFFF0000" text="联系人 功能未开发" />
+			</VerticalLayout>
+			<VerticalLayout >
+				<Label font="0" align="center" valign="vcenter" textcolor="#FFFF0000" text="聊天 功能未开发" />
+			</VerticalLayout>
+		</TabLayout>
+		<VerticalLayout height="80" bkcolor="#FF26303A" >
+			<HorizontalLayout />
+			<HorizontalLayout name="tab_view" height="40">
+				<HorizontalLayout >
+					<HorizontalLayout />
+					<Option name="tabitem_view_home"     	width="30" normalimage="file='image/main/tab_home.png' "   hotimage="file='image/main/tab_home.png' "   pushedimage="file='image/main/tab_home.png' "   disabledimage="file='image/main/tab_home.png' "  keyboard="false" group="tab_view" selected="true"/>
+					<HorizontalLayout />
+				</HorizontalLayout>
+				<HorizontalLayout >
+					<HorizontalLayout />
+					<Option name="tabitem_view_conference" 	width="30" normalimage="file='image/main/tab_conference.png' "   hotimage="file='image/main/tab_conference.png' "   pushedimage="file='image/main/tab_conference.png' "   disabledimage="file='image/main/tab_conference.png' "  keyboard="false" group="tab_view" />
+					<HorizontalLayout />
+				</HorizontalLayout>
+				<HorizontalLayout >
+					<HorizontalLayout />
+					<Option name="tabitem_view_contacts"    width="30" normalimage="file='image/main/tab_contacts.png' "   hotimage="file='image/main/tab_contacts.png' "   pushedimage="file='image/main/tab_contacts.png' "   disabledimage="file='image/main/tab_contacts.png' "  keyboard="false" group="tab_view" />
+					<HorizontalLayout />
+				</HorizontalLayout>
+				<HorizontalLayout >
+					<HorizontalLayout />
+					<Option name="tabitem_view_chat"     	width="30" normalimage="file='image/main/tab_chat.png' "   hotimage="file='image/main/tab_chat.png' "   pushedimage="file='image/main/tab_chat.png' "   disabledimage="file='image/main/tab_chat.png' "  keyboard="false" group="tab_view" />	
+					<HorizontalLayout />
+				</HorizontalLayout>
+			</HorizontalLayout >
+			<HorizontalLayout />
+		</VerticalLayout>
+	</VerticalLayout>
+</Window>

@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Windows>
+<!-- 进度 -->
+	<VerticalLayout >
+		<VerticalLayout width="600" height="350" bkimage="file='uninstall_bg2.png'">
+		</VerticalLayout>
+		<VerticalLayout height="70" bkimage="file='bgbottom.png' corner='10,0,10,10'" >
+			<Slider name="slrUnInstProgress" padding="60,23,0,0" height="24" width="480" mouse="false" bkimage="file='process.png' source='1,1,10,10' corner='2,2,2,2'" foreimage="file='process.png' source='11,1,20,10' corner='2,2,2,2'" thumbsize="0,0" />
+		</VerticalLayout>
+	</VerticalLayout>	
+</Windows>

@@ -1,0 +1,11 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Windows>
+<!-- 完成 -->
+	<VerticalLayout >
+		<VerticalLayout width="600" height="350" bkimage="file='uninstall_bg3.png'">
+		</VerticalLayout>
+		<VerticalLayout height="70" bkimage="file='bgbottom.png' corner='10,0,10,10'" >	
+			<Button name="btnUninstalled" padding="250,19,0,0" width="93" height="32" normalimage="file='button.png' source='0,1,50,35' corner='3,3,3,3'" hotimage="file='button.png' source='51,1,101,35' corner='3,3,3,3'" pushedimage="file='button.png' source='102,1,152,35' corner='3,3,3,3' " />
+		</VerticalLayout>
+	</VerticalLayout>
+</Windows>
